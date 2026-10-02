@@ -24,8 +24,8 @@ jobs:
         run: pip install Pillow
       - name: Assemble icon.svg from parts
         run: |
-          cat icons/part1.txt icons/part2.txt icons/part3.txt icons/part4.txt icons/part5.txt icons/part6.txt icons/part7.txt icons/part8.txt > icons/icon.svg
-          rm icons/part1.txt icons/part2.txt icons/part3.txt icons/part4.txt icons/part5.txt icons/part6.txt icons/part7.txt icons/part8.txt
+          cat icons/part??.txt > icons/icon.svg
+          rm icons/part??.txt
       - name: Extract embedded image and render PNG icons
         run: |
           python3 - <<'EOF'
