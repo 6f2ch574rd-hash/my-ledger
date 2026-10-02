@@ -1,0 +1,31 @@
+name: Generate PNG icons
+
+on:
+  push:
+    paths:
+      - 'icons/icon.svg'
+      - '.github/workflows/icons.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  icons:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install SVG renderer
+        run: sudo apt-get update && sudo apt-get install -y librsvg2-bin
+      - name: Render PNG icons
+        run: |
+          rsvg-convert -w 180 -h 180 icons/icon.svg -o icons/icon-180.png
+          rsvg-convert -w 192 -h 192 icons/icon.svg -o icons/icon-192.png
+          rsvg-convert -w 512 -h 512 icons/icon.svg -o icons/icon-512.png
+      - name: Commit generated icons
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add icons/icon-180.png icons/icon-192.png icons/icon-512.png
+          git diff --staged --quiet || git commit -m "chore: generate PNG icons from SVG"
+          git push
