@@ -4,6 +4,7 @@ on:
   push:
     paths:
       - 'icons/icon.svg'
+      - 'icons/part*.txt'
       - '.github/workflows/icons.yml'
   workflow_dispatch:
 
@@ -21,6 +22,10 @@ jobs:
           python-version: '3.12'
       - name: Install Pillow
         run: pip install Pillow
+      - name: Assemble icon.svg from parts
+        run: |
+          cat icons/part1.txt icons/part2.txt icons/part3.txt > icons/icon.svg
+          rm icons/part1.txt icons/part2.txt icons/part3.txt
       - name: Extract embedded image and render PNG icons
         run: |
           python3 - <<'EOF'
