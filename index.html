@@ -389,7 +389,10 @@ label{font-size:13px;color:#666;font-weight:600;}
 const $=id=>document.getElementById(id);
 const LS={get:(k,d)=>{try{const v=localStorage.getItem(k);return v?JSON.parse(v):d;}catch(e){return d;}},set:(k,v)=>localStorage.setItem(k,JSON.stringify(v))};
 function uid(){return (crypto.randomUUID?crypto.randomUUID():'id-'+Date.now()+'-'+Math.random().toString(16).slice(2));}
-function today(){return new Date().toISOString().slice(0,10);}
+function pad2(n){return String(n).padStart(2,'0');}
+function fmtYMD(d){return d.getFullYear()+'-'+pad2(d.getMonth()+1)+'-'+pad2(d.getDate());}
+function fmtYM(d){return d.getFullYear()+'-'+pad2(d.getMonth()+1);}
+function today(){return fmtYMD(new Date());}
 function nowTs(){return Date.now();}
 function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
 function fmt(n){return 'NT$'+Number(n||0).toLocaleString('zh-TW',{maximumFractionDigits:2});}
@@ -505,7 +508,7 @@ function renderBookSelect(){
 function switchBook(id){activeId=id;saveBooks();refreshAll();toast('已切換帳本');}
 function renderHome(){
   renderBookSelect();
-  const d=D(),m=new Date().toISOString().slice(0,7);
+  const d=D(),m=fmtYM(new Date());
   const rows=d.tx.filter(r=>r.date.startsWith(m));
   let exp=0,inc=0;rows.forEach(r=>r.type==='expense'?exp+=r.amount:inc+=r.amount);
   $('heroMonth').textContent=new Date().getFullYear()+' 年 '+(new Date().getMonth()+1)+' 月';
@@ -537,10 +540,10 @@ function txRow(r){
 }
 
 /* ================= 明細 ================= */
-let listCursor=new Date().toISOString().slice(0,7),listFilter='all';
+let listCursor=fmtYM(new Date()),listFilter='all';
 function shiftMonth(d){
   const [y,m]=listCursor.split('-').map(Number);
-  listCursor=new Date(y,m-1+d,1).toISOString().slice(0,7);renderList();
+  listCursor=fmtYM(new Date(y,m-1+d,1));renderList();
 }
 function setFilter(f){listFilter=f;
   document.querySelectorAll('#filterChips .chip').forEach(c=>c.classList.toggle('on',c.dataset.f===f));
@@ -581,9 +584,9 @@ function setRange(r,btn){
 }
 function statPeriod(){
   const now=new Date(),y=now.getFullYear();
-  if(statRange==='month')return[now.toISOString().slice(0,8)+'01',today()];
+  if(statRange==='month')return[fmtYM(now)+'-01',today()];
   if(statRange==='lastmonth'){const d=new Date(y,now.getMonth()-1,1);
-    return[d.toISOString().slice(0,8)+'01',new Date(y,now.getMonth(),0).toISOString().slice(0,10)];}
+    return[fmtYM(d)+'-01',fmtYMD(new Date(y,now.getMonth(),0))];}
   if(statRange==='year')return[y+'-01-01',today()];
   if(statRange==='custom')return[$('rStart').value||'2000-01-01',$('rEnd').value||today()];
   return['2000-01-01','2999-12-31'];
@@ -628,7 +631,7 @@ function renderStats(){
     }).join('');
   }
   const months=[];const now=new Date();
-  for(let k=5;k>=0;k--)months.push(new Date(now.getFullYear(),now.getMonth()-k,1).toISOString().slice(0,7));
+  for(let k=5;k>=0;k--)months.push(fmtYM(new Date(now.getFullYear(),now.getMonth()-k,1)));
   const mv=months.map(m=>D().tx.filter(r=>r.type==='expense'&&r.date.startsWith(m)).reduce((s,r)=>s+r.amount,0));
   const max=Math.max(...mv,1),W=320,H=150,bw=W/6;
   $('trendBox').innerHTML=`<svg viewBox="0 0 ${W} ${H+26}" style="width:100%;">`+
