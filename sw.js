@@ -1,5 +1,5 @@
-/* 我的記帳本 — 離線快取 */
-const CACHE = 'my-ledger-v1';
+/* 我的記帳本 — 離線快取 v2（網路優先，確保更新即時生效） */
+const CACHE = 'my-ledger-v2';
 const CORE = [
   './',
   './index.html',
@@ -23,13 +23,17 @@ self.addEventListener('activate', e => {
 self.addEventListener('fetch', e => {
   const req = e.request;
   if (req.method !== 'GET') return;
-  // App 殼：快取優先，更新時背景更新
+  // App 殼：網路優先（離線才用快取）→ 每次開啟都拿到最新版
   if (req.mode === 'navigate' || req.url.endsWith('.html') || req.url.endsWith('/')) {
     e.respondWith(
       caches.open(CACHE).then(async cache => {
         const cached = await cache.match('./index.html');
-        const network = fetch(req).then(res => { if (res && res.status === 200) cache.put('./index.html', res.clone()); return res; }).catch(() => cached);
-        return cached || network;
+        return fetch(req)
+          .then(res => {
+            if (res && res.status === 200) cache.put('./index.html', res.clone());
+            return res;
+          })
+          .catch(() => cached);
       })
     );
     return;
