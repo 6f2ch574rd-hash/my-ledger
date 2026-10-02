@@ -22,9 +22,9 @@
   <!-- 兩條橫線 -->
   <rect x="202" y="176" width="150" height="16" rx="8" fill="#C65D77"/>
   <rect x="202" y="222" width="110" height="12" rx="6" fill="#F5C451"/>
-  <!-- $ -->
-  <text x="224" y="330" text-anchor="middle" dominant-baseline="central" font-family="'DejaVu Sans','Helvetica Neue',sans-serif" font-size="158" font-weight="700" fill="#C65D77">$</text>
-  <!-- 金條堆：1/3 跨出帳本右緣 -->
+  <!-- $：右移並微縮，四周留白不碰任何東西 -->
+  <text x="238" y="322" text-anchor="middle" dominant-baseline="central" font-family="'DejaVu Sans','Helvetica Neue',sans-serif" font-size="140" font-weight="700" fill="#C65D77">$</text>
+  <!-- 金條堆：回原本位置，1/3 跨出帳本右緣 -->
   <rect x="313" y="362" width="64" height="40" rx="7" fill="#C0882C"/>
   <rect x="313" y="357" width="64" height="35" rx="7" fill="url(#bar)"/>
   <rect x="383" y="362" width="64" height="40" rx="7" fill="#C0882C"/>
