@@ -15,13 +15,25 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Install SVG renderer
-        run: sudo apt-get update && sudo apt-get install -y librsvg2-bin
-      - name: Render PNG icons
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install Pillow
+        run: pip install Pillow
+      - name: Extract embedded image and render PNG icons
         run: |
-          rsvg-convert -w 180 -h 180 icons/icon.svg -o icons/icon-180.png
-          rsvg-convert -w 192 -h 192 icons/icon.svg -o icons/icon-192.png
-          rsvg-convert -w 512 -h 512 icons/icon.svg -o icons/icon-512.png
+          python3 - <<'EOF'
+          import base64, re, io
+          from PIL import Image
+          svg = open('icons/icon.svg', encoding='utf-8').read()
+          m = re.search(r'base64,([A-Za-z0-9+/=]+)', svg)
+          assert m, 'no embedded base64 image found'
+          data = base64.b64decode(m.group(1))
+          im = Image.open(io.BytesIO(data)).convert('RGBA')
+          for s in (180, 192, 512):
+              im.resize((s, s), Image.LANCZOS).save(f'icons/icon-{s}.png')
+          EOF
       - name: Commit generated icons
         run: |
           git config user.name "github-actions[bot]"
