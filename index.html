@@ -51,7 +51,8 @@ label{font-size:13px;color:#666;font-weight:600;}
 .row-split{display:grid;grid-template-columns:minmax(0,3fr) minmax(0,2fr);gap:16px;}
 .row-split>*{min-width:0;max-width:none;flex:none;}
 .row>* input,.row>* select{display:block;min-width:0;width:100%;}
-#fDate,#fAccount{padding:8px 10px;margin:4px 0 10px;height:auto;min-height:40px;font-size:16px;}
+#fDate{padding:5px 12px;margin:4px 0 10px;height:34px;min-height:0;font-size:16px;box-sizing:border-box;}
+#fAccount{padding:8px 10px;margin:4px 0 10px;height:auto;min-height:40px;font-size:16px;}
 .seg{display:flex;border:1.5px solid var(--wine);border-radius:12px;overflow:hidden;margin-bottom:14px;}
 .seg button{flex:1;border:none;background:#fff;color:var(--wine);padding:11px;font-size:15px;font-weight:700;cursor:pointer;}
 .seg button.on-exp{background:var(--wine);color:#fff;}
@@ -357,6 +358,9 @@ label{font-size:13px;color:#666;font-weight:600;}
         <label class="sw"><input type="checkbox" id="hapticSwitch" onchange="toggleHaptic(this.checked)"><i></i></label></div>
       <div class="mini" id="hapticHint" style="margin-top:2px;"></div>
       <div class="mini" id="hapticInfo" style="margin-top:2px;color:var(--sub);"></div>
+      <div class="set-row" style="margin-top:8px;"><span>🔊 點擊音效</span>
+        <label class="sw"><input type="checkbox" id="soundSwitch" onchange="toggleSound(this.checked)"><i></i></label></div>
+      <div class="mini" style="margin-top:2px;color:var(--sub);">關閉後保留震動、靜音點擊</div>
       <label for="haptic-input" class="btn btn-sm btn-gray" style="margin-top:8px;" onclick="haptic();toast('已觸發震動測試');">測試震動</label>
     </div>
   </div>
@@ -462,6 +466,7 @@ function catName(cat){const i=String(cat).indexOf(' ');return i>0?cat.slice(i+1)
    後端自動偵測：iOS 17.4+ → 隱藏 switch 觸發 Taptic；Android/桌面 → 標準 vibrate。 */
 let _tickCtx=null;
 function playTick(){
+  if(settings.sound===false)return;
   try{
     if(!_tickCtx)_tickCtx=new (window.AudioContext||window.webkitAudioContext)();
     if(_tickCtx.state==='suspended')_tickCtx.resume();
@@ -948,6 +953,7 @@ function renderSettings(){
     $('bioHint').textContent='此瀏覽器不支援 Face ID（需 Safari 與 HTTPS 環境）';
   }
   $('hapticSwitch').checked=!!settings.haptic;
+  $('soundSwitch').checked=settings.sound!==false;
   $('hapticHint').textContent=settings.haptic
     ?'已開啟：按鈕互動時震動＋輕點音'
     :'已關閉：按鈕互動不會震動或發聲';
@@ -1050,6 +1056,11 @@ function clearPasscode(){
 function toggleHaptic(on){
   settings.haptic=!!on;LS.set('ll_settings',settings);
   haptic();renderSettings();toast(on?'已開啟按鈕震動反饋':'已關閉震動反饋');
+}
+function toggleSound(on){
+  settings.sound=!!on;LS.set('ll_settings',settings);
+  if(on)playTick();
+  renderSettings();toast(on?'已開啟點擊音效':'已關閉點擊音效（震動保留）');
 }
 function initLock(){
   if(!settings.pass)return;
@@ -1163,6 +1174,19 @@ window.addEventListener('DOMContentLoaded',()=>{
   initLock();
   renderAddForm();
   refreshAll();
+  // iOS 導航貼底補償：地址列收合時視口變高，用 visualViewport 校正讓導航永遠貼可見視口底
+  if(window.visualViewport){
+    const _nav=document.querySelector('.nav');
+    const _fixNav=()=>{
+      try{
+        const off=Math.max(0,window.innerHeight-window.visualViewport.height);
+        _nav.style.bottom=off+'px';
+      }catch(e){}
+    };
+    window.visualViewport.addEventListener('resize',_fixNav);
+    window.visualViewport.addEventListener('scroll',_fixNav);
+    _fixNav();
+  }
   requestPersistentStorage();
   if('serviceWorker' in navigator && location.protocol.startsWith('http')){
     navigator.serviceWorker.register('./sw.js').catch(()=>{});
