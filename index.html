@@ -45,8 +45,9 @@ h2.app-title{color:var(--wine);margin:14px 4px 10px;font-size:22px;display:flex;
 input,select{width:100%;padding:11px 12px;margin:5px 0 12px;border:1px solid #ddd;border-radius:10px;font-size:16px;font-family:inherit;background:#fff;color:var(--ink);min-width:0;}
 input:focus,select:focus{outline:none;border-color:var(--wine);}
 label{font-size:13px;color:#666;font-weight:600;}
-.row{display:flex;gap:10px;}
-.row>*{flex:1;min-width:0;}
+.row{display:flex;gap:10px;align-items:flex-start;}
+.row>*{flex:1 1 0;min-width:0;max-width:calc(50% - 5px);}
+.row>* input,.row>* select{display:block;min-width:0;width:100%;}
 .seg{display:flex;border:1.5px solid var(--wine);border-radius:12px;overflow:hidden;margin-bottom:14px;}
 .seg button{flex:1;border:none;background:#fff;color:var(--wine);padding:11px;font-size:15px;font-weight:700;cursor:pointer;}
 .seg button.on-exp{background:var(--wine);color:#fff;}
@@ -478,9 +479,8 @@ async function toggleBio(on){
     renderSettings();toast('已關閉 Face ID 解鎖');
   }
 }
-async function unlockBio(){
-  if(!settings.bioCred){toast('尚未設定 Face ID');return;}
-  haptic();
+async function doBioUnlock(silent){
+  if(!settings.bioCred){if(!silent)toast('尚未設定 Face ID');return;}
   try{
     const ch=new Uint8Array(32);crypto.getRandomValues(ch);
     await navigator.credentials.get({publicKey:{
@@ -490,8 +490,9 @@ async function unlockBio(){
       userVerification:'required',timeout:60000
     }});
     $('lockScreen').classList.remove('show');
-  }catch(e){toast('Face ID 驗證失敗');haptic();}
+  }catch(e){if(!silent)toast('Face ID 驗證失敗');haptic();}
 }
+function unlockBio(){haptic();doBioUnlock(false);}
 
 /* ================= 預設資料 ================= */
 const DEF_EXP=['🍔 餐飲','🚌 交通','🛒 購物','🏠 居家','🎮 娛樂','💊 醫療','📚 學習','✈️ 旅遊','🎁 送禮','📱 訂閱','🧾 其他'];
@@ -742,8 +743,7 @@ function renderStats(){
         <text x="${cx}" y="${cy+16}" text-anchor="middle" font-size="17" font-weight="800" fill="${pieType==='expense'?'#9E203E':'#27AE60'}">${total>=10000?(total/10000).toFixed(1)+'萬':Math.round(total).toLocaleString()}</text>
         <text x="${cx}" y="${cy+34}" text-anchor="middle" font-size="9" fill="#aaa">點圓環看分類詳情</text>`;
     }
-    $('donutBox').innerHTML=`<svg viewBox="0 0 220 220" style="width:100%;">${arcs}
-      ${center}<text x="${cx+52}" y="${cy+86}" text-anchor="middle" font-size="9" fill="#bbb" style="cursor:pointer" onclick="pieClick('')">× 清空</text></svg>`;
+    $('donutBox').innerHTML=`<svg viewBox="0 0 220 220" style="width:100%;">${arcs}${center}</svg>`;
     $('rankBox').innerHTML=entries.map((en,i)=>{
       const pct=en[1]/total*100;
       const sel=selPieCat===en[0]?'outline:2px solid '+colors[i%colors.length]+';outline-offset:-1px;border-radius:8px;':'';
@@ -827,8 +827,8 @@ function renderSettings(){
   }
   $('hapticSwitch').checked=!!settings.haptic;
   $('hapticHint').textContent=('vibrate' in navigator)
-    ?'開啟後點按主要按鈕會有輕微震動'
-    :'iPhone 的 Safari 未開放震動 API，此開關在 Android／桌面瀏覽器有效';
+    ?(settings.haptic?'已開啟：按鈕互動時輕微震動':'已關閉：按鈕互動不會震動')
+    :'此瀏覽器不支援震動 API（iOS 17.4 以上 Safari／PWA 已支援）';
   $('acctMgrBox').innerHTML=D().accounts.map((a,i)=>`
     <div class="acct-row"><span>${a.icon} ${esc(a.name)} <span class="mini">開戶 ${a.opening||0}</span></span>
     <button class="del-x" onclick="delAccount(${i})">刪</button></div>`).join('')
@@ -942,6 +942,9 @@ function initLock(){
       else{buf='';draw();toast('密碼錯誤');}
     },120);
   };
+  if(settings.bio&&settings.bioCred&&bioSupported()){
+    setTimeout(()=>doBioUnlock(true),350);
+  }
 }
 
 /* ================= 備份 ================= */
