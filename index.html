@@ -42,11 +42,11 @@ h2.app-title{color:var(--wine);margin:14px 4px 10px;font-size:22px;display:flex;
 .btn-ghost{background:#fff;color:var(--wine);border:1.5px solid var(--wine);}
 .btn-gray{background:#f0f0f2;color:#333;}
 .btn-sm{width:auto;padding:7px 12px;font-size:13px;border-radius:8px;display:inline-block;}
-input,select{width:100%;padding:11px 12px;margin:5px 0 12px;border:1px solid #ddd;border-radius:10px;font-size:16px;font-family:inherit;background:#fff;color:var(--ink);}
+input,select{width:100%;padding:11px 12px;margin:5px 0 12px;border:1px solid #ddd;border-radius:10px;font-size:16px;font-family:inherit;background:#fff;color:var(--ink);min-width:0;}
 input:focus,select:focus{outline:none;border-color:var(--wine);}
 label{font-size:13px;color:#666;font-weight:600;}
 .row{display:flex;gap:10px;}
-.row>*{flex:1;}
+.row>*{flex:1;min-width:0;}
 .seg{display:flex;border:1.5px solid var(--wine);border-radius:12px;overflow:hidden;margin-bottom:14px;}
 .seg button{flex:1;border:none;background:#fff;color:var(--wine);padding:11px;font-size:15px;font-weight:700;cursor:pointer;}
 .seg button.on-exp{background:var(--wine);color:#fff;}
@@ -114,6 +114,28 @@ label{font-size:13px;color:#666;font-weight:600;}
 .lock .pad button{width:72px;height:72px;border-radius:50%;border:none;font-size:26px;background:rgba(255,255,255,.15);color:#fff;cursor:pointer;}
 .lock .pad button:active{background:rgba(255,255,255,.35);}
 .lock .pad button.sub{background:none;font-size:14px;}
+.lock .face-btn{margin-top:26px;border:1.5px solid rgba(255,255,255,.55);background:rgba(255,255,255,.12);color:#fff;
+  padding:12px 26px;border-radius:14px;font-size:16px;font-weight:600;cursor:pointer;display:none;}
+.lock .face-btn:active{background:rgba(255,255,255,.28);}
+.set-row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 0;border-bottom:1px solid var(--line);}
+.set-row:last-child{border-bottom:none;}
+.sw{position:relative;flex:0 0 52px;height:32px;display:inline-block;}
+.sw input{opacity:0;width:0;height:0;position:absolute;}
+.sw i{position:absolute;inset:0;border-radius:20px;background:#e3e3e8;transition:background .2s;}
+.sw i::after{content:"";position:absolute;left:3px;top:3px;width:26px;height:26px;border-radius:50%;background:#fff;
+  box-shadow:0 1px 4px rgba(0,0,0,.25);transition:left .2s;}
+.sw input:checked+i{background:var(--green);}
+.sw input:checked+i::after{left:23px;}
+#donutBox svg circle{cursor:pointer;}
+#donutBox svg circle:hover{opacity:.85;}
+.pie-detail{margin-top:12px;background:#faf5f5;border:1px solid #f0dcdc;border-radius:12px;padding:12px 14px;font-size:13px;}
+.pie-detail .pd-head{display:flex;align-items:center;gap:8px;font-weight:700;color:var(--wine);padding-bottom:8px;border-bottom:1px solid #f0dcdc;}
+.pie-detail .pd-head b{margin-left:auto;}
+.pie-detail .pd-row{display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px dashed #f3e3e3;font-size:13px;}
+.pie-detail .pd-row:last-child{border-bottom:none;}
+.pie-detail .pd-row .d{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.pie-detail .pd-row .dt{color:#999;flex:0 0 52px;font-size:12px;}
+.pie-detail .pd-row b{margin-left:auto;color:#333;}
 .toast{position:fixed;top:calc(14px + env(safe-area-inset-top));left:50%;transform:translateX(-50%);
   background:rgba(40,40,40,.92);color:#fff;padding:10px 18px;border-radius:20px;font-size:14px;z-index:1200;
   max-width:88%;text-align:center;animation:tin .2s;}
@@ -133,6 +155,7 @@ label{font-size:13px;color:#666;font-weight:600;}
   <div style="font-size:20px;font-weight:700;margin-top:10px;">我的記帳本</div>
   <div class="dots" id="lockDots"><i></i><i></i><i></i><i></i></div>
   <div class="pad" id="lockPad"></div>
+  <button class="face-btn" id="faceBtn" onclick="unlockBio()">🔓 Face ID 解鎖</button>
 </div>
 
 <div class="wrap">
@@ -271,7 +294,7 @@ label{font-size:13px;color:#666;font-weight:600;}
   </div>
 
   <div class="card">
-    <div class="card-head gray">近 6 個月支出趨勢</div>
+    <div class="card-head gray">近 6 個月支出趨勢（點柱看金額）</div>
     <div class="card-body"><div id="trendBox"></div></div>
   </div>
 </div>
@@ -313,6 +336,13 @@ label{font-size:13px;color:#666;font-weight:600;}
       <hr style="border:none;border-top:1px solid var(--line);margin:16px 0;">
       <button class="btn btn-sm btn-gray" id="passBtn" onclick="setPasscode()">🔒 設定／變更 4 位數密碼鎖</button>
       <button class="btn btn-sm btn-gray" style="margin-top:8px;display:none;" id="clearPassBtn" onclick="clearPasscode()">關閉密碼鎖</button>
+      <hr style="border:none;border-top:1px solid var(--line);margin:14px 0;">
+      <div class="set-row"><span>👤 Face ID 解鎖（搭配密碼）</span>
+        <label class="sw"><input type="checkbox" id="bioSwitch" onchange="toggleBio(this.checked)"><i></i></label></div>
+      <div class="mini" id="bioHint" style="margin-top:2px;"></div>
+      <div class="set-row" style="margin-top:8px;"><span>📳 按鈕震動反饋</span>
+        <label class="sw"><input type="checkbox" id="hapticSwitch" onchange="toggleHaptic(this.checked)"><i></i></label></div>
+      <div class="mini" id="hapticHint" style="margin-top:2px;"></div>
     </div>
   </div>
 
@@ -401,6 +431,68 @@ function toast(msg,ms=1900){const t=document.createElement('div');t.className='t
 function catEmoji(cat){const i=String(cat).indexOf(' ');return i>0?cat.slice(0,i):'🧾';}
 function catName(cat){const i=String(cat).indexOf(' ');return i>0?cat.slice(i+1):cat;}
 
+/* ================= 觸覺反饋（震動） ================= */
+function haptic(){
+  if(!settings.haptic)return;
+  try{if(navigator.vibrate)navigator.vibrate(12);}catch(e){}
+}
+
+/* ================= Face ID / Touch ID（WebAuthn） ================= */
+function bioSupported(){
+  return !!(window.isSecureContext&&navigator.credentials&&navigator.credentials.create
+    &&navigator.credentials.get&&window.PublicKeyCredential!==undefined);
+}
+function b64urlToBytes(s){
+  const b=atob(s.replace(/-/g,'+').replace(/_/g,'/'));
+  const u=new Uint8Array(b.length);
+  for(let i=0;i<b.length;i++)u[i]=b.charCodeAt(i);
+  return u;
+}
+function bytesToB64url(u){
+  let s='';const chunk=0x8000;
+  for(let i=0;i<u.length;i+=chunk)s+=String.fromCharCode.apply(null,u.subarray(i,i+chunk));
+  return btoa(s).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
+}
+async function toggleBio(on){
+  haptic();
+  if(on){
+    if(!bioSupported()){toast('此瀏覽器不支援 Face ID／Touch ID');$('bioSwitch').checked=false;return;}
+    if(!settings.pass){toast('請先設定 4 位數密碼鎖');$('bioSwitch').checked=false;return;}
+    if(settings.bioCred){settings.bio=true;LS.set('ll_settings',settings);renderSettings();toast('已啟用 Face ID 解鎖');return;}
+    try{
+      const ch=new Uint8Array(32);crypto.getRandomValues(ch);
+      const uid=new Uint8Array(16);crypto.getRandomValues(uid);
+      const cred=await navigator.credentials.create({publicKey:{
+        challenge:ch,
+        rp:{id:location.hostname,name:'我的記帳本'},
+        user:{id:uid,name:settings.pass,displayName:'我的記帳本'},
+        pubKeyCredParams:[{type:'public-key',alg:-7},{type:'public-key',alg:-257}],
+        authenticatorSelection:{authenticatorAttachment:'platform',userVerification:'required',residentKey:'preferred'},
+        timeout:60000,attestation:'none'
+      }});
+      settings.bioCred=cred.id;settings.bio=true;LS.set('ll_settings',settings);
+      renderSettings();toast('✅ 已啟用 Face ID 解鎖');
+    }catch(e){toast('啟用失敗（已取消或裝置不支援）');$('bioSwitch').checked=false;}
+  }else{
+    settings.bio=false;settings.bioCred=null;LS.set('ll_settings',settings);
+    renderSettings();toast('已關閉 Face ID 解鎖');
+  }
+}
+async function unlockBio(){
+  if(!settings.bioCred){toast('尚未設定 Face ID');return;}
+  haptic();
+  try{
+    const ch=new Uint8Array(32);crypto.getRandomValues(ch);
+    await navigator.credentials.get({publicKey:{
+      challenge:ch,
+      rpId:location.hostname,
+      allowCredentials:[{type:'public-key',id:b64urlToBytes(settings.bioCred)}],
+      userVerification:'required',timeout:60000
+    }});
+    $('lockScreen').classList.remove('show');
+  }catch(e){toast('Face ID 驗證失敗');haptic();}
+}
+
 /* ================= 預設資料 ================= */
 const DEF_EXP=['🍔 餐飲','🚌 交通','🛒 購物','🏠 居家','🎮 娛樂','💊 醫療','📚 學習','✈️ 旅遊','🎁 送禮','📱 訂閱','🧾 其他'];
 const DEF_INC=['💰 薪水','🎁 紅包','📈 投資','💼 獎金','🧾 其他'];
@@ -415,6 +507,10 @@ if(!books.find(b=>b.id===activeId)){activeId=books[0].id;LS.set('ll_active',acti
 let DB=LS.get('ll_db',{});
 if(!DB[activeId]){DB[activeId]=freshBookData();LS.set('ll_db',DB);}
 let settings=LS.get('ll_settings',{pass:null});
+if(settings.bio===undefined)settings.bio=false;
+if(settings.bioCred===undefined)settings.bioCred=null;
+if(settings.haptic===undefined)settings.haptic=false;
+LS.set('ll_settings',settings);
 function saveDB(){LS.set('ll_db',DB);}
 function saveBooks(){LS.set('ll_books',books);LS.set('ll_active',activeId);}
 function book(){return books.find(b=>b.id===activeId);}
@@ -422,6 +518,7 @@ function D(){return DB[activeId];}
 
 /* ================= 導航 ================= */
 function goPage(pid,btn){
+  haptic();
   document.querySelectorAll('.nav button').forEach(b=>b.classList.remove('active'));
   if(typeof btn==='number')btn=document.querySelector(`.nav button[data-p="${pid}"]`);
   if(btn&&btn.dataset)btn.classList.add('active');
@@ -438,6 +535,7 @@ function goPage(pid,btn){
 /* ================= 記一筆 ================= */
 let curType='expense',selCat=null,editingId=null;
 function setType(t){
+  haptic();
   curType=t;const seg=$('typeSeg');
   seg.classList.toggle('inc',t==='income');
   seg.children[0].className=t==='expense'?'on-exp':'';
@@ -453,7 +551,7 @@ function renderCatGrid(){
     return `<div class="cat-cell ${sel}" onclick="pickCat('${esc(c)}')"><span class="e">${catEmoji(c)}</span>${esc(catName(c))}</div>`;
   }).join('');
 }
-function pickCat(c){selCat=c;renderCatGrid();}
+function pickCat(c){haptic();selCat=c;renderCatGrid();}
 function renderAccounts(sel){
   $('fAccount').innerHTML=D().accounts.map(a=>`<option value="${a.id}" ${sel===a.id?'selected':''}>${a.icon} ${esc(a.name)}</option>`).join('');
 }
@@ -464,6 +562,7 @@ function renderAddForm(){
 }
 function resetForm(){renderAddForm();toast('表單已清空');}
 function doSave(){
+  haptic();
   const d=D();
   const amount=Number($('fAmount').value.replace(/[^\d.]/g,''));
   if(!amount||amount<=0){toast('請輸入正確金額');return;}
@@ -492,6 +591,7 @@ function editTx(id){
   goPage('pageAdd',document.querySelector('.nav button[data-p="pageAdd"]'));
 }
 function deleteEditing(){
+  haptic();
   if(!editingId)return;
   if(!confirm('確定刪除這筆記錄？'))return;
   D().tx=D().tx.filter(x=>x.id!==editingId);
@@ -505,7 +605,7 @@ function renderBookSelect(){
   $('bookSelect').innerHTML=books.map(b=>
     `<option value="${b.id}" ${b.id===activeId?'selected':''}>${esc(b.name)}</option>`).join('');
 }
-function switchBook(id){activeId=id;saveBooks();refreshAll();toast('已切換帳本');}
+function switchBook(id){haptic();activeId=id;saveBooks();refreshAll();toast('已切換帳本');}
 function renderHome(){
   renderBookSelect();
   const d=D(),m=fmtYM(new Date());
@@ -542,10 +642,11 @@ function txRow(r){
 /* ================= 明細 ================= */
 let listCursor=fmtYM(new Date()),listFilter='all';
 function shiftMonth(d){
+  haptic();
   const [y,m]=listCursor.split('-').map(Number);
   listCursor=fmtYM(new Date(y,m-1+d,1));renderList();
 }
-function setFilter(f){listFilter=f;
+function setFilter(f){haptic();listFilter=f;
   document.querySelectorAll('#filterChips .chip').forEach(c=>c.classList.toggle('on',c.dataset.f===f));
   renderList();
 }
@@ -574,8 +675,9 @@ function renderList(){
 }
 
 /* ================= 統計 ================= */
-let pieType='expense',statRange='month';
+let pieType='expense',statRange='month',selPieCat=null,selTrend=null;
 function setRange(r,btn){
+  haptic();
   statRange=r;
   document.querySelectorAll('#rangeBtns button').forEach(b=>b.classList.remove('on'));
   btn.classList.add('on');
@@ -591,11 +693,16 @@ function statPeriod(){
   if(statRange==='custom')return[$('rStart').value||'2000-01-01',$('rEnd').value||today()];
   return['2000-01-01','2999-12-31'];
 }
-function switchPie(t){pieType=t;
+function switchPie(t){haptic();selPieCat=null;pieType=t;
   $('pieExpBtn').style.background=t==='expense'?'var(--wine)':'#f0f0f2';
   $('pieExpBtn').style.color=t==='expense'?'#fff':'#333';
   $('pieIncBtn').style.background=t==='income'?'var(--green)':'#f0f0f2';
   $('pieIncBtn').style.color=t==='income'?'#fff':'#333';
+  renderStats();
+}
+function pieClick(cat){
+  haptic();
+  selPieCat=(!cat||cat===selPieCat)?null:cat;
   renderStats();
 }
 function renderStats(){
@@ -616,31 +723,60 @@ function renderStats(){
     const R=88,C=2*Math.PI*R,cx=110,cy=110;let acc=0;
     const arcs=entries.map((en,i)=>{
       const frac=en[1]/total,len=frac*C,gap=entries.length>1?2:0;
+      const dim=selPieCat&&selPieCat!==en[0]?' opacity="0.28"':'';
       const seg=`<circle cx="${cx}" cy="${cy}" r="${R}" fill="none" stroke="${colors[i%colors.length]}"
         stroke-width="34" stroke-dasharray="${Math.max(len-gap,0)} ${C-len+gap}" stroke-dashoffset="${-acc*C}"
-        transform="rotate(-90 ${cx} ${cy})"><title>${esc(en[0])} ${fmt(en[1])}</title></circle>`;
+        transform="rotate(-90 ${cx} ${cy})"${dim} onclick="pieClick('${esc(en[0])}')">
+        <title>${esc(en[0])} ${fmt(en[1])}（${(frac*100).toFixed(1)}%）</title></circle>`;
       acc+=frac;return seg;
     }).join('');
+    let center;
+    if(selPieCat){
+      const en=entries.find(x=>x[0]===selPieCat);
+      const cnt=rows.filter(r=>r.type===pieType&&r.category===selPieCat).length;
+      center=`<text x="${cx}" y="${cy-14}" text-anchor="middle" font-size="12" fill="#888">${esc(catName(selPieCat))}</text>
+        <text x="${cx}" y="${cy+6}" text-anchor="middle" font-size="15" font-weight="800" fill="${pieType==='expense'?'#9E203E':'#27AE60'}">${fmt(en?en[1]:0).replace('NT$','')}</text>
+        <text x="${cx}" y="${cy+22}" text-anchor="middle" font-size="10" fill="#888">${en?((en[1]/total*100).toFixed(1)):'0'}%・${cnt}筆・點擊返回</text>`;
+    }else{
+      center=`<text x="${cx}" y="${cy-6}" text-anchor="middle" font-size="12" fill="#888">${pieType==='expense'?'總支出':'總收入'}</text>
+        <text x="${cx}" y="${cy+16}" text-anchor="middle" font-size="17" font-weight="800" fill="${pieType==='expense'?'#9E203E':'#27AE60'}">${total>=10000?(total/10000).toFixed(1)+'萬':Math.round(total).toLocaleString()}</text>
+        <text x="${cx}" y="${cy+34}" text-anchor="middle" font-size="9" fill="#aaa">點圓環看分類詳情</text>`;
+    }
     $('donutBox').innerHTML=`<svg viewBox="0 0 220 220" style="width:100%;">${arcs}
-      <text x="${cx}" y="${cy-6}" text-anchor="middle" font-size="12" fill="#888">${pieType==='expense'?'總支出':'總收入'}</text>
-      <text x="${cx}" y="${cy+16}" text-anchor="middle" font-size="17" font-weight="800" fill="${pieType==='expense'?'#9E203E':'#27AE60'}">${total>=10000?(total/10000).toFixed(1)+'萬':Math.round(total).toLocaleString()}</text></svg>`;
+      ${center}<text x="${cx+52}" y="${cy+86}" text-anchor="middle" font-size="9" fill="#bbb" style="cursor:pointer" onclick="pieClick('')">× 清空</text></svg>`;
     $('rankBox').innerHTML=entries.map((en,i)=>{
       const pct=en[1]/total*100;
-      return `<div class="rank-row"><div class="top"><span>${esc(en[0])} <span class="mini">${pct.toFixed(1)}%</span></span>
+      const sel=selPieCat===en[0]?'outline:2px solid '+colors[i%colors.length]+';outline-offset:-1px;border-radius:8px;':'';
+      return `<div class="rank-row" style="cursor:pointer;${sel}" onclick="pieClick('${esc(en[0])}')"><div class="top"><span>${esc(en[0])} <span class="mini">${pct.toFixed(1)}%</span></span>
         <b>${fmt(en[1])}</b></div><div class="bar"><i style="width:${pct}%;background:${colors[i%colors.length]};"></i></div></div>`;
     }).join('');
+    if(selPieCat){
+      const rowsSel=rows.filter(r=>r.type===pieType&&r.category===selPieCat).sort((a,b)=>b.date.localeCompare(a.date)||b.createdAt-a.createdAt);
+      $('rankBox').insertAdjacentHTML('beforeend',
+        `<div class="pie-detail"><div class="pd-head">${catEmoji(selPieCat)} ${esc(catName(selPieCat))}
+          <span class="mini">${rowsSel.length}筆</span><b>${fmt(rowsSel.reduce((s,r)=>s+r.amount,0))}</b>
+          <button class="del-x" onclick="pieClick('')">×</button></div>
+          ${rowsSel.slice(0,30).map(r=>`<div class="pd-row"><span class="dt">${r.date.slice(5).replace('-','/')}</span>
+            <span class="d">${esc(r.name)}</span><b>${r.type==='income'?'+':'-'}${fmt(r.amount).replace('NT$','')}</b></div>`).join('')
+          + (rowsSel.length>30?`<div class="mini" style="padding-top:6px;">僅顯示前 30 筆</div>`:'')}
+        </div>`);
+    }
   }
   const months=[];const now=new Date();
   for(let k=5;k>=0;k--)months.push(fmtYM(new Date(now.getFullYear(),now.getMonth()-k,1)));
   const mv=months.map(m=>D().tx.filter(r=>r.type==='expense'&&r.date.startsWith(m)).reduce((s,r)=>s+r.amount,0));
-  const max=Math.max(...mv,1),W=320,H=150,bw=W/6;
-  $('trendBox').innerHTML=`<svg viewBox="0 0 ${W} ${H+26}" style="width:100%;">`+
-    mv.map((v,i)=>{const h=Math.max(v/max*H,v?4:0);
-      return `<rect x="${i*bw+bw*0.22}" y="${H-h+6}" width="${bw*0.56}" height="${h}" rx="4" fill="${i===5?'#9E203E':'#E8A0A8'}"><title>${monthLabel(months[i])}：${fmt(v)}</title></rect>
-      <text x="${i*bw+bw/2}" y="${H+20}" text-anchor="middle" font-size="10" fill="#888">${Number(months[i].slice(5))}月</text>
-      ${v>=max*0.55?`<text x="${i*bw+bw/2}" y="${H-h+2}" text-anchor="middle" font-size="9" fill="#666">${v>=10000?(v/10000).toFixed(1)+'萬':Math.round(v/1000)+'k'}</text>`:''}`;
+  const max=Math.max(...mv,1),W=320,H=105,top=38,bw=W/6;
+  $('trendBox').innerHTML=`<svg viewBox="0 0 ${W} ${top+H+26}" style="width:100%;">`+
+    mv.map((v,i)=>{const h=Math.max(v/max*H,v?5:0);
+      const sel=selTrend===i,dim=selTrend!==null&&selTrend!==i;
+      return `<rect x="${i*bw+bw*0.22}" y="${top+H-h}" width="${bw*0.56}" height="${h}" rx="4"
+        fill="${i===5?'#9E203E':'#E8A0A8'}"${dim?' opacity="0.35"':''} style="cursor:pointer" onclick="trendClick(${i})">
+        <title>${monthLabel(months[i])}：${fmt(v)}</title></rect>
+        ${sel?`<text x="${i*bw+bw/2}" y="${top+H-h-7}" text-anchor="middle" font-size="11" font-weight="700" fill="${i===5?'#9E203E':'#b05a70'}">${v>=10000?(v/10000).toFixed(1)+'萬':Math.round(v).toLocaleString()}</text>`:''}
+        <text x="${i*bw+bw/2}" y="${top+H+20}" text-anchor="middle" font-size="10" fill="#888">${Number(months[i].slice(5))}月</text>`;
     }).join('')+`</svg>`;
 }
+function trendClick(i){haptic();selTrend=(selTrend===i)?null:i;renderStats();}
 
 /* ================= 設定：帳本 ================= */
 function openBookMgr(){renderBookMgr();$('bookSheet').classList.add('show');}
@@ -656,14 +792,16 @@ function renderBookMgr(){
   $('bookListBox').innerHTML=bookRowsHtml()+
     `<button class="btn btn-sm btn-wine" style="margin-top:10px;" onclick="createLocalBook()">＋ 新增一本帳</button>`;
 }
-function useBook(id){activeId=id;saveBooks();closeSheet('bookSheet');refreshAll();toast('已切換帳本');}
+function useBook(id){haptic();activeId=id;saveBooks();closeSheet('bookSheet');refreshAll();toast('已切換帳本');}
 function createLocalBook(){
+  haptic();
   const name=(prompt('新帳本名稱（例：旅行基金、小家庭）')||'').trim();if(!name)return;
   const b={id:uid(),name,createdAt:nowTs()};
   books.push(b);DB[b.id]=freshBookData();activeId=b.id;saveBooks();saveDB();
   closeSheet('bookSheet');refreshAll();toast('已建立帳本：'+name);
 }
 function removeBook(id){
+  haptic();
   if(books.length===1){toast('至少保留一本帳');return;}
   if(!confirm('刪除這本帳會一併刪除其中所有記錄，確定？'))return;
   books=books.filter(b=>b.id!==id);delete DB[id];
@@ -676,6 +814,21 @@ function renderSettings(){
   $('budgetInput').value=D().budget||'';
   $('passBtn').textContent=settings.pass?'🔒 變更 4 位數密碼鎖':'🔒 設定 4 位數密碼鎖';
   $('clearPassBtn').style.display=settings.pass?'inline-block':'none';
+  const bioOn=!!(settings.bio&&settings.bioCred);
+  $('bioSwitch').checked=bioOn;
+  if(bioSupported()){
+    $('bioSwitch').disabled=false;
+    $('bioHint').textContent=bioOn
+      ?'已啟用：鎖定畫面會出現「Face ID 解鎖」按鈕'
+      :(settings.pass?'使用 iPhone 的 Face ID／Touch ID 解鎖（需 Safari 開啟）':'先設定密碼鎖後即可啟用');
+  }else{
+    $('bioSwitch').disabled=true;$('bioSwitch').checked=false;
+    $('bioHint').textContent='此瀏覽器不支援 Face ID（需 Safari 與 HTTPS 環境）';
+  }
+  $('hapticSwitch').checked=!!settings.haptic;
+  $('hapticHint').textContent=('vibrate' in navigator)
+    ?'開啟後點按主要按鈕會有輕微震動'
+    :'iPhone 的 Safari 未開放震動 API，此開關在 Android／桌面瀏覽器有效';
   $('acctMgrBox').innerHTML=D().accounts.map((a,i)=>`
     <div class="acct-row"><span>${a.icon} ${esc(a.name)} <span class="mini">開戶 ${a.opening||0}</span></span>
     <button class="del-x" onclick="delAccount(${i})">刪</button></div>`).join('')
@@ -687,11 +840,13 @@ function renderSettings(){
   renderCatMgrList();renderBookMgr();renderDataSafety();
 }
 function addAccount(){
+  haptic();
   const name=$('newAcctName').value.trim(),icon=$('newAcctIcon').value.trim()||'💳',open=Number($('newAcctOpen').value)||0;
   if(!name){toast('請輸入帳戶名稱');return;}
   D().accounts.push({id:uid(),name,icon,opening:open});saveDB();renderSettings();toast('已新增帳戶');
 }
 function delAccount(i){
+  haptic();
   const a=D().accounts[i];
   if(D().tx.some(r=>r.account===a.id)){toast('這個帳戶已有記錄，建議保留');return;}
   if(!confirm('刪除帳戶「'+a.name+'」？'))return;
@@ -699,6 +854,7 @@ function delAccount(i){
 }
 let catMgrType='expense';
 function switchCatMgr(t,btn){
+  haptic();
   catMgrType=t;
   btn.parentElement.children[0].className=t==='expense'?'on-exp':'';
   btn.parentElement.children[1].className=t==='income'?'on-inc':'';
@@ -711,6 +867,7 @@ function renderCatMgrList(){
     `<span class="chip" style="padding-right:4px;">${esc(c)} <button class="del-x" style="font-size:13px;padding:0 4px;display:inline;" onclick="delCategory(${i})">×</button></span>`).join('');
 }
 function addCategory(){
+  haptic();
   const name=$('newCatName').value.trim(),emoji=$('newCatEmoji').value.trim();
   if(!name){toast('請輸入分類名稱');return;}
   const full=(emoji?emoji+' ':'')+name;
@@ -719,11 +876,12 @@ function addCategory(){
   arr.push(full);saveDB();$('newCatName').value='';$('newCatEmoji').value='';renderCatMgrList();toast('已新增分類');
 }
 function delCategory(i){
+  haptic();
   const arr=catMgrType==='expense'?D().catsExp:D().catsInc;
   if(arr.length<=1){toast('至少保留一個分類');return;}
   arr.splice(i,1);saveDB();renderCatMgrList();
 }
-function saveBudget(){D().budget=Number($('budgetInput').value)||0;saveDB();toast('預算已儲存');renderHome();}
+function saveBudget(){haptic();D().budget=Number($('budgetInput').value)||0;saveDB();toast('預算已儲存');renderHome();}
 function renderDataSafety(){
   // 永久儲存狀態
   const ps=$('persistStatus');
@@ -752,20 +910,31 @@ async function requestPersistentStorage(){
   }catch(e){}
 }
 function setPasscode(){
+  haptic();
   const p=prompt('輸入 4 位數密碼（留空取消）');
   if(p===null)return;
   if(!/^\d{4}$/.test(p)){toast('必須是 4 位數字');return;}
   settings.pass=p;LS.set('ll_settings',settings);renderSettings();toast('密碼鎖已設定');
 }
-function clearPasscode(){settings.pass=null;LS.set('ll_settings',settings);renderSettings();toast('已關閉密碼鎖');}
+function clearPasscode(){
+  haptic();
+  settings.pass=null;settings.bio=false;settings.bioCred=null;
+  LS.set('ll_settings',settings);renderSettings();toast('已關閉密碼鎖');
+}
+function toggleHaptic(on){
+  settings.haptic=!!on;LS.set('ll_settings',settings);
+  haptic();renderSettings();toast(on?'已開啟按鈕震動反饋':'已關閉震動反饋');
+}
 function initLock(){
   if(!settings.pass)return;
   $('lockScreen').classList.add('show');
+  $('faceBtn').style.display=(settings.bio&&settings.bioCred&&bioSupported())?'block':'none';
   let buf='';
   const draw=()=>[...$('lockDots').children].forEach((d,i)=>d.className=buf[i]?'fill':'');
   const keys=['1','2','3','4','5','6','7','8','9','C','0','⌫'];
   $('lockPad').innerHTML=keys.map(k=>`<button class="${k==='C'?'sub':''}" data-k="${k}">${k}</button>`).join('');
   $('lockPad').onclick=e=>{const k=e.target.dataset.k;if(!k)return;
+    haptic();
     if(k==='C')buf='';else if(k==='⌫')buf=buf.slice(0,-1);else if(buf.length<4)buf+=k;
     draw();
     if(buf.length===4)setTimeout(()=>{
