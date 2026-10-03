@@ -1,0 +1,64 @@
+text>`;
+    }).join('')+`</svg>`;
+}
+function trendClick(i){haptic();selTrend=(selTrend===i)?null:i;renderStats();}
+
+/* ================= 設定：帳本 ================= */
+function openBookMgr(){renderBookMgr();$('bookSheet').classList.add('show');}
+function closeSheet(id){$(id).classList.remove('show');}
+function bookRowsHtml(){
+  return books.map(b=>`
+    <div class="acct-row"><span>📓 ${esc(b.name)}${b.id===activeId?' <b class="mini" style="color:var(--wine)">使用中</b>':''}</span>
+      <span><button class="btn btn-sm btn-gray" onclick="useBook('${b.id}')">切換</button>
+      <button class="del-x" onclick="removeBook('${b.id}')">刪</button></span></div>`).join('');
+}
+function renderBookMgr(){
+  $('bookMgrList').innerHTML=bookRowsHtml();
+  $('bookListBox').innerHTML=bookRowsHtml()+
+    `<button class="btn btn-sm btn-wine" style="margin-top:10px;" onclick="createLocalBook()">＋ 新增一本帳</button>`;
+}
+function useBook(id){haptic();activeId=id;saveBooks();closeSheet('bookSheet');refreshAll();toast('已切換帳本');}
+function createLocalBook(){
+  haptic();
+  const name=(prompt('新帳本名稱（例：旅行基金、小家庭）')||'').trim();if(!name)return;
+  const b={id:uid(),name,createdAt:nowTs()};
+  books.push(b);DB[b.id]=freshBookData();activeId=b.id;saveBooks();saveDB();
+  closeSheet('bookSheet');refreshAll();toast('已建立帳本：'+name);
+}
+function removeBook(id){
+  haptic();
+  if(books.length===1){toast('至少保留一本帳');return;}
+  if(!confirm('刪除這本帳會一併刪除其中所有記錄，確定？'))return;
+  books=books.filter(b=>b.id!==id);delete DB[id];
+  if(activeId===id){activeId=books[0].id;}
+  saveBooks();saveDB();renderBookMgr();refreshAll();
+}
+
+/* ================= 設定：帳戶 / 分類 / 預算 / 密碼 ================= */
+function renderSettings(){
+  $('budgetInput').value=D().budget||'';
+  $('passBtn').textContent=settings.pass?'🔒 變更 4 位數密碼鎖':'🔒 設定 4 位數密碼鎖';
+  $('clearPassBtn').style.display=settings.pass?'inline-block':'none';
+  const bioOn=!!(settings.bio&&settings.bioCred);
+  $('bioSwitch').checked=bioOn;
+  if(bioSupported()){
+    $('bioSwitch').disabled=false;
+    $('bioHint').textContent=bioOn
+      ?'已啟用：鎖定畫面會出現「Face ID 解鎖」按鈕'
+      :(settings.pass?'使用 iPhone 的 Face ID／Touch ID 解鎖（需 Safari 開啟）':'先設定密碼鎖後即可啟用');
+  }else{
+    $('bioSwitch').disabled=true;$('bioSwitch').checked=false;
+    $('bioHint').textContent='此瀏覽器不支援 Face ID（需 Safari 與 HTTPS 環境）';
+  }
+  $('hapticSwitch').checked=!!settings.haptic;
+  $('hapticHint').textContent=settings.haptic
+    ?'已開啟：按鈕互動時震動＋輕點音（iOS 17.4 以上以系統觸覺回饋觸發）'
+    :'已關閉：按鈕互動不會震動或發聲（iOS 17.4 以上 Safari／PWA 有效）';
+  $('acctMgrBox').innerHTML=D().accounts.map((a,i)=>`
+    <div class="acct-row"><span>${a.icon} ${esc(a.name)} <span class="mini">開戶 ${a.opening||0}</span></span>
+    <button class="del-x" onclick="delAccount(${i})">刪</button></div>`).join('')
+    +`<div class="row" style="margin-top:10px;">
+      <input id="newAcctIcon" placeholder="😀" style="flex:0 0 56px;text-align:center;" maxlength="2">
+      <input id="newAcctName" placeholder="新帳戶名稱">
+      <input id="newAcctOpen" type="number" placeholder="初始額" style="flex:0 0 90px;">
+      <button class="btn btn-sm btn-wine" style="flex
