@@ -1,0 +1,63 @@
+s">
+  <div class="card">
+    <div class="card-head gray">📓 我的帳本</div>
+    <div class="card-body" id="bookListBox"></div>
+  </div>
+
+  <div class="card">
+    <div class="card-head gray">💳 帳戶管理（目前帳本）</div>
+    <div class="card-body" id="acctMgrBox"></div>
+  </div>
+
+  <div class="card">
+    <div class="card-head gray">🏷 分類管理（目前帳本）</div>
+    <div class="card-body">
+      <div class="seg" id="catMgrSeg" style="margin-bottom:10px;">
+        <button class="on-exp" onclick="switchCatMgr('expense',this)">支出分類</button>
+        <button onclick="switchCatMgr('income',this)">收入分類</button>
+      </div>
+      <div id="catMgrBox"></div>
+      <div class="row" style="margin-top:8px;">
+        <input id="newCatEmoji" placeholder="😀" style="flex:0 0 64px;text-align:center;" maxlength="2">
+        <input id="newCatName" placeholder="新分類名稱">
+        <button class="btn btn-sm btn-wine" style="flex:0 0 70px;" onclick="addCategory()">＋新增</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head gray">🎯 預算與安全</div>
+    <div class="card-body">
+      <label>每月支出預算（NT$，0＝不設定）</label>
+      <input type="number" id="budgetInput" inputmode="numeric">
+      <button class="btn btn-sm btn-wine" onclick="saveBudget()">儲存預算</button>
+      <hr style="border:none;border-top:1px solid var(--line);margin:16px 0;">
+      <button class="btn btn-sm btn-gray" id="passBtn" onclick="setPasscode()">🔒 設定／變更 4 位數密碼鎖</button>
+      <button class="btn btn-sm btn-gray" style="margin-top:8px;display:none;" id="clearPassBtn" onclick="clearPasscode()">關閉密碼鎖</button>
+      <hr style="border:none;border-top:1px solid var(--line);margin:14px 0;">
+      <div class="set-row"><span>👤 Face ID 解鎖（搭配密碼）</span>
+        <label class="sw"><input type="checkbox" id="bioSwitch" onchange="toggleBio(this.checked)"><i></i></label></div>
+      <div class="mini" id="bioHint" style="margin-top:2px;"></div>
+      <div class="set-row" style="margin-top:8px;"><span>📳 按鈕震動反饋</span>
+        <label class="sw"><input type="checkbox" id="hapticSwitch" onchange="toggleHaptic(this.checked)"><i></i></label></div>
+      <div class="mini" id="hapticHint" style="margin-top:2px;"></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head gray">🛡 資料保存</div>
+    <div class="card-body" style="line-height:1.8;font-size:13.5px;">
+      資料只存在這支手機中，<b>加入主畫面後保存等級接近一般 App</b>，正常使用不會憑空消失。請注意：
+      <ul style="margin:8px 0;padding-left:20px;">
+        <li>長按<b>刪除主畫面圖示</b>，資料會一併刪除。</li>
+        <li>「清除 Safari 網站資料」只會清網頁版；已加入主畫面的 App 是獨立空間，通常不受影響。</li>
+        <li><b>換手機或手機重置前</b>，請先匯出完整備份。</li>
+      </ul>
+      <div id="persistStatus" class="mini" style="background:#f7f7f9;border-radius:10px;padding:8px 10px;"></div>
+      <div id="backupStatus" class="mini" style="margin-top:6px;"></div>
+      <div class="hint-box" style="margin-bottom:0;">建議每月或大量記錄後，匯出一次 JSON 備份，存到 iCloud、LINE 自己的對話框或 E-mail。</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head gray">📦 備份與還原（
