@@ -45,8 +45,10 @@ h2.app-title{color:var(--wine);margin:14px 4px 10px;font-size:22px;display:flex;
 input,select{width:100%;padding:11px 12px;margin:5px 0 12px;border:1px solid #ddd;border-radius:10px;font-size:16px;font-family:inherit;background:#fff;color:var(--ink);min-width:0;}
 input:focus,select:focus{outline:none;border-color:var(--wine);}
 label{font-size:13px;color:#666;font-weight:600;}
-.row{display:flex;gap:14px;align-items:flex-start;}
-.row>*{flex:0 0 auto;width:44%;min-width:0;}
+.row{display:flex;gap:10px;align-items:flex-start;}
+.row>*{flex:1 1 0;min-width:0;max-width:calc(50% - 5px);}
+.row-split{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+.row-split>*{min-width:0;max-width:none;flex:none;}
 .row>* input,.row>* select{display:block;min-width:0;width:100%;}
 .seg{display:flex;border:1.5px solid var(--wine);border-radius:12px;overflow:hidden;margin-bottom:14px;}
 .seg button{flex:1;border:none;background:#fff;color:var(--wine);padding:11px;font-size:15px;font-weight:700;cursor:pointer;}
@@ -224,7 +226,7 @@ label{font-size:13px;color:#666;font-weight:600;}
       <div class="cat-grid" id="catGrid"></div>
       <label>名稱（選填，留空自動用分類名）</label>
       <input id="fName" placeholder="例：午餐、捷運、薪水">
-      <div class="row">
+      <div class="row row-split">
         <div><label>日期</label><input type="date" id="fDate"></div>
         <div><label>帳戶</label><select id="fAccount"></select></div>
       </div>
@@ -437,14 +439,32 @@ function toast(msg,ms=1900){const t=document.createElement('div');t.className='t
 function catEmoji(cat){const i=String(cat).indexOf(' ');return i>0?cat.slice(0,i):'🧾';}
 function catName(cat){const i=String(cat).indexOf(' ');return i>0?cat.slice(i+1):cat;}
 
-/* ================= 觸覺反饋（震動） ================= */
+/* ================= 觸覺反饋（震動＋點擊音） =================
+   全部由設定頁「震動提示」單一開關控制：關閉即整組停用；
+   未來 iOS 若封鎖此機制，只需移除下方 haptic-trigger 元素＋本函數即可。 */
+let _tickCtx=null;
+function playTick(){
+  try{
+    if(!_tickCtx)_tickCtx=new (window.AudioContext||window.webkitAudioContext)();
+    if(_tickCtx.state==='suspended')_tickCtx.resume();
+    const o=_tickCtx.createOscillator(),g=_tickCtx.createGain();
+    o.type='sine';o.frequency.value=1900;
+    g.gain.value=0.03;
+    o.connect(g);g.connect(_tickCtx.destination);
+    o.start();o.stop(_tickCtx.currentTime+0.014);
+  }catch(e){}
+}
 function haptic(){
   if(!settings.haptic)return;
-  // iOS 17.4+：隱藏 switch 觸發 Taptic Engine（標準 vibrate 在 iOS 是 no-op）
+  playTick();                       // 聽覺回饋：14ms 輕點音
   const t=document.getElementById('haptic-trigger');
-  if(t){try{t.click();}catch(e){}}
-  // 其他平台（Android／桌面）：標準 Vibration API
+  if(t){try{t.click();}catch(e){}}  // iOS 17.4+：隱藏 switch 觸發 Taptic
   try{if(navigator.vibrate)navigator.vibrate(12);}catch(e){}
+  // 雙連觸發：40ms 後再補一下（iOS 上更有感；系統若合併則等效單下）
+  setTimeout(function(){
+    if(t){try{t.click();}catch(e){}}
+    try{if(navigator.vibrate)navigator.vibrate(10);}catch(e){}
+  },40);
 }
 
 /* ================= Face ID / Touch ID（WebAuthn） ================= */
@@ -836,8 +856,8 @@ function renderSettings(){
   }
   $('hapticSwitch').checked=!!settings.haptic;
   $('hapticHint').textContent=settings.haptic
-    ?'已開啟：按鈕互動時輕微震動（iOS 17.4 以上以系統觸覺回饋觸發）'
-    :'已關閉：按鈕互動不會震動（iOS 17.4 以上 Safari／PWA 有效）';
+    ?'已開啟：按鈕互動時震動＋輕點音（iOS 17.4 以上以系統觸覺回饋觸發）'
+    :'已關閉：按鈕互動不會震動或發聲（iOS 17.4 以上 Safari／PWA 有效）';
   $('acctMgrBox').innerHTML=D().accounts.map((a,i)=>`
     <div class="acct-row"><span>${a.icon} ${esc(a.name)} <span class="mini">開戶 ${a.opening||0}</span></span>
     <button class="del-x" onclick="delAccount(${i})">刪</button></div>`).join('')
