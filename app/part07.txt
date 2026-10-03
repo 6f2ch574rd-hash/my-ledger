@@ -1,0 +1,56 @@
+>目前主題：<b id="themeName">經典酒紅</b></span></div>
+      <input id="themeCode" placeholder="輸入主題兌換碼" style="margin-top:8px;">
+      <button class="btn btn-sm btn-wine" style="margin-top:4px;" onclick="redeemTheme()">兌換主題</button>
+      <button class="btn btn-sm btn-gray" style="margin-top:8px;display:none;" id="resetThemeBtn" onclick="resetTheme()">恢復預設主題</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head gray">🛡 資料保存</div>
+    <div class="card-body" style="line-height:1.8;font-size:13.5px;">
+      資料只存在這支手機中，<b>加入主畫面後保存等級接近一般 App</b>，正常使用不會憑空消失。請注意：
+      <ul style="margin:8px 0;padding-left:20px;">
+        <li>長按<b>刪除主畫面圖示</b>，資料會一併刪除。</li>
+        <li>「清除 Safari 網站資料」只會清網頁版；已加入主畫面的 App 是獨立空間，通常不受影響。</li>
+        <li><b>換手機或手機重置前</b>，請先匯出完整備份。</li>
+      </ul>
+      <div id="persistStatus" class="mini" style="background:#f7f7f9;border-radius:10px;padding:8px 10px;"></div>
+      <div id="backupStatus" class="mini" style="margin-top:6px;"></div>
+      <div class="hint-box" style="margin-bottom:0;">建議每月或大量記錄後，匯出一次 JSON 備份，存到 iCloud、LINE 自己的對話框或 E-mail。</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head gray">📦 備份與還原（換手機必做）</div>
+    <div class="card-body">
+      <button class="btn btn-sm btn-wine" onclick="exportCSV()">📤 匯出 CSV（Excel 可開）</button>
+      <button class="btn btn-sm btn-ghost" style="margin-top:8px;" onclick="exportJSON()">🗂 匯出完整備份（JSON，換手機用這個）</button>
+      <hr style="border:none;border-top:1px solid var(--line);margin:14px 0;">
+      <label>從 CSV 匯入（本 App 或舊版 LocalLedger 格式）</label>
+      <input type="file" id="csvFile" accept=".csv" style="margin-bottom:8px;">
+      <button class="btn btn-sm btn-green" onclick="importCSV()">📥 匯入 CSV 到目前帳本</button>
+      <label style="margin-top:14px;display:block;">從 JSON 完整備份還原</label>
+      <input type="file" id="jsonFile" accept=".json,application/json" style="margin-bottom:8px;">
+      <button class="btn btn-sm btn-green" onclick="importJSON()">📥 還原 JSON 備份</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head gray">📱 安裝到 iPhone 主畫面／分享給朋友</div>
+    <div class="card-body" style="line-height:1.8;font-size:14px;">
+      <b>安裝成 App：</b><br>
+      1. 用 <b>Safari</b> 打開本 App 網址（一定要用 Safari）。<br>
+      2. 點底部「分享」按鈕（方框向上箭頭）。<br>
+      3. 選擇「<b>加入主畫面</b>」→「加入」，主畫面就會出現 📒。<br>
+      <div class="hint-box" style="margin-top:10px;">
+        <b>分享給朋友：</b>把同一個網址傳給他們 → 用 Safari 開啟 → 加入主畫面即可。<br>
+        每支手機的資料各自獨立、互看不見；不需要註冊、沒有伺服器、可離線使用。換手機前記得先「匯出完整備份」。
+      </div>
+    </div>
+  </div>
+  <div class="mini" style="text-align:center;margin:14px 0 4px;">我的記帳本 v1.1 · 資料只存放於你的手機</div>
+</div>
+
+</div><!-- /wrap -->
+
+<!-- 底部導航 -
