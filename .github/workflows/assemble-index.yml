@@ -1,0 +1,24 @@
+name: assemble-index
+on:
+  push:
+    paths: ['app/part*.txt', '.github/workflows/assemble-index.yml']
+permissions:
+  contents: write
+jobs:
+  assemble:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: |
+          if ls app/part*.txt >/dev/null 2>&1; then
+            cat app/part*.txt > index.html
+            rm -f app/part*.txt
+          fi
+      - name: Commit and push
+        run: |
+          git config user.name "6f2ch574rd-hash"
+          git config user.email "6f2ch574rd-hash@users.noreply.github.com"
+          git add -A
+          if git diff --cached --quiet; then echo "no-change"; exit 0; fi
+          git commit -m "組裝 index.html（Face ID/震動/互動圖表）"
+          git push
