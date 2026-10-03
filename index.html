@@ -51,7 +51,7 @@ label{font-size:13px;color:#666;font-weight:600;}
 .row-split{display:grid;grid-template-columns:minmax(0,3fr) minmax(0,2fr);gap:16px;}
 .row-split>*{min-width:0;max-width:none;flex:none;}
 .row>* input,.row>* select{display:block;min-width:0;width:100%;}
-#fDate{padding:5px 12px;margin:4px 0 10px;height:34px;min-height:0;font-size:16px;box-sizing:border-box;}
+#fDate{padding:0 12px;margin:4px 0 10px;height:32px;min-height:0;font-size:16px;box-sizing:border-box;-webkit-appearance:none;appearance:none;}
 #fAccount{padding:8px 10px;margin:4px 0 10px;height:auto;min-height:40px;font-size:16px;}
 .seg{display:flex;border:1.5px solid var(--wine);border-radius:12px;overflow:hidden;margin-bottom:14px;}
 .seg button{flex:1;border:none;background:#fff;color:var(--wine);padding:11px;font-size:15px;font-weight:700;cursor:pointer;}
@@ -1174,19 +1174,6 @@ window.addEventListener('DOMContentLoaded',()=>{
   initLock();
   renderAddForm();
   refreshAll();
-  // iOS 導航貼底補償：地址列收合時視口變高，用 visualViewport 校正讓導航永遠貼可見視口底
-  if(window.visualViewport){
-    const _nav=document.querySelector('.nav');
-    const _fixNav=()=>{
-      try{
-        const off=Math.max(0,window.innerHeight-window.visualViewport.height);
-        _nav.style.bottom=off+'px';
-      }catch(e){}
-    };
-    window.visualViewport.addEventListener('resize',_fixNav);
-    window.visualViewport.addEventListener('scroll',_fixNav);
-    _fixNav();
-  }
   requestPersistentStorage();
   if('serviceWorker' in navigator && location.protocol.startsWith('http')){
     navigator.serviceWorker.register('./sw.js').catch(()=>{});
