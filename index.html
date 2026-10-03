@@ -473,8 +473,8 @@ function playTick(){
   }catch(e){}
 }
 function hapticBackend(){
+  if('vibrate' in navigator)return 'vibrate';
   if(typeof document!=='undefined'&&document.getElementById('haptic-trigger'))return 'ios';
-  if('vibrate' in navigator)return 'android';
   return 'noop';
 }
 function _iosPulse(){
@@ -485,11 +485,13 @@ function haptic(){
   if(!settings.haptic)return;
   const b=hapticBackend();
   playTick();                                   // 第一聲點擊音
-  if(b==='ios'){
+  if(b==='vibrate'){
+    try{navigator.vibrate([12,40,12]);}catch(e){} // 系統震動（iOS 27+ / Android）
+    const t=document.getElementById('haptic-trigger');
+    if(t){try{t.click();}catch(e){}}             // 舊 iOS 備援：vibrate 若為空指令，Taptic 補上
+  }else if(b==='ios'){
     _iosPulse();                                // Taptic 第一下
     setTimeout(function(){playTick();_iosPulse();},55); // 55ms 後第二下（tappt 式雙脈衝，更有感）
-  }else if(b==='android'){
-    try{navigator.vibrate([12,40,12]);}catch(e){} // 標準雙脈衝 pattern
   }
 }
 
@@ -950,7 +952,7 @@ function renderSettings(){
     ?'已開啟：按鈕互動時震動＋輕點音'
     :'已關閉：按鈕互動不會震動或發聲';
   const bk=hapticBackend();
-  $('hapticInfo').textContent='此裝置震動後端：'+(bk==='ios'?'iOS 觸覺回饋（Taptic）':(bk==='android'?'標準震動 API':'不支援（無感屬正常）'));
+  $('hapticInfo').textContent='此裝置震動後端：'+(bk==='vibrate'?'系統震動（iOS 27+ ／ Android）':(bk==='ios'?'iOS 觸覺回饋（Taptic）':'不支援（無感屬正常）'));
   $('themeName').textContent=settings.theme?(parseTheme(settings.theme)||{}).name||'自訂主題':'經典酒紅';
   $('resetThemeBtn').style.display=settings.theme?'inline-block':'none';
   $('acctMgrBox').innerHTML=D().accounts.map((a,i)=>`
