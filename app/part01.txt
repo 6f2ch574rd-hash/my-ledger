@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="記帳本">
+<meta name="theme-color" content="#9E203E">
+<link rel="manifest" href="./manifest.webmanifest">
+<link rel="apple-touch-icon" href="./icons/icon-180.png">
+<link rel="icon" href="./icons/icon-180.png">
+<title>我的記帳本</title>
+<style>
+:root{
+  --wine:#9E203E; --wine-d:#7E1830; --wine-l:#F7E8EB;
+  --green:#27AE60; --green-l:#E8F8F0;
+  --ink:#222; --sub:#8a8a8a; --line:#eee; --bg:#f5f5f7;
+  --nav-bg:rgba(255,255,255,.96); --cover:#F7E8EB;
+  --nav-h:68px;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+html,body{margin:0;padding:0;}
+body{background:var(--bg);color:var(--ink);
+  font-family:-apple-system,BlinkMacSystemFont,"PingFang TC","Microsoft JhengHei","Segoe UI",sans-serif;
+  padding-bottom:calc(var(--nav-h) + env(safe-area-inset-bottom) + 24px);
+  padding-top:env(safe-area-inset-top);
+  font-size:15px;}
+.wrap{max-width:640px;margin:0 auto;padding:0 14px;}
+h2.app-title{color:var(--wine);margin:14px 4px 10px;font-size:22px;display:flex;align-items:center;gap:8px;}
+.page{display:none;animation:fade .18s ease;}
+.page.active{display:block;}
+@keyframes fade{from{opacity:0;transform:translateY(4px);}to{opacity:1;transform:none;}}
+.card{background:#fff;border-radius:16px;box-shadow:0 2px 10px rgba(0,0,0,.05);margin:12px 0;overflow:hidden;}
+.card-head{padding:13px 16px;font-weight:600;font-size:15px;}
+.card-head.gray{background:#fafafa;color:#333;border-bottom:1px solid var(--line);}
+.card-body{padding:14px 16px;}
+.btn{border:none;border-radius:10px;padding:12px 16px;font-size:15px;font-weight:600;cursor:pointer;width:100%;}
+.btn:active{opacity:.8;}
+.btn-wine{background:var(--wine);color:#fff;}
+.btn-green{background:var(--green);color:#fff;}
+.btn-ghost{background:#fff;color:var(--wine);border:1.5px solid var(--wine);}
+.btn-gray{background:#f0f0f2;color:#333;}
+.btn-sm{width:auto;padding:7px 12px;font-size:13px;border-radius:8px;display:inline-block;}
+input,select{width:100%;padding:11px 12px;margin:5px 0 12px;border:1px solid #ddd;border-radius:10px;font-size:16px;font-family:inherit;background:#fff;color:var(--ink);min-width:0;}
+input:focus,select:focus{outline:none;border-color:var(--wine);}
+label{font-size:13px;color:#666;font-weight:600;}
+.row{display:flex;gap:10px;align-items:flex-start;}
+.row>*{flex:1 1 0;min-width:0;max-width:calc(50% - 5px);}
+.row-split{display:grid;grid-template-columns:minmax(0,3fr) minmax(0,2fr);gap:16px;}
+.row-split>*{min-width:0;max-width:none;flex:none;}
+.row>* input,.row>* select{display:block;min-width:0;width:100%;}
+#fDate,#fAccount{padding:8px 10px;margin:4px 0 10px;height:auto;min-height:40px;font-size:16px;}
+.seg{display:flex;border:1.5px solid var(--wine);border-radius:12px;overflow:hidden;margin-bottom:14px;}
+.seg button{flex:1;border:none;background:#fff;color:var(--wine);padding:11px;font-size:15px;font-weight:700;cursor:pointer;}
+.seg button.on-exp{background:var(--wine);color:#fff;}
+.seg button.on-inc{background:var(--green);color:#fff;}
+.seg.inc{border-color:var(--green);}
+.nav{position:fixed;left:10px;right:10px;bottom:0;max-width:620px;marg
