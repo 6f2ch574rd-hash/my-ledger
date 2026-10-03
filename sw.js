@@ -1,5 +1,5 @@
-/* 我的記帳本 — 離線快取 v2（網路優先，確保更新即時生效） */
-const CACHE = 'my-ledger-v2';
+/* 我的記帳本 — 離線快取 v3（網路優先，確保更新即時生效） */
+const CACHE = 'my-ledger-v3';
 const CORE = [
   './',
   './index.html',
