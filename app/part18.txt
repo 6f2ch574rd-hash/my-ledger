@@ -1,0 +1,64 @@
+ame:'',r.type==='income'?'收入':'支出',r.amount,r.note||'']
+      .map(v=>`"${String(v).replace(/"/g,'""')}"`).join(',')+'\n';});
+  download(`記帳備份_${book().name}_${today()}.csv`,csv,'text/csv;charset=utf-8',true);
+  LS.set('ll_lastBackup',nowTs());
+  toast('CSV 已匯出');
+}
+function exportJSON(){
+  const pack={app:'my-ledger',v:3,exportedAt:nowTs(),books,activeBook:activeId,db:DB,settings:{pass:settings.pass}};
+  download(`記帳完整備份_${today()}.json`,JSON.stringify(pack,null,2),'application/json',false);
+  LS.set('ll_lastBackup',nowTs());
+  toast('完整備份已匯出');
+}
+function readFile(input){return new Promise((res,rej)=>{
+  const f=input.files[0];if(!f)return rej(new Error('no-file'));
+  const r=new FileReader();r.onload=e=>res(e.target.result);r.onerror=rej;r.readAsText(f,'utf-8');});}
+async function importCSV(){
+  let text;try{text=await readFile($('csvFile'));}catch(e){toast('請先選擇 CSV 檔案');return;}
+  const rows=csvParse(text);if(rows.length<2){toast('檔案裡沒有資料');return;}
+  const head=rows[0].map(h=>h.trim());
+  const idx=k=>head.findIndex(h=>h.includes(k));
+  const iDate=idx('date')>=0?idx('date'):0;
+  const iName=idx('name')>=0?idx('name'):1;
+  const iCat=idx('category')>=0?idx('category'):2;
+  const iAmt=idx('amount')>=0?idx('amount'):3;
+  const iType=idx('type')>=0?idx('type'):(head.length>=6?4:-1);
+  const iNote=idx('note')>=0?idx('note'):(head.length>=6?5:-1);
+  const iAcct=idx('帳戶')>=0?idx('帳戶'):-1;
+  const d=D();const acct0=d.accounts[0]?.id||'';let n=0;
+  rows.slice(1).forEach(c=>{
+    if(!c||!c[iDate])return;
+    const amt=Number(String(c[iAmt]||'').replace(/[^\d.-]/g,''));
+    if(!amt)return;
+    let type='expense';
+    if(iType>=0){const tv=(c[iType]||'').trim();type=(tv==='income'||tv==='收入')?'income':'expense';}
+    let cat=(c[iCat]||'其他').trim();
+    if(!cat.includes(' '))cat=(type==='income'?'💰 ':'🧾 ')+cat;
+    const cats=type==='income'?d.catsInc:d.catsExp;
+    if(!cats.includes(cat))cats.push(cat);
+    let aid=acct0;
+    if(iAcct>=0&&c[iAcct]){let a=d.accounts.find(x=>x.name===c[iAcct].trim());
+      if(!a){a={id:uid(),name:c[iAcct].trim(),icon:'💳',opening:0};d.accounts.push(a);}aid=a.id;}
+    d.tx.push({id:uid(),date:c[iDate].trim().replace(/\//g,'-'),name:(c[iName]||catName(cat)).trim(),
+      category:cat,amount:Math.abs(amt),type,account:aid,note:iNote>=0?(c[iNote]||'').trim():'',createdAt:nowTs()+n});
+    n++;
+  });
+  saveDB();refreshAll();toast(`✅ 已匯入 ${n} 筆到「${book().name}」`);
+}
+async function importJSON(){
+  let text;try{text=await readFile($('jsonFile'));}catch(e){toast('請先選擇 JSON 檔案');return;}
+  let pack;try{pack=JSON.parse(text);}catch(e){toast('檔案格式不正確');return;}
+  if(pack.app!=='my-ledger'||!pack.db){toast('不是本 App 的備份檔');return;}
+  if(!confirm('還原會覆蓋這支手機上目前的所有記錄，確定繼續？建議先匯出目前備份。'))return;
+  books=pack.books||books;DB=pack.db;activeId=pack.activeBook||books[0].id;
+  if(!DB[activeId])DB[activeId]=freshBookData();
+  if(pack.settings&&pack.settings.pass!==undefined)settings.pass=pack.settings.pass;
+  saveBooks();saveDB();LS.set('ll_settings',settings);
+  refreshAll();toast('✅ 備份已還原');
+}
+
+/* ================= 重新整理 ================= */
+function refreshAll(){renderBookSelect();renderHome();renderList();renderStats();}
+
+/* ================= 啟動 ================= */
+window.addEventListener('DO
