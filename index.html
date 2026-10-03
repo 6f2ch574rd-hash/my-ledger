@@ -36,7 +36,7 @@ h2.app-title{color:var(--wine);margin:14px 4px 10px;font-size:22px;display:flex;
 .card-head{padding:13px 16px;font-weight:600;font-size:15px;}
 .card-head.gray{background:#fafafa;color:#333;border-bottom:1px solid var(--line);}
 .card-body{padding:14px 16px;}
-.btn{border:none;border-radius:10px;padding:12px 16px;font-size:15px;font-weight:600;cursor:pointer;width:100%;}
+.btn{border:none;border-radius:10px;padding:12px 16px;font-size:15px;font-weight:600;cursor:pointer;width:100%;display:inline-block;box-sizing:border-box;text-align:center;}
 .btn:active{opacity:.8;}
 .btn-wine{background:var(--wine);color:#fff;}
 .btn-green{background:var(--green);color:#fff;}
@@ -62,11 +62,11 @@ label{font-size:13px;color:#666;font-weight:600;}
   box-shadow:0 4px 20px rgba(0,0,0,.12);display:flex;align-items:stretch;z-index:200;
   background:var(--nav-bg);
   padding-bottom:env(safe-area-inset-bottom);}
-.nav button{flex:1;border:none;background:none;padding:0;font-size:11px;color:#999;cursor:pointer;
+.nav button,.nav label[for]{flex:1;border:none;background:none;padding:0;font-size:11px;color:#999;cursor:pointer;
   display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;height:60px;}
-.nav button .ic{display:block;font-size:20px;line-height:24px;height:24px;}
-.nav button.active{color:var(--wine);font-weight:700;}
-.nav button.add-btn .ic{background:var(--wine);color:#fff;width:40px;height:40px;border-radius:50%;
+.nav button .ic,.nav label[for] .ic{display:block;font-size:20px;line-height:24px;height:24px;}
+.nav button.active,.nav label[for].active{color:var(--wine);font-weight:700;}
+.nav button.add-btn .ic,.nav label[for].add-btn .ic{background:var(--wine);color:#fff;width:40px;height:40px;border-radius:50%;
   display:flex;align-items:center;justify-content:center;margin:0;font-size:22px;
   box-shadow:0 4px 12px rgba(0,0,0,.25);}
 .hero{background:linear-gradient(135deg,var(--wine),var(--wine-d));color:#fff;border-radius:18px;padding:18px 20px;margin:12px 0;box-shadow:0 6px 18px rgba(0,0,0,.18);}
@@ -168,7 +168,7 @@ label{font-size:13px;color:#666;font-weight:600;}
   <div style="font-size:20px;font-weight:700;margin-top:10px;">我的記帳本</div>
   <div class="dots" id="lockDots"><i></i><i></i><i></i><i></i></div>
   <div class="pad" id="lockPad"></div>
-  <button class="face-btn" id="faceBtn" onclick="unlockBio()">🔓 Face ID 解鎖</button>
+  <label for="haptic-input" class="face-btn" id="faceBtn" onclick="unlockBio()">🔓 Face ID 解鎖</label>
 </div>
 
 <div class="wrap">
@@ -238,8 +238,8 @@ label{font-size:13px;color:#666;font-weight:600;}
       <label>備註（選填）</label>
       <input id="fNote" placeholder="可以寫一下細節">
       <div style="display:flex;gap:10px;margin-top:6px;">
-        <button class="btn btn-wine" id="saveBtn" onclick="doSave()">💾 儲存</button>
-        <button class="btn btn-ghost" style="flex:0 0 90px;" onclick="resetForm()">清空</button>
+        <label for="haptic-input" class="btn btn-wine" id="saveBtn" onclick="doSave()">💾 儲存</label>
+        <label for="haptic-input" class="btn btn-ghost" style="flex:0 0 90px;" onclick="resetForm()">清空</label>
       </div>
       <button class="btn btn-gray" id="editDelBtn" style="margin-top:10px;display:none;" onclick="deleteEditing()">🗑 刪除這筆</button>
     </div>
@@ -357,7 +357,7 @@ label{font-size:13px;color:#666;font-weight:600;}
         <label class="sw"><input type="checkbox" id="hapticSwitch" onchange="toggleHaptic(this.checked)"><i></i></label></div>
       <div class="mini" id="hapticHint" style="margin-top:2px;"></div>
       <div class="mini" id="hapticInfo" style="margin-top:2px;color:var(--sub);"></div>
-      <button class="btn btn-sm btn-gray" style="margin-top:8px;" onclick="haptic();toast('已觸發震動測試');">測試震動</button>
+      <label for="haptic-input" class="btn btn-sm btn-gray" style="margin-top:8px;" onclick="haptic();toast('已觸發震動測試');">測試震動</label>
     </div>
   </div>
 
@@ -421,11 +421,11 @@ label{font-size:13px;color:#666;font-weight:600;}
 
 <!-- 底部導航 -->
 <div class="nav">
-  <button class="active" data-p="pageHome" onclick="goPage('pageHome',this)"><span class="ic">🏠</span>首頁</button>
-  <button data-p="pageList" onclick="goPage('pageList',this)"><span class="ic">📋</span>明細</button>
-  <button class="add-btn" data-p="pageAdd" onclick="goPage('pageAdd',this)"><span class="ic">＋</span>記帳</button>
-  <button data-p="pageStats" onclick="goPage('pageStats',this)"><span class="ic">📊</span>統計</button>
-  <button data-p="pageSettings" onclick="goPage('pageSettings',this)"><span class="ic">⚙️</span>設定</button>
+  <label for="haptic-input" class="active" data-p="pageHome" onclick="goPage('pageHome',this)"><span class="ic">🏠</span>首頁</label>
+  <label for="haptic-input" data-p="pageList" onclick="goPage('pageList',this)"><span class="ic">📋</span>明細</label>
+  <label for="haptic-input" class="add-btn" data-p="pageAdd" onclick="goPage('pageAdd',this)"><span class="ic">＋</span>記帳</label>
+  <label for="haptic-input" data-p="pageStats" onclick="goPage('pageStats',this)"><span class="ic">📊</span>統計</label>
+  <label for="haptic-input" data-p="pageSettings" onclick="goPage('pageSettings',this)"><span class="ic">⚙️</span>設定</label>
 </div>
 
 <!-- 彈窗：帳本管理 -->
@@ -642,8 +642,8 @@ function D(){return DB[activeId];}
 /* ================= 導航 ================= */
 function goPage(pid,btn){
   haptic();
-  document.querySelectorAll('.nav button').forEach(b=>b.classList.remove('active'));
-  if(typeof btn==='number')btn=document.querySelector(`.nav button[data-p="${pid}"]`);
+  document.querySelectorAll('.nav button,.nav label[for]').forEach(b=>b.classList.remove('active'));
+  if(typeof btn==='number')btn=document.querySelector(`.nav button[data-p="${pid}"],.nav label[data-p="${pid}"]`);
   if(btn&&btn.dataset)btn.classList.add('active');
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   $(pid).classList.add('active');
@@ -711,7 +711,7 @@ function editTx(id){
   $('fAmount').value=r.amount;$('fNote').value=r.note||'';
   renderAccounts(r.account);
   $('editDelBtn').style.display='block';
-  goPage('pageAdd',document.querySelector('.nav button[data-p="pageAdd"]'));
+  goPage('pageAdd',document.querySelector('.nav button[data-p="pageAdd"],.nav label[data-p="pageAdd"]'));
 }
 function deleteEditing(){
   haptic();
@@ -719,7 +719,7 @@ function deleteEditing(){
   if(!confirm('確定刪除這筆記錄？'))return;
   D().tx=D().tx.filter(x=>x.id!==editingId);
   saveDB();editingId=null;renderAddForm();
-  goPage('pageHome',document.querySelector('.nav button[data-p="pageHome"]'));
+  goPage('pageHome',document.querySelector('.nav button[data-p="pageHome"],.nav label[data-p="pageHome"]'));
   toast('已刪除');
 }
 
