@@ -21,13 +21,16 @@
   --nav-h:68px;
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
-html,body{margin:0;padding:0;}
+html,body{margin:0;padding:0;height:100%;overflow:hidden;}
 body{background:var(--bg);color:var(--ink);
   font-family:-apple-system,BlinkMacSystemFont,"PingFang TC","Microsoft JhengHei","Segoe UI",sans-serif;
   padding-bottom:calc(var(--nav-h) + env(safe-area-inset-bottom) + 24px);
   padding-top:env(safe-area-inset-top);
   font-size:15px;}
-.wrap{max-width:640px;margin:0 auto;padding:0 14px;}
+.wrap{max-width:640px;margin:0 auto;padding:0 14px;
+  height:100vh;height:100dvh;
+  overflow-y:auto;-webkit-overflow-scrolling:touch;
+  overscroll-behavior-y:none;}
 h2.app-title{color:var(--wine);margin:14px 4px 10px;font-size:22px;display:flex;align-items:center;gap:8px;}
 .page{display:none;animation:fade .18s ease;}
 .page.active{display:block;}
