@@ -1,0 +1,66 @@
+======== 預設資料 ================= */
+const DEF_EXP=['🍔 餐飲','🚌 交通','🛒 購物','🏠 居家','🎮 娛樂','💊 醫療','📚 學習','✈️ 旅遊','🎁 送禮','📱 訂閱','🧾 其他'];
+const DEF_INC=['💰 薪水','🎁 紅包','📈 投資','💼 獎金','🧾 其他'];
+const DEF_ACCTS=[{id:'a-cash',name:'現金',icon:'💵',opening:0},{id:'a-bank',name:'銀行',icon:'🏦',opening:0},{id:'a-card',name:'信用卡',icon:'💳',opening:0}];
+function freshBookData(){return {tx:[],accounts:JSON.parse(JSON.stringify(DEF_ACCTS)),catsExp:[...DEF_EXP],catsInc:[...DEF_INC],budget:0};}
+
+/* ================= 狀態（每支手機各自獨立） ================= */
+let books=LS.get('ll_books',null);
+if(!books){const bid=uid();books=[{id:bid,name:'我的帳本',createdAt:nowTs()}];LS.set('ll_books',books);LS.set('ll_active',bid);}
+let activeId=LS.get('ll_active',books[0].id);
+if(!books.find(b=>b.id===activeId)){activeId=books[0].id;LS.set('ll_active',activeId);}
+let DB=LS.get('ll_db',{});
+if(!DB[activeId]){DB[activeId]=freshBookData();LS.set('ll_db',DB);}
+let settings=LS.get('ll_settings',{pass:null});
+if(settings.bio===undefined)settings.bio=false;
+if(settings.bioCred===undefined)settings.bioCred=null;
+if(settings.haptic===undefined)settings.haptic=false;
+LS.set('ll_settings',settings);
+function saveDB(){LS.set('ll_db',DB);}
+function saveBooks(){LS.set('ll_books',books);LS.set('ll_active',activeId);}
+function book(){return books.find(b=>b.id===activeId);}
+function D(){return DB[activeId];}
+
+/* ================= 導航 ================= */
+function goPage(pid,btn){
+  haptic();
+  document.querySelectorAll('.nav button,.nav label[for]').forEach(b=>b.classList.remove('active'));
+  if(typeof btn==='number')btn=document.querySelector(`.nav button[data-p="${pid}"],.nav label[data-p="${pid}"]`);
+  if(btn&&btn.dataset)btn.classList.add('active');
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  $(pid).classList.add('active');
+  window.scrollTo(0,0);
+  if(pid==='pageHome')renderHome();
+  if(pid==='pageList')renderList();
+  if(pid==='pageStats')renderStats();
+  if(pid==='pageSettings')renderSettings();
+  if(pid==='pageAdd'&&!editingId)renderAddForm();
+}
+
+/* ================= 記一筆 ================= */
+let curType='expense',selCat=null,editingId=null;
+function setType(t){
+  haptic();
+  curType=t;const seg=$('typeSeg');
+  seg.classList.toggle('inc',t==='income');
+  seg.children[0].className=t==='expense'?'on-exp':'';
+  seg.children[1].className=t==='income'?'on-inc':'';
+  $('saveBtn').className='btn '+(t==='income'?'btn-green':'btn-wine');
+  $('fAmount').className='amt-input'+(t==='income'?' inc':'');
+  selCat=null;renderCatGrid();
+}
+function renderCatGrid(){
+  const cats=curType==='expense'?D().catsExp:D().catsInc;
+  $('catGrid').innerHTML=cats.map(c=>{
+    const sel=selCat===c?(curType==='income'?'sel-inc':'sel'):'';
+    return `<div class="cat-cell ${sel}" onclick="pickCat('${esc(c)}')"><span class="e">${catEmoji(c)}</span>${esc(catName(c))}</div>`;
+  }).join('');
+}
+function pickCat(c){haptic();selCat=c;renderCatGrid();}
+function renderAccounts(sel){
+  $('fAccount').innerHTML=D().accounts.map(a=>`<option value="${a.id}" ${sel===a.id?'selected':''}>${a.icon} ${esc(a.name)}</option>`).join('');
+}
+function renderAddForm(){
+  editingId=null;$('editDelBtn').style.display='none';
+  $('fDate').value=today();$('fName').value='';$('fAmount').value='';$('fNote').value='';
+  renderAccounts(D().account
