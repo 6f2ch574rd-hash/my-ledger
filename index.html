@@ -31,9 +31,6 @@ body{background:var(--bg);color:var(--ink);
   height:100vh;height:100dvh;
   overflow-y:auto;-webkit-overflow-scrolling:touch;
   overscroll-behavior-y:none;}
-/* 底部安全區補色：確保導航下方（home indicator 區）永遠是導航色，無縫貼底 */
-body::after{content:'';position:fixed;left:0;right:0;bottom:0;height:env(safe-area-inset-bottom,0px);
-  background:var(--nav-bg);z-index:199;pointer-events:none;}
 h2.app-title{color:var(--wine);margin:14px 4px 10px;font-size:22px;display:flex;align-items:center;gap:8px;}
 .page{display:none;animation:fade .18s ease;}
 .page.active{display:block;}
