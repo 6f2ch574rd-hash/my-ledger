@@ -1,0 +1,66 @@
+==id);delete DB[id];
+  if(activeId===id){activeId=books[0].id;}
+  saveBooks();saveDB();renderBookMgr();refreshAll();
+}
+
+/* ================= 設定：帳戶 / 分類 / 預算 / 密碼 ================= */
+function renderSettings(){
+  $('budgetInput').value=D().budget||'';
+  $('passBtn').textContent=settings.pass?'🔒 變更 4 位數密碼鎖':'🔒 設定 4 位數密碼鎖';
+  $('clearPassBtn').style.display=settings.pass?'inline-block':'none';
+  const bioOn=!!(settings.bio&&settings.bioCred);
+  $('bioSwitch').checked=bioOn;
+  if(bioSupported()){
+    $('bioSwitch').disabled=false;
+    $('bioHint').textContent=bioOn
+      ?'已啟用：鎖定畫面會出現「Face ID 解鎖」按鈕'
+      :(settings.pass?'使用 iPhone 的 Face ID／Touch ID 解鎖（需 Safari 開啟）':'先設定密碼鎖後即可啟用');
+  }else{
+    $('bioSwitch').disabled=true;$('bioSwitch').checked=false;
+    $('bioHint').textContent='此瀏覽器不支援 Face ID（需 Safari 與 HTTPS 環境）';
+  }
+  $('hapticSwitch').checked=!!settings.haptic;
+  $('soundSwitch').checked=settings.sound!==false;
+  $('hapticHint').textContent=settings.haptic
+    ?'已開啟：按鈕互動時震動＋輕點音'
+    :'已關閉：按鈕互動不會震動或發聲';
+  const bk=hapticBackend();
+  $('hapticInfo').textContent='此裝置震動後端：'+(bk==='vibrate'?'系統震動（iOS 27+ ／ Android）':(bk==='ios'?'iOS 觸覺回饋（Taptic）':'不支援（無感屬正常）'));
+  $('themeName').textContent=settings.theme?(parseTheme(settings.theme)||{}).name||'自訂主題':'經典酒紅';
+  $('resetThemeBtn').style.display=settings.theme?'inline-block':'none';
+  $('acctMgrBox').innerHTML=D().accounts.map((a,i)=>`
+    <div class="acct-row"><span>${a.icon} ${esc(a.name)} <span class="mini">開戶 ${a.opening||0}</span></span>
+    <button class="del-x" onclick="delAccount(${i})">刪</button></div>`).join('')
+    +`<div class="row" style="margin-top:10px;">
+      <input id="newAcctIcon" placeholder="😀" style="flex:0 0 56px;text-align:center;" maxlength="2">
+      <input id="newAcctName" placeholder="新帳戶名稱">
+      <input id="newAcctOpen" type="number" placeholder="初始額" style="flex:0 0 90px;">
+      <button class="btn btn-sm btn-wine" style="flex:0 0 60px;" onclick="addAccount()">＋</button></div>`;
+  renderCatMgrList();renderBookMgr();renderDataSafety();
+}
+function addAccount(){
+  haptic();
+  const name=$('newAcctName').value.trim(),icon=$('newAcctIcon').value.trim()||'💳',open=Number($('newAcctOpen').value)||0;
+  if(!name){toast('請輸入帳戶名稱');return;}
+  D().accounts.push({id:uid(),name,icon,opening:open});saveDB();renderSettings();toast('已新增帳戶');
+}
+function delAccount(i){
+  haptic();
+  const a=D().accounts[i];
+  if(D().tx.some(r=>r.account===a.id)){toast('這個帳戶已有記錄，建議保留');return;}
+  if(!confirm('刪除帳戶「'+a.name+'」？'))return;
+  D().accounts.splice(i,1);saveDB();renderSettings();
+}
+let catMgrType='expense';
+function switchCatMgr(t,btn){
+  haptic();
+  catMgrType=t;
+  btn.parentElement.children[0].className=t==='expense'?'on-exp':'';
+  btn.parentElement.children[1].className=t==='income'?'on-inc':'';
+  btn.parentElement.classList.toggle('inc',t==='income');
+  renderCatMgrList();
+}
+function renderCatMgrList(){
+  const list=catMgrType==='expense'?D().catsExp:D().catsInc;
+  $('catMgrBox').innerHTML=list.map((c,i)=>
+    `<span class="chip" style="padding-right:4px;">${esc(c)} <button class="del-x" style="fo
