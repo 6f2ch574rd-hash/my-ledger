@@ -18,7 +18,7 @@
   --green:#27AE60; --green-l:#E8F8F0;
   --ink:#222; --sub:#8a8a8a; --line:#eee; --bg:#f5f5f7;
   --nav-bg:rgba(255,255,255,.96); --cover:#F7E8EB;
-  --nav-h:68px;
+  --nav-h:128px;
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
 html,body{margin:0;padding:0;height:100%;overflow:hidden;}
@@ -62,9 +62,9 @@ label{font-size:13px;color:#666;font-weight:600;}
 .seg button.on-inc{background:var(--green);color:#fff;}
 .seg.inc{border-color:var(--green);}
 .nav{position:fixed;left:0;right:0;bottom:0;margin:0;
-  background:var(--nav-bg);border-top:1px solid var(--line);border-radius:0;
+  background:var(--nav-bg);border-top:1px solid var(--line);border-radius:18px 18px 0 0;
   box-shadow:0 -2px 10px rgba(0,0,0,.05);display:flex;align-items:stretch;z-index:200;
-  height:calc(60px + env(safe-area-inset-bottom));padding:0;}
+  height:calc(120px + env(safe-area-inset-bottom));padding:0;}
 .nav button,.nav label[for]{flex:1;border:none;background:none;padding:0;font-size:11px;color:#999;cursor:pointer;
   display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;height:100%;}
 .nav button .ic,.nav label[for] .ic{display:block;font-size:20px;line-height:24px;height:24px;}
