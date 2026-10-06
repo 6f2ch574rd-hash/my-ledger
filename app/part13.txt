@@ -1,0 +1,75 @@
+);
+  $('recentBox').innerHTML=recent.length?recent.map(txRow).join(''):'<div class="empty"><span class="big-e">🧾</span>還沒有記錄，點下方＋開始記第一筆</div>';
+}
+function txRow(r){
+  const acct=D().accounts.find(a=>a.id===r.account);
+  return `<div class="tx" onclick="editTx('${r.id}')">
+    <div class="emoji ${r.type==='income'?'inc':''}">${catEmoji(r.category)}</div>
+    <div class="info"><div class="n">${esc(r.name)}</div>
+    <div class="m">${r.date} · ${esc(catName(r.category))}${acct?' · '+acct.icon+esc(acct.name):''}</div></div>
+    <div class="amt ${r.type==='expense'?'exp':'inc'}">${r.type==='expense'?'-':'+'}${fmt(r.amount).replace('NT$','')}</div>
+  </div>`;
+}
+
+/* ================= 明細 ================= */
+let listCursor=fmtYM(new Date()),listFilter='all',listAccount=null;
+function viewAccount(id){
+  haptic();
+  listAccount=id;
+  renderList();
+  goPage('pageList',document.querySelector('.nav label[data-p="pageList"]'));
+}
+function setAccountFilter(id){
+  haptic();
+  listAccount=id;
+  document.querySelectorAll('#acctChips .chip').forEach(c=>c.classList.toggle('on',c.dataset.a===(id||'all')));
+  renderList();
+}
+function shiftMonth(d){
+  haptic();
+  const [y,m]=listCursor.split('-').map(Number);
+  listCursor=fmtYM(new Date(y,m-1+d,1));renderList();
+}
+function setFilter(f){haptic();listFilter=f;
+  document.querySelectorAll('#filterChips .chip').forEach(c=>c.classList.toggle('on',c.dataset.f===f));
+  renderList();
+}
+function renderList(){
+  $('listMonth').textContent=monthLabel(listCursor);
+  const d=D();
+  $('acctChips').innerHTML=`<span class="chip${!listAccount?' on':''}" data-a="all" onclick="setAccountFilter(null)">全部</span>`+
+    d.accounts.map(a=>`<span class="chip${listAccount===a.id?' on':''}" data-a="${a.id}" onclick="setAccountFilter('${a.id}')">${a.icon} ${esc(a.name)}</span>`).join('');
+  const kw=($('searchBox')?.value||'').trim().toLowerCase();
+  let rows=d.tx.filter(r=>r.date.startsWith(listCursor));
+  if(listFilter!=='all')rows=rows.filter(r=>r.type===listFilter);
+  if(listAccount)rows=rows.filter(r=>r.account===listAccount);
+  if(kw)rows=rows.filter(r=>(r.name+r.category+(r.note||'')).toLowerCase().includes(kw));
+  rows.sort((a,b)=>b.date.localeCompare(a.date)||b.createdAt-a.createdAt);
+  const box=$('listBox');
+  if(!rows.length){box.innerHTML='<div class="empty"><span class="big-e">📭</span>這個月沒有記錄</div>';return;}
+  const groups={};
+  rows.forEach(r=>{(groups[r.date]=groups[r.date]||[]).push(r);});
+  let html='';
+  Object.keys(groups).sort().reverse().forEach(date=>{
+    const list=groups[date];
+    const de=list.filter(r=>r.type==='expense').reduce((s,r)=>s+r.amount,0);
+    const di=list.filter(r=>r.type==='income').reduce((s,r)=>s+r.amount,0);
+    const wd=['日','一','二','三','四','五','六'][new Date(date+'T12:00:00').getDay()];
+    html+=`<div class="day-head"><span>${date.slice(5).replace('-','/')} 週${wd}</span>
+      <span>${de?'支 '+de.toLocaleString():''}${de&&di?' · ':''}${di?'收 '+di.toLocaleString():''}</span></div>`;
+    html+=list.map(txRow).join('');
+  });
+  box.innerHTML=html;
+}
+
+/* ================= 統計 ================= */
+let pieType='expense',statRange='month',selPieCat=null,selTrend=null;
+function setRange(r,btn){
+  haptic();
+  statRange=r;
+  document.querySelectorAll('#rangeBtns button').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+  $('customRange').style.display=r==='custom'?'flex':'none';
+  renderStats();
+}
+fu

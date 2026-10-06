@@ -1,0 +1,82 @@
+鎖此機制，只需移除 haptic-trigger 元素＋本函數即可。
+   後端自動偵測：iOS 17.4+ → 隱藏 switch 觸發 Taptic；Android/桌面 → 標準 vibrate。 */
+let _tickCtx=null;
+function playTick(){
+  if(settings.sound===false)return;
+  try{
+    if(!_tickCtx)_tickCtx=new (window.AudioContext||window.webkitAudioContext)();
+    if(_tickCtx.state==='suspended')_tickCtx.resume();
+    const o=_tickCtx.createOscillator(),g=_tickCtx.createGain();
+    o.type='sine';o.frequency.value=1900;
+    g.gain.value=0.04;
+    o.connect(g);g.connect(_tickCtx.destination);
+    o.start();o.stop(_tickCtx.currentTime+0.02);
+  }catch(e){}
+}
+function hapticBackend(){
+  if('vibrate' in navigator)return 'vibrate';
+  if(typeof document!=='undefined'&&document.getElementById('haptic-trigger'))return 'ios';
+  return 'noop';
+}
+function _iosPulse(){
+  const t=document.getElementById('haptic-trigger');
+  if(t){try{t.click();}catch(e){}}
+}
+function haptic(){
+  if(!settings.haptic)return;
+  const b=hapticBackend();
+  playTick();                                   // 第一聲點擊音
+  if(b==='vibrate'){
+    try{navigator.vibrate([12,40,12]);}catch(e){} // 系統震動（iOS 27+ / Android）
+    const t=document.getElementById('haptic-trigger');
+    if(t){try{t.click();}catch(e){}}             // 舊 iOS 備援：vibrate 若為空指令，Taptic 補上
+  }else if(b==='ios'){
+    _iosPulse();                                // Taptic 第一下
+    setTimeout(function(){playTick();_iosPulse();},55); // 55ms 後第二下（tappt 式雙脈衝，更有感）
+  }
+}
+
+/* ================= 主題兌換（代碼＝主題定義，自包含可離線） ================= */
+function encodeThemeName(n){let s='';for(const ch of n)s+=ch.codePointAt(0).toString(16);return s;}
+function parseTheme(code){
+  try{
+    if(!code||code[0]!=='T')return null;
+    const i=code.indexOf('-');if(i<0)return null;
+    const nameHex=code.slice(1,i),seg=code.slice(i+1).split('-');
+    const hex=seg[0];
+    if(hex.length!==54||!/^[0-9a-fA-F]+$/.test(hex))return null;
+    const c=[];
+    for(let k=0;k<9;k++)c.push('#'+hex.slice(k*6,k*6+6));
+    let name='';
+    for(let k=0;k+4<=nameHex.length;k+=4)name+=String.fromCharCode(parseInt(nameHex.slice(k,k+4),16));
+    const icon=seg[1]&&['d','m','o'].includes(seg[1])?seg[1]:'d';
+    return {name:name||'自訂主題',c,icon};
+  }catch(e){return null;}
+}
+function applyIcon(icon){
+  const def={
+    mf:'./manifest.webmanifest',at:'./icons/icon-180.png',tc:'#9E203E'
+  },map={
+    m:{mf:'./manifest-mint.webmanifest',at:'./icons/icon-mint-180.png',tc:'#0FAE8C'}
+  };
+  const t=map[icon]||def;
+  document.querySelector('link[rel="manifest"]').href=t.mf;
+  document.querySelector('link[rel="apple-touch-icon"]').href=t.at;
+  document.querySelector('meta[name="theme-color"]').setAttribute('content',t.tc);
+  document.querySelector('link[rel="icon"]').href=icon==='m'?'./icons/icon-mint-192.png':'./icons/icon-192.png';
+}
+function applyTheme(th){
+  const r=document.documentElement.style,c=th.c;
+  r.setProperty('--wine',c[0]);r.setProperty('--wine-d',c[1]);r.setProperty('--wine-l',c[2]);
+  r.setProperty('--green',c[3]);r.setProperty('--green-l',c[4]);
+  r.setProperty('--ink',c[5]);r.setProperty('--sub',c[6]);r.setProperty('--line',c[7]);r.setProperty('--bg',c[8]);
+  r.setProperty('--cover',c[2]);
+  applyIcon(th.icon||'d');
+}
+function initTheme(){
+  if(settings.theme){
+    const th=parseTheme(settings.theme);
+    if(th)applyTheme(th);
+  }
+}
+function redeemTheme(){
