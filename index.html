@@ -18,7 +18,7 @@
   --green:#27AE60; --green-l:#E8F8F0;
   --ink:#222; --sub:#8a8a8a; --line:#eee; --bg:#f5f5f7;
   --nav-bg:rgba(255,255,255,.96); --cover:#F7E8EB;
-  --nav-h:76px;
+  --nav-h:68px;
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
 html,body{margin:0;padding:0;height:100%;overflow:hidden;}
@@ -64,10 +64,10 @@ label{font-size:13px;color:#666;font-weight:600;}
 .nav{position:fixed;left:0;right:0;bottom:0;margin:0;
   background:var(--nav-bg);border-top:2px solid var(--line);border-radius:0;
   box-shadow:0 -2px 10px rgba(0,0,0,.05);z-index:200;
-  padding:10px 12px env(safe-area-inset-bottom,0px);}
-.nav-in{display:flex;justify-content:space-between;max-width:560px;min-height:76px;margin:0 auto;}
-.nav button,.nav label[for]{width:64px;min-height:56px;border:none;background:none;padding:0;font-size:11px;color:#999;cursor:pointer;
-  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;}
+  padding:6px 12px env(safe-area-inset-bottom,0px);}
+.nav-in{display:flex;justify-content:space-between;max-width:560px;min-height:56px;margin:0 auto;}
+.nav button,.nav label[for]{width:64px;min-height:48px;border:none;background:none;padding:0;font-size:11px;color:#999;cursor:pointer;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;}
 .nav button .ic,.nav label[for] .ic{display:block;font-size:20px;line-height:24px;height:24px;}
 .nav button.active,.nav label[for].active{color:var(--wine);font-weight:700;}
 .nav button.add-btn .ic,.nav label[for].add-btn .ic{background:var(--wine);color:#fff;width:40px;height:40px;border-radius:50%;
