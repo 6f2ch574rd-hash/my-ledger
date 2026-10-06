@@ -215,7 +215,7 @@ label{font-size:13px;color:#666;font-weight:600;}
   <div class="card">
     <div class="card-head gray" style="display:flex;justify-content:space-between;align-items:center;">
       <span>🕘 最近記錄</span>
-      <span style="font-size:12px;color:var(--wine);font-weight:500;cursor:pointer;" onclick="goPage('pageList',1)">看全部 ›</span>
+      <span style="font-size:12px;color:var(--wine);font-weight:500;cursor:pointer;" onclick="viewAccount(null)">看全部 ›</span>
     </div>
     <div class="card-body" id="recentBox" style="padding-top:4px;"></div>
   </div>
@@ -263,6 +263,7 @@ label{font-size:13px;color:#666;font-weight:600;}
         <span class="chip" data-f="expense" onclick="setFilter('expense')">支出</span>
         <span class="chip" data-f="income" onclick="setFilter('income')">收入</span>
       </div>
+      <div class="chips" id="acctChips" style="margin-bottom:8px;"></div>
       <input id="searchBox" placeholder="🔍 搜尋名稱／分類／備註" oninput="renderList()">
       <div id="listBox"></div>
     </div>
@@ -754,7 +755,7 @@ function renderHome(){
   $('acctBox').innerHTML=d.accounts.map(a=>{
     let bal=a.opening||0;
     d.tx.forEach(r=>{if(r.account!==a.id)return;bal+=r.type==='income'?r.amount:-r.amount;});
-    return `<div class="acct-row"><span>${a.icon} ${esc(a.name)}</span><b>${fmt(bal)}</b></div>`;
+    return `<div class="acct-row" style="cursor:pointer;" onclick="viewAccount('${a.id}')"><span>${a.icon} ${esc(a.name)}</span><b>${fmt(bal)}</b></div>`;
   }).join('')||'<div class="empty">尚無帳戶</div>';
   const recent=[...d.tx].sort((a,b)=>b.date.localeCompare(a.date)||b.createdAt-a.createdAt).slice(0,7);
   $('recentBox').innerHTML=recent.length?recent.map(txRow).join(''):'<div class="empty"><span class="big-e">🧾</span>還沒有記錄，點下方＋開始記第一筆</div>';
@@ -770,7 +771,19 @@ function txRow(r){
 }
 
 /* ================= 明細 ================= */
-let listCursor=fmtYM(new Date()),listFilter='all';
+let listCursor=fmtYM(new Date()),listFilter='all',listAccount=null;
+function viewAccount(id){
+  haptic();
+  listAccount=id;
+  renderList();
+  goPage('pageList',document.querySelector('.nav label[data-p="pageList"]'));
+}
+function setAccountFilter(id){
+  haptic();
+  listAccount=id;
+  document.querySelectorAll('#acctChips .chip').forEach(c=>c.classList.toggle('on',c.dataset.a===(id||'all')));
+  renderList();
+}
 function shiftMonth(d){
   haptic();
   const [y,m]=listCursor.split('-').map(Number);
@@ -782,9 +795,13 @@ function setFilter(f){haptic();listFilter=f;
 }
 function renderList(){
   $('listMonth').textContent=monthLabel(listCursor);
+  const d=D();
+  $('acctChips').innerHTML=`<span class="chip${!listAccount?' on':''}" data-a="all" onclick="setAccountFilter(null)">全部</span>`+
+    d.accounts.map(a=>`<span class="chip${listAccount===a.id?' on':''}" data-a="${a.id}" onclick="setAccountFilter('${a.id}')">${a.icon} ${esc(a.name)}</span>`).join('');
   const kw=($('searchBox')?.value||'').trim().toLowerCase();
-  let rows=D().tx.filter(r=>r.date.startsWith(listCursor));
+  let rows=d.tx.filter(r=>r.date.startsWith(listCursor));
   if(listFilter!=='all')rows=rows.filter(r=>r.type===listFilter);
+  if(listAccount)rows=rows.filter(r=>r.account===listAccount);
   if(kw)rows=rows.filter(r=>(r.name+r.category+(r.note||'')).toLowerCase().includes(kw));
   rows.sort((a,b)=>b.date.localeCompare(a.date)||b.createdAt-a.createdAt);
   const box=$('listBox');
