@@ -1,0 +1,81 @@
+.set('ll_active',activeId);}
+let DB=LS.get('ll_db',{});
+if(!DB[activeId]){DB[activeId]=freshBookData();LS.set('ll_db',DB);}
+let settings=LS.get('ll_settings',{pass:null});
+if(settings.bio===undefined)settings.bio=false;
+if(settings.bioCred===undefined)settings.bioCred=null;
+if(settings.haptic===undefined)settings.haptic=false;
+let ui={navH:68,navR:0,navIc:20,density:'normal'};
+if(settings.ui)ui=Object.assign(ui,settings.ui);
+function applyUI(){
+  const r=document.documentElement.style;
+  r.setProperty('--nav-h',ui.navH+'px');
+  r.setProperty('--nav-r',ui.navR+'px');
+  r.setProperty('--nav-ic',ui.navIc+'px');
+  r.setProperty('--card-pad',{compact:'12px',normal:'14px',roomy:'18px'}[ui.density]);
+  settings.ui=ui;LS.set('ll_settings',settings);
+  const rec=document.getElementById('navRecover');
+  if(rec)rec.style.display=ui.navH<35?'block':'none';
+}
+function recoverNav(){
+  ui.navH=68;applyUI();
+  const s=document.getElementById('uiNavH');if(s){s.value=68;}
+  const v=document.getElementById('uiNavHVal');if(v){v.textContent='68';}
+  toast('導航已恢復');haptic();
+}
+function uiChange(){
+  ui.navH=+$('uiNavH').value;ui.navR=+$('uiNavR').value;ui.navIc=+$('uiNavIc').value;
+  $('uiNavHVal').textContent=ui.navH;$('uiNavRVal').textContent=ui.navR;$('uiNavIcVal').textContent=ui.navIc;
+  applyUI();
+}
+function setDensity(d,el){
+  ui.density=d;
+  document.querySelectorAll('#uiDensity .chip').forEach(c=>c.classList.toggle('on',c.dataset.d===d));
+  applyUI();
+}
+LS.set('ll_settings',settings);
+function saveDB(){LS.set('ll_db',DB);}
+function saveBooks(){LS.set('ll_books',books);LS.set('ll_active',activeId);}
+function book(){return books.find(b=>b.id===activeId);}
+function D(){return DB[activeId];}
+
+/* ================= 導航 ================= */
+function goPage(pid,btn){
+  haptic();
+  document.querySelectorAll('.nav button,.nav label[for]').forEach(b=>b.classList.remove('active'));
+  if(typeof btn==='number')btn=document.querySelector(`.nav button[data-p="${pid}"],.nav label[data-p="${pid}"]`);
+  if(btn&&btn.dataset)btn.classList.add('active');
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  $(pid).classList.add('active');
+  window.scrollTo(0,0);
+  if(pid==='pageHome')renderHome();
+  if(pid==='pageList')renderList();
+  if(pid==='pageStats')renderStats();
+  if(pid==='pageSettings')renderSettings();
+  if(pid==='pageAdd'&&!editingId)renderAddForm();
+}
+
+/* ================= 記一筆 ================= */
+let curType='expense',selCat=null,editingId=null;
+function setType(t){
+  haptic();
+  curType=t;const seg=$('typeSeg');
+  seg.classList.toggle('inc',t==='income');
+  seg.children[0].className=t==='expense'?'on-exp':'';
+  seg.children[1].className=t==='income'?'on-inc':'';
+  $('saveBtn').className='btn '+(t==='income'?'btn-green':'btn-wine');
+  $('fAmount').className='amt-input'+(t==='income'?' inc':'');
+  selCat=null;renderCatGrid();
+}
+function renderCatGrid(){
+  const cats=curType==='expense'?D().catsExp:D().catsInc;
+  $('catGrid').innerHTML=cats.map(c=>{
+    const sel=selCat===c?(curType==='income'?'sel-inc':'sel'):'';
+    return `<div class="cat-cell ${sel}" onclick="pickCat('${esc(c)}')"><span class="e">${catEmoji(c)}</span>${esc(catName(c))}</div>`;
+  }).join('');
+}
+function pickCat(c){haptic();selCat=c;renderCatGrid();}
+function renderAccounts(sel){
+  $('fAccount').innerHTML=D().accounts.map(a=>`<option value="${a.id}" ${sel===a.id?'selected':''}>${a.icon} ${esc(a.name)}</option>`).join('');
+}
+function renderAddForm

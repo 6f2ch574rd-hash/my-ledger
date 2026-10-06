@@ -1,0 +1,65 @@
+text&&navigator.credentials&&navigator.credentials.create
+    &&navigator.credentials.get&&window.PublicKeyCredential!==undefined);
+}
+function b64urlToBytes(s){
+  const b=atob(s.replace(/-/g,'+').replace(/_/g,'/'));
+  const u=new Uint8Array(b.length);
+  for(let i=0;i<b.length;i++)u[i]=b.charCodeAt(i);
+  return u;
+}
+function bytesToB64url(u){
+  let s='';const chunk=0x8000;
+  for(let i=0;i<u.length;i+=chunk)s+=String.fromCharCode.apply(null,u.subarray(i,i+chunk));
+  return btoa(s).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
+}
+async function toggleBio(on){
+  haptic();
+  if(on){
+    if(!bioSupported()){toast('此瀏覽器不支援 Face ID／Touch ID');$('bioSwitch').checked=false;return;}
+    if(!settings.pass){toast('請先設定 4 位數密碼鎖');$('bioSwitch').checked=false;return;}
+    if(settings.bioCred){settings.bio=true;LS.set('ll_settings',settings);renderSettings();toast('已啟用 Face ID 解鎖');return;}
+    try{
+      const ch=new Uint8Array(32);crypto.getRandomValues(ch);
+      const uid=new Uint8Array(16);crypto.getRandomValues(uid);
+      const cred=await navigator.credentials.create({publicKey:{
+        challenge:ch,
+        rp:{id:location.hostname,name:'我的記帳本'},
+        user:{id:uid,name:settings.pass,displayName:'我的記帳本'},
+        pubKeyCredParams:[{type:'public-key',alg:-7},{type:'public-key',alg:-257}],
+        authenticatorSelection:{authenticatorAttachment:'platform',userVerification:'required',residentKey:'preferred'},
+        timeout:60000,attestation:'none'
+      }});
+      settings.bioCred=cred.id;settings.bio=true;LS.set('ll_settings',settings);
+      renderSettings();toast('✅ 已啟用 Face ID 解鎖');
+    }catch(e){toast('啟用失敗（已取消或裝置不支援）');$('bioSwitch').checked=false;}
+  }else{
+    settings.bio=false;settings.bioCred=null;LS.set('ll_settings',settings);
+    renderSettings();toast('已關閉 Face ID 解鎖');
+  }
+}
+async function doBioUnlock(silent){
+  if(!settings.bioCred){if(!silent)toast('尚未設定 Face ID');return;}
+  try{
+    const ch=new Uint8Array(32);crypto.getRandomValues(ch);
+    await navigator.credentials.get({publicKey:{
+      challenge:ch,
+      rpId:location.hostname,
+      allowCredentials:[{type:'public-key',id:b64urlToBytes(settings.bioCred)}],
+      userVerification:'required',timeout:60000
+    }});
+    $('lockScreen').classList.remove('show');
+  }catch(e){if(!silent)toast('Face ID 驗證失敗');haptic();}
+}
+function unlockBio(){haptic();doBioUnlock(false);}
+
+/* ================= 預設資料 ================= */
+const DEF_EXP=['🍔 餐飲','🚌 交通','🛒 購物','🏠 居家','🎮 娛樂','💊 醫療','📚 學習','✈️ 旅遊','🎁 送禮','📱 訂閱','🧾 其他'];
+const DEF_INC=['💰 薪水','🎁 紅包','📈 投資','💼 獎金','🧾 其他'];
+const DEF_ACCTS=[{id:'a-cash',name:'現金',icon:'💵',opening:0},{id:'a-bank',name:'銀行',icon:'🏦',opening:0},{id:'a-card',name:'信用卡',icon:'💳',opening:0}];
+function freshBookData(){return {tx:[],accounts:JSON.parse(JSON.stringify(DEF_ACCTS)),catsExp:[...DEF_EXP],catsInc:[...DEF_INC],budget:0};}
+
+/* ================= 狀態（每支手機各自獨立） ================= */
+let books=LS.get('ll_books',null);
+if(!books){const bid=uid();books=[{id:bid,name:'我的帳本',createdAt:nowTs()}];LS.set('ll_books',books);LS.set('ll_active',bid);}
+let activeId=LS.get('ll_active',books[0].id);
+if(!books.find(b=>b.id===activeId)){activeId=books[0].id;LS
