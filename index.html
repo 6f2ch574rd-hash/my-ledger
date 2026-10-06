@@ -377,7 +377,7 @@ label{font-size:13px;color:#666;font-weight:600;}
     <div class="card-head gray">🎛 介面自訂</div>
     <div class="card-body">
       <div class="set-row"><span>導航高度</span><b class="ui-val" id="uiNavHVal">68</b></div>
-      <input type="range" class="ui-slider" id="uiNavH" min="56" max="110" step="1" oninput="uiChange()">
+      <input type="range" class="ui-slider" id="uiNavH" min="0" max="110" step="1" oninput="uiChange()">
       <div class="set-row"><span>導航圓角</span><b class="ui-val" id="uiNavRVal">0</b></div>
       <input type="range" class="ui-slider" id="uiNavR" min="0" max="24" step="1" oninput="uiChange()">
       <div class="set-row"><span>導航圖示大小</span><b class="ui-val" id="uiNavIcVal">20</b></div>
@@ -388,7 +388,7 @@ label{font-size:13px;color:#666;font-weight:600;}
         <span class="chip" data-d="normal" onclick="setDensity('normal',this)">標準</span>
         <span class="chip" data-d="roomy" onclick="setDensity('roomy',this)">寬鬆</span>
       </div>
-      <div class="mini" style="margin-top:8px;color:var(--sub);">調整立即生效、只存在這支手機。進階自訂（CSS）即將推出。</div>
+      <div class="mini" style="margin-top:8px;color:var(--sub);">調整立即生效、只存在這支手機。滑到 0 會隱藏導航（畫面底部會出現恢復按鈕）。進階自訂（CSS）即將推出。</div>
     </div>
   </div>
 
@@ -459,6 +459,10 @@ label{font-size:13px;color:#666;font-weight:600;}
   <label for="haptic-input" data-p="pageStats" onclick="goPage('pageStats',this)"><span class="ic">📊</span>統計</label>
   <label for="haptic-input" data-p="pageSettings" onclick="goPage('pageSettings',this)"><span class="ic">⚙️</span>設定</label>
   </div>
+</div>
+<!-- 導航隱藏時的恢復條 -->
+<div id="navRecover" style="display:none;position:fixed;left:0;right:0;bottom:0;z-index:300;background:var(--nav-bg);border-top:2px solid var(--line);padding:8px;text-align:center;">
+  <button class="btn btn-sm btn-wine" onclick="recoverNav()">↺ 導航已隱藏 — 點此恢復</button>
 </div>
 
 <!-- 彈窗：帳本管理 -->
@@ -676,6 +680,14 @@ function applyUI(){
   r.setProperty('--nav-ic',ui.navIc+'px');
   r.setProperty('--card-pad',{compact:'12px',normal:'14px',roomy:'18px'}[ui.density]);
   settings.ui=ui;LS.set('ll_settings',settings);
+  const rec=document.getElementById('navRecover');
+  if(rec)rec.style.display=ui.navH<35?'block':'none';
+}
+function recoverNav(){
+  ui.navH=68;applyUI();
+  const s=document.getElementById('uiNavH');if(s){s.value=68;}
+  const v=document.getElementById('uiNavHVal');if(v){v.textContent='68';}
+  toast('導航已恢復');haptic();
 }
 function uiChange(){
   ui.navH=+$('uiNavH').value;ui.navR=+$('uiNavR').value;ui.navIc=+$('uiNavIc').value;
