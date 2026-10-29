@@ -451,6 +451,7 @@ label{font-size:13px;color:#666;font-weight:600;}
     </div>
   </div>
   <div class="mini" style="text-align:center;margin:14px 0 4px;" onclick="showDbg()">我的記帳本 v1.3 · 資料只存放於你的手機</div>
+  <div id="dbgLine" class="mini" style="text-align:center;margin:2px 0 10px;word-break:break-all;"></div>
 </div>
 
 </div><!-- /wrap -->
@@ -691,6 +692,17 @@ function showDbg(){
   const b=document.body.getBoundingClientRect();
   toast('inner '+innerHeight+' · vv '+Math.round(window.visualViewport?visualViewport.height:0)+' · screen '+screen.height+' · body '+Math.round(b.height)+' · safe '+safe+' · '+(navigator.standalone?'App':'網頁'),6000);
 }
+function updDbg(){
+  try{
+    const e=document.getElementById('dbgLine');if(!e)return;
+    const pr=document.createElement('div');pr.style.cssText='position:absolute;visibility:hidden;padding-bottom:env(safe-area-inset-bottom)';document.body.appendChild(pr);
+    const safe=parseFloat(getComputedStyle(pr).paddingBottom)||0;pr.remove();
+    const nav=document.querySelector('.nav'),nb=nav?Math.round(nav.getBoundingClientRect().bottom):0;
+    e.textContent='inner '+innerHeight+' · vv '+Math.round(window.visualViewport?visualViewport.height:0)+' · screen '+screen.height+' · body '+Math.round(document.body.getBoundingClientRect().height)+' · navBottom '+nb+' · safe '+safe+' · '+(navigator.standalone?'App':'網頁');
+  }catch(err){}
+}
+window.addEventListener('resize',updDbg);
+setTimeout(updDbg,500);setTimeout(updDbg,2000);setInterval(updDbg,3000);
 function recoverNav(){
   ui.navH=68;applyUI();
   const s=document.getElementById('uiNavH');if(s){s.value=68;}
