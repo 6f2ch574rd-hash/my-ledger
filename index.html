@@ -33,7 +33,7 @@ body{background:var(--bg);color:var(--ink);
   height:100%;
   overflow-y:auto;-webkit-overflow-scrolling:touch;
   overscroll-behavior-y:none;
-  padding:0 14px calc(var(--nav-h) + env(safe-area-inset-bottom) + 24px);}
+  padding:0 14px calc(var(--nav-h) + var(--sab,env(safe-area-inset-bottom,0px)) + 24px);}
 h2.app-title{color:var(--wine);margin:14px 4px 10px;font-size:22px;display:flex;align-items:center;gap:8px;}
 .page{display:none;animation:fade .18s ease;}
 .page.active{display:block;}
@@ -68,7 +68,7 @@ label{font-size:13px;color:#666;font-weight:600;}
   background:var(--nav-bg);border-top:2px solid var(--line);
   border-radius:var(--nav-r,0px) var(--nav-r,0px) 0 0;
   box-shadow:0 -2px 10px rgba(0,0,0,.05);z-index:200;
-  height:calc(var(--nav-h,68px) + env(safe-area-inset-bottom));padding:0 12px env(safe-area-inset-bottom,0px);}
+  height:calc(var(--nav-h,68px) + var(--sab,env(safe-area-inset-bottom,0px)));padding:0 12px var(--sab,env(safe-area-inset-bottom,0px));}
 .nav-in{display:flex;justify-content:space-between;max-width:560px;min-height:56px;margin:0 auto;height:100%;}
 .nav button,.nav label[for]{width:64px;min-height:48px;border:none;background:none;padding:0;font-size:11px;color:#999;cursor:pointer;
   display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;height:100%;}
@@ -121,7 +121,7 @@ label{font-size:13px;color:#666;font-weight:600;}
 .mini{font-size:12px;color:var(--sub);}
 .overlay{position:absolute;inset:0;background:rgba(0,0,0,.45);z-index:500;display:none;align-items:flex-end;justify-content:center;}
 .overlay.show{display:flex;}
-.sheet{background:#fff;width:100%;max-width:640px;border-radius:20px 20px 0 0;padding:20px 18px calc(20px + env(safe-area-inset-bottom));max-height:82vh;overflow:auto;}
+.sheet{background:#fff;width:100%;max-width:640px;border-radius:20px 20px 0 0;padding:20px 18px calc(20px + var(--sab,env(safe-area-inset-bottom,0px)));max-height:82vh;overflow:auto;}
 .sheet h3{margin:0 0 14px;color:var(--wine);}
 .lock{position:absolute;inset:0;z-index:999;background:linear-gradient(165deg,var(--wine),var(--wine-d));
   display:none;flex-direction:column;align-items:center;justify-content:center;color:#fff;padding:24px;}
@@ -692,13 +692,31 @@ function showDbg(){
   const b=document.body.getBoundingClientRect();
   toast('inner '+innerHeight+' · vv '+Math.round(window.visualViewport?visualViewport.height:0)+' · screen '+screen.height+' · body '+Math.round(b.height)+' · safe '+safe+' · '+(navigator.standalone?'App':'網頁'),6000);
 }
+function fitSafe(){
+  try{
+    const de=document.documentElement,ae=document.activeElement;
+    if(ae&&/^(INPUT|TEXTAREA|SELECT)$/.test(ae.tagName))return;
+    const standalone=navigator.standalone===true||(window.matchMedia&&matchMedia('(display-mode: standalone)').matches);
+    const pr=document.createElement('div');pr.style.cssText='position:absolute;visibility:hidden;padding-bottom:env(safe-area-inset-bottom,0px)';document.body.appendChild(pr);
+    const safe=parseFloat(getComputedStyle(pr).paddingBottom)||0;pr.remove();
+    const gap=Math.max(screen.height,screen.width)-window.innerHeight;
+    // App 模式下，網頁區域若本來就比螢幕矮（底下已在 Home 橫條之上），就不必再留安全區，否則導航底下會多一條白空白
+    if(standalone&&window.innerHeight>window.innerWidth&&gap>=safe&&safe>0){
+      de.style.setProperty('--sab','0px');
+    }else{
+      de.style.removeProperty('--sab');
+    }
+  }catch(err){}
+}
+window.addEventListener('resize',fitSafe);window.addEventListener('pageshow',fitSafe);
+fitSafe();setTimeout(fitSafe,300);setTimeout(fitSafe,1500);setInterval(fitSafe,3000);
 function updDbg(){
   try{
     const e=document.getElementById('dbgLine');if(!e)return;
     const pr=document.createElement('div');pr.style.cssText='position:absolute;visibility:hidden;padding-bottom:env(safe-area-inset-bottom)';document.body.appendChild(pr);
     const safe=parseFloat(getComputedStyle(pr).paddingBottom)||0;pr.remove();
     const nav=document.querySelector('.nav'),nb=nav?Math.round(nav.getBoundingClientRect().bottom):0;
-    e.textContent='inner '+innerHeight+' · vv '+Math.round(window.visualViewport?visualViewport.height:0)+' · screen '+screen.height+' · body '+Math.round(document.body.getBoundingClientRect().height)+' · navBottom '+nb+' · safe '+safe+' · '+(navigator.standalone?'App':'網頁');
+    e.textContent='inner '+innerHeight+' · vv '+Math.round(window.visualViewport?visualViewport.height:0)+' · screen '+screen.height+' · body '+Math.round(document.body.getBoundingClientRect().height)+' · navBottom '+nb+' · safe '+safe+' · sab '+(document.documentElement.style.getPropertyValue('--sab')||'auto')+' · '+(navigator.standalone?'App':'網頁');
   }catch(err){}
 }
 window.addEventListener('resize',updDbg);
