@@ -33,7 +33,7 @@ body{background:var(--bg);color:var(--ink);
   height:100%;
   overflow-y:auto;-webkit-overflow-scrolling:touch;
   overscroll-behavior-y:none;
-  padding:0 14px calc(var(--nav-h) + var(--sab,env(safe-area-inset-bottom,0px)) + 24px);}
+  padding:0 14px calc(var(--nav-h) + var(--sab,env(safe-area-inset-bottom,0px)) + 8px + 24px);}
 h2.app-title{color:var(--wine);margin:14px 4px 10px;font-size:22px;display:flex;align-items:center;gap:8px;}
 .page{display:none;animation:fade .18s ease;}
 .page.active{display:block;}
@@ -64,11 +64,13 @@ label{font-size:13px;color:#666;font-weight:600;}
 .seg button.on-exp{background:var(--wine);color:#fff;}
 .seg button.on-inc{background:var(--green);color:#fff;}
 .seg.inc{border-color:var(--green);}
-.nav{position:absolute;left:0;right:0;bottom:0;margin:0;
-  background:var(--nav-bg);border-top:2px solid var(--line);
-  border-radius:var(--nav-r,0px) var(--nav-r,0px) 0 0;
-  box-shadow:0 -2px 10px rgba(0,0,0,.05);z-index:200;
-  height:calc(var(--nav-h,68px) + var(--sab,env(safe-area-inset-bottom,0px)));padding:0 12px var(--sab,env(safe-area-inset-bottom,0px));}
+/* 懸浮式圓角導航：浮在底部，下方若有 iPhone 網頁畫不到的區域，看起來像刻意留白 */
+.nav{position:absolute;left:12px;right:12px;bottom:calc(8px + var(--sab,env(safe-area-inset-bottom,0px)));margin:0 auto;max-width:560px;
+  background:var(--nav-bg);border:1px solid rgba(0,0,0,.06);
+  border-radius:max(var(--nav-r,0px),26px);
+  -webkit-backdrop-filter:saturate(1.6) blur(14px);backdrop-filter:saturate(1.6) blur(14px);
+  box-shadow:0 6px 22px rgba(0,0,0,.14),0 1px 3px rgba(0,0,0,.08);z-index:200;
+  height:var(--nav-h,68px);padding:0 8px;}
 .nav-in{display:flex;justify-content:space-between;max-width:560px;min-height:56px;margin:0 auto;height:100%;}
 .nav button,.nav label[for]{width:64px;min-height:48px;border:none;background:none;padding:0;font-size:11px;color:#999;cursor:pointer;
   display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;height:100%;}
@@ -77,6 +79,7 @@ label{font-size:13px;color:#666;font-weight:600;}
 .ui-slider::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:20px;height:20px;border-radius:50%;background:var(--wine);border:none;box-shadow:0 1px 4px rgba(0,0,0,.25);}
 .ui-val{font-size:13px;color:var(--wine);font-weight:600;}
 .nav button.active,.nav label[for].active{color:var(--wine);font-weight:700;}
+.nav label[for].active:not(.add-btn){background:var(--wine-l);border-radius:20px;height:calc(100% - 14px);margin:7px 0;}
 .nav button.add-btn .ic,.nav label[for].add-btn .ic{background:var(--wine);color:#fff;width:40px;height:40px;border-radius:50%;
   display:flex;align-items:center;justify-content:center;margin:0;font-size:22px;
   box-shadow:0 4px 12px rgba(0,0,0,.25);}
@@ -685,6 +688,7 @@ function applyUI(){
   settings.ui=ui;LS.set('ll_settings',settings);
   const rec=document.getElementById('navRecover');
   if(rec)rec.style.display=ui.navH<35?'block':'none';
+  const navEl=document.querySelector('.nav');if(navEl)navEl.style.display=ui.navH<35?'none':'';
 }
 function showDbg(){
   const pr=document.createElement('div');pr.style.cssText='position:absolute;visibility:hidden;padding-bottom:env(safe-area-inset-bottom)';document.body.appendChild(pr);
