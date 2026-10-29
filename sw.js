@@ -1,5 +1,5 @@
-/* 我的記帳本 — 離線快取 v3（網路優先，確保更新即時生效） */
-const CACHE = 'my-ledger-v3';
+/* 我的記帳本 — 離線快取 v4（網路優先，確保更新即時生效） */
+const CACHE = 'my-ledger-v4';
 const CORE = [
   './',
   './index.html',
@@ -18,6 +18,11 @@ self.addEventListener('activate', e => {
     caches.keys().then(keys => Promise.all(keys.filter(k => k !== CACHE).map(k => caches.delete(k))))
       .then(() => self.clients.claim())
   );
+});
+
+// 收到頁面「立即更新」指令時，讓新 SW 立刻接管
+self.addEventListener('message', e => {
+  if (e.data && e.data.type === 'SKIP_WAITING') self.skipWaiting();
 });
 
 self.addEventListener('fetch', e => {
