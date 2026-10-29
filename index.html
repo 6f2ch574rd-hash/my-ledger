@@ -21,11 +21,10 @@
   --nav-h:68px;
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
-html{height:100%;background:var(--bg);}
+/* html 底色＝導航白色：iPhone 主畫面 App 底部若有網頁畫不到的區域，會與導航連成一片，看起來貼底 */
+html{height:100%;background:#fff;}
 html,body{margin:0;padding:0;overflow:hidden;}
-/* 整個 App 固定撐滿實際螢幕；導航/彈窗以 body 為基準貼底（解決 iPhone 主畫面 App 底部留白） */
 body{position:fixed;top:0;left:0;right:0;bottom:0;}
-html.fixh body{bottom:auto;height:var(--app-h);}
 body{background:var(--bg);color:var(--ink);
   font-family:-apple-system,BlinkMacSystemFont,"PingFang TC","Microsoft JhengHei","Segoe UI",sans-serif;
   padding-top:env(safe-area-inset-top);
@@ -686,28 +685,11 @@ function applyUI(){
   const rec=document.getElementById('navRecover');
   if(rec)rec.style.display=ui.navH<35?'block':'none';
 }
-function fitHeight(){
-  try{
-    const de=document.documentElement,ae=document.activeElement;
-    if(ae&&/^(INPUT|TEXTAREA|SELECT)$/.test(ae.tagName))return;
-    const standalone=navigator.standalone===true||(window.matchMedia&&matchMedia('(display-mode: standalone)').matches);
-    const portrait=window.innerHeight>window.innerWidth;
-    const full=Math.max(screen.height,screen.width);
-    if(standalone&&portrait&&window.innerHeight<full-1&&window.innerHeight>full*0.8){
-      de.style.setProperty('--app-h',full+'px');de.classList.add('fixh');
-    }else{
-      de.classList.remove('fixh');de.style.removeProperty('--app-h');
-    }
-  }catch(e){}
-}
-['resize','orientationchange','pageshow'].forEach(ev=>window.addEventListener(ev,()=>{fitHeight();setTimeout(fitHeight,300);}));
-document.addEventListener('visibilitychange',()=>{if(!document.hidden){fitHeight();setTimeout(fitHeight,300);}});
-fitHeight();setTimeout(fitHeight,300);setTimeout(fitHeight,1200);
 function showDbg(){
   const pr=document.createElement('div');pr.style.cssText='position:absolute;visibility:hidden;padding-bottom:env(safe-area-inset-bottom)';document.body.appendChild(pr);
   const safe=parseFloat(getComputedStyle(pr).paddingBottom)||0;pr.remove();
   const b=document.body.getBoundingClientRect();
-  toast('inner '+innerHeight+' · screen '+screen.height+' · body '+Math.round(b.height)+' · safe '+safe+' · '+(navigator.standalone?'App':'網頁'));
+  toast('inner '+innerHeight+' · vv '+Math.round(window.visualViewport?visualViewport.height:0)+' · screen '+screen.height+' · body '+Math.round(b.height)+' · safe '+safe+' · '+(navigator.standalone?'App':'網頁'),6000);
 }
 function recoverNav(){
   ui.navH=68;applyUI();
