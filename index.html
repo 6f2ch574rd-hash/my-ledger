@@ -838,7 +838,7 @@ function viewAccount(id){
 function setAccountFilter(id){
   haptic();
   listAccount=id;
-  document.querySelectorAll('#acctChips .chip').forEach(c=>c.classList.toggle('on',c.dataset.a===(id||'all'));
+  document.querySelectorAll('#acctChips .chip').forEach(c=>c.classList.toggle('on',c.dataset.a===(id||'all')));
   renderList();
 }
 function shiftMonth(d){
