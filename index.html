@@ -812,7 +812,7 @@ function doSave(){
   saveDB();renderAddForm();
 }
 function editTx(id){
-  const r=D().tx.find(x=>x.id);if(!r)return;
+  const r=D().tx.find(x=>x.id===id);if(!r)return;
   editingId=id;setType(r.type);
   selCat=r.category;renderCatGrid();
   $('fDate').value=r.date;$('fName').value=r.name===catName(r.category)?'':r.name;
