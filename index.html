@@ -236,6 +236,10 @@ label{font-size:13px;color:#666;font-weight:600;}
 <div class="page" id="pageAdd">
   <div class="card">
     <div class="card-body">
+      <div id="editBanner" style="display:none;align-items:center;justify-content:space-between;gap:8px;background:var(--wine-l);color:var(--wine);border-radius:12px;padding:8px 8px 8px 12px;margin-bottom:12px;font-size:14px;font-weight:700;">
+        <span>✏️ 正在編輯這一筆</span>
+        <button class="btn btn-sm btn-ghost" onclick="cancelEdit()">取消編輯，改為新增</button>
+      </div>
       <div class="seg" id="typeSeg">
         <button class="on-exp" onclick="setType('expense')">💸 支出</button>
         <button onclick="setType('income')">💰 收入</button>
@@ -464,7 +468,7 @@ label{font-size:13px;color:#666;font-weight:600;}
   <div class="nav-in">
   <label for="haptic-input" class="active" data-p="pageHome" onclick="goPage('pageHome',this)"><span class="ic">🏠</span>首頁</label>
   <label for="haptic-input" data-p="pageList" onclick="goPage('pageList',this)"><span class="ic">📋</span>明細</label>
-  <label for="haptic-input" class="add-btn" data-p="pageAdd" onclick="goPage('pageAdd',this)"><span class="ic">＋</span>記帳</label>
+  <label for="haptic-input" class="add-btn" data-p="pageAdd" onclick="newEntry(this)"><span class="ic">＋</span>記帳</label>
   <label for="haptic-input" data-p="pageStats" onclick="goPage('pageStats',this)"><span class="ic">📊</span>統計</label>
   <label for="haptic-input" data-p="pageSettings" onclick="goPage('pageSettings',this)"><span class="ic">⚙️</span>設定</label>
   </div>
@@ -787,10 +791,12 @@ function renderAccounts(sel){
   $('fAccount').innerHTML=D().accounts.map(a=>`<option value="${a.id}" ${sel===a.id?'selected':''}>${a.icon} ${esc(a.name)}</option>`).join('');
 }
 function renderAddForm(){
-  editingId=null;$('editDelBtn').style.display='none';
+  editingId=null;$('editDelBtn').style.display='none';$('editBanner').style.display='none';
   $('fDate').value=today();$('fName').value='';$('fAmount').value='';$('fNote').value='';
   renderAccounts(D().accounts[0]?.id);setType('expense');
 }
+function cancelEdit(){renderAddForm();toast('已取消編輯，可以新增記錄');}
+function newEntry(btn){editingId=null;goPage('pageAdd',btn);}
 function resetForm(){renderAddForm();toast('表單已清空');}
 function doSave(){
   haptic();
@@ -818,7 +824,7 @@ function editTx(id){
   $('fDate').value=r.date;$('fName').value=r.name===catName(r.category)?'':r.name;
   $('fAmount').value=r.amount;$('fNote').value=r.note||'';
   renderAccounts(r.account);
-  $('editDelBtn').style.display='block';
+  $('editDelBtn').style.display='block';$('editBanner').style.display='flex';
   goPage('pageAdd',document.querySelector('.nav button[data-p="pageAdd"],.nav label[data-p="pageAdd"]'));
 }
 function deleteEditing(){
