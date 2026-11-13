@@ -71,6 +71,12 @@ svg{display:block;}
 .ico{width:1.1em;height:1.1em;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
 
 /* ============ App 外框：開 Sheet 時後面縮小，像 iOS ============ */
+/* iOS 26 主畫面 App 的已知問題（WebKit 301108）：用 viewport-fit=cover＋透明狀態列時，可視區會比螢幕短一個狀態列高度，
+   固定定位的層會停在那條短的邊上，底下空一截。解法：在主畫面模式把這些層拉到 min(100lvh, 100% + 頂部安全區)。 */
+@media (display-mode: standalone){
+  html{min-height:min(100lvh,calc(100% + env(safe-area-inset-top,0px)));}
+  body,.sheet,.asheet,.alert,.lock{bottom:auto;height:min(100lvh,calc(100% + env(safe-area-inset-top,0px)));}
+}
 #app{position:absolute;inset:0;background:var(--bg);overflow:hidden;transform-origin:50% 0;
   transition:transform .42s var(--ease),border-radius .42s var(--ease),filter .42s var(--ease);}
 body.sheet-open{background:#000;}
@@ -200,6 +206,12 @@ body.sheet-open #app{transform:translateY(calc(var(--sat) + 10px)) scale(.92);bo
 .monthbar button:disabled{color:var(--label3);}
 .monthbar .ico{width:22px;height:22px;stroke-width:2.5;}
 .switch{position:relative;flex:none;width:51px;height:31px;}
+.switch input[switch]{appearance:none;-webkit-appearance:none;}
+.hap-rel{position:relative;}
+.hap-ov{position:absolute;inset:0;z-index:5;display:block;margin:0;padding:0;border-radius:inherit;background:transparent;
+  -webkit-tap-highlight-color:transparent;-webkit-touch-callout:none;-webkit-user-select:none;user-select:none;cursor:pointer;}
+.hap-ov>input{position:absolute;width:1px;height:1px;margin:0;opacity:0;visibility:hidden;pointer-events:none;}
+html[data-nohap] .hap-ov{display:none;}
 .switch input{position:absolute;opacity:0;width:100%;height:100%;margin:0;cursor:pointer;z-index:1;}
 .switch span{position:absolute;inset:0;border-radius:16px;background:var(--fill2);transition:background .25s;}
 .switch span::after{content:"";position:absolute;top:2px;left:2px;width:27px;height:27px;border-radius:50%;background:#fff;box-shadow:0 3px 8px rgba(0,0,0,.15),0 1px 1px rgba(0,0,0,.16);transition:transform .25s var(--ease);}
@@ -996,7 +1008,8 @@ function _pulse(){
 }
 function haptic(kind){
   if(!settings.haptic)return;
-  if(!kind&&Date.now()-_lastPulse<60)return;   // 同一下點擊已經震過了
+  if(!kind&&(Date.now()-_lastPulse<60||Date.now()-_hapAt<900)){   // 這一下點擊 iPhone 已經由真實觸碰震過了；Android 用 vibrate 補上
+    playTick();if('vibrate' in navigator){try{navigator.vibrate(10);}catch(e){}}return;}
   playTick();
   const n=kind==='error'?3:kind==='success'?2:1;
   if('vibrate' in navigator){try{navigator.vibrate(n===1?10:n===2?[12,60,12]:[18,60,18,60,18]);}catch(e){}}
@@ -1690,7 +1703,7 @@ const setPages=[];
 const sic=(icon,color)=>`<span class="sic" style="--cc:var(--c-${color==='warn'?'red':color})">${ICON[icon]}</span>`;
 const rowNav=(act,icon,color,title,value)=>`<button class="row tap" data-act="${act}" style="--inset:58px">${sic(icon,color)}<div class="rt"><div class="t">${title}</div></div><span class="v">${value||''}</span>${ICON.chev}</button>`;
 const rowBtn=(act,icon,color,title,sub)=>`<button class="row tap" data-act="${act}" style="--inset:58px">${sic(icon,color)}<div class="rt"><div class="t">${title}</div>${sub?`<div class="s">${sub}</div>`:''}</div></button>`;
-const rowToggle=(key,icon,color,title,on,disabled)=>`<div class="row" style="--inset:58px">${sic(icon,color)}<div class="rt"><div class="t">${title}</div></div><label class="switch"><input type="checkbox" role="switch" data-toggle="${key}" ${on?'checked':''} ${disabled?'disabled':''} aria-label="${title}"><span></span></label></div>`;
+const rowToggle=(key,icon,color,title,on,disabled)=>`<div class="row" style="--inset:58px">${sic(icon,color)}<div class="rt"><div class="t">${title}</div></div><label class="switch"><input type="checkbox" switch role="switch" data-toggle="${key}" ${on?'checked':''} ${disabled?'disabled':''} aria-label="${title}"><span></span></label></div>`;
 function backupInfo(){
   const last=LS.get('ll_lastBackup',0);
   if(!last)return {text:'從未備份',warn:true};
@@ -1866,7 +1879,7 @@ async function settingsAction(act){
   }
 }
 async function toggleSetting(key,on,input){
-  if(key==='haptic'){settings.haptic=on;saveSettings();if(on)haptic();return;}
+  if(key==='haptic'){settings.haptic=on;saveSettings();applyHapticSetting();if(on)haptic();return;}
   // 等開關滑完（約 .3 秒）再換外觀，畫面用淡入淡出銜接
   if(key==='darkFrost'){settings.darkFrost=on;saveSettings();lookTransition(()=>{applyLook();syncLookUI();},reduceMotion()?0:300);return;}
   if(key==='muted'){settings.muted=on;saveSettings();lookTransition(()=>{applyMuted();applyWall();},reduceMotion()?0:300);return;}
@@ -2226,8 +2239,8 @@ function fitSafe(){
     const standalone=navigator.standalone===true||(window.matchMedia&&matchMedia('(display-mode: standalone)').matches);
     const pr=document.createElement('div');pr.style.cssText='position:absolute;visibility:hidden;padding-bottom:env(safe-area-inset-bottom,0px)';document.body.appendChild(pr);
     const safe=parseFloat(getComputedStyle(pr).paddingBottom)||0;pr.remove();
-    const gap=Math.max(screen.height,screen.width)-window.innerHeight;
-    if(standalone&&window.innerHeight>window.innerWidth&&gap>=safe&&safe>0)de.style.setProperty('--sab','0px');else de.style.removeProperty('--sab');
+    // 以前在這裡把底部安全區歸零（因為頁面停在 Home 橫條上方）；現在頁面會延伸到螢幕最底，安全區要保留
+    void standalone;void safe;de.style.removeProperty('--sab');
   }catch(e){}
 }
 window.addEventListener('resize',fitSafe);window.addEventListener('pageshow',fitSafe);
@@ -2337,14 +2350,40 @@ async function chooseBook(){
   }
 })();
 
-/* 所有可點的元件都給一下輕觸回饋；若這次點擊已經由程式觸發過（例如成功／錯誤的節奏），就不重複 */
-document.addEventListener('click',e=>{
-  if(!e.isTrusted||!settings.haptic)return;
-  const t=e.target.closest&&e.target.closest('button,[role="button"],[role="tab"],[role="option"],.tap,.tab,.key,.chip,.pill,.cat,.sw,.wtile,label.switch,[data-key],[data-act],[data-go]');
-  if(!t||t.disabled)return;
-  if(Date.now()-_lastPulse<60)return;
-  _pulse();
-});
+/* 觸覺回饋（iOS 26.5 起只認「手指真的點在包著 switch 的 label 上」）：
+   每個可點的元件裡都常駐一個透明 label，裡面包一個隱藏的 <input switch>。手指點下去 → iOS 視為真的切換 switch → 震一下；
+   點擊照樣冒泡給按鈕本身；轉發給 switch 的那次點擊在 switch 上就攔下，按鈕不會被觸發兩次。 */
+const HAP_SEL='button,[role="button"],[role="tab"],[role="option"],.tap,.key,.chip,.pill,.cat,.wtile,[data-key],[data-act],[data-go],[data-open],[data-cat-open],[data-edit],[data-del]';
+const HAP_TOUCH=('ontouchstart' in window)||(navigator.maxTouchPoints>0);
+var _hapAt=0;
+function hapOverlay(el){
+  if(!el||el.nodeType!==1||el.disabled)return;
+  if(el.matches('input,textarea,select,label,option')||el.closest('label,select,.hap-ov'))return;
+  if(el.querySelector(':scope>.hap-ov'))return;
+  if(el.querySelector('input:not([type=checkbox]):not([type=radio]),textarea,select'))return;   // 裡面有輸入框的不蓋，免得點不到
+  const l=document.createElement('label');l.className='hap-ov';l.setAttribute('aria-hidden','true');
+  const sw=document.createElement('input');sw.type='checkbox';sw.setAttribute('switch','');sw.tabIndex=-1;sw.setAttribute('aria-hidden','true');
+  sw.addEventListener('click',e=>e.stopPropagation());sw.addEventListener('change',e=>e.stopPropagation());
+  sw.addEventListener('input',e=>e.stopPropagation());
+  l.appendChild(sw);
+  if(getComputedStyle(el).position==='static')el.classList.add('hap-rel');
+  el.appendChild(l);
+}
+function hapScan(root){
+  if(!HAP_TOUCH||!root||root.nodeType!==1)return;
+  if(root.matches(HAP_SEL))hapOverlay(root);
+  root.querySelectorAll(HAP_SEL).forEach(hapOverlay);
+}
+function applyHapticSetting(){document.documentElement.toggleAttribute('data-nohap',!settings.haptic);}
+if(HAP_TOUCH){
+  let pend=new Set(),raf=0;
+  new MutationObserver(ms=>{for(const m of ms)for(const n of m.addedNodes)if(n.nodeType===1&&!n.classList.contains('hap-ov'))pend.add(n);
+    if(!raf)raf=requestAnimationFrame(()=>{raf=0;const a=[...pend];pend.clear();a.forEach(n=>{if(n.isConnected)hapScan(n);});});
+  }).observe(document.body,{childList:true,subtree:true});
+  hapScan(document.body);
+  document.addEventListener('pointerdown',e=>{if(e.target&&e.target.classList&&e.target.classList.contains('hap-ov'))_hapAt=Date.now();},true);
+}
+applyHapticSetting();
 </script>
 </body>
 </html>
