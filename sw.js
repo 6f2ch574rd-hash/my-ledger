@@ -1,5 +1,5 @@
-/* 我的記帳本 — 離線快取 v4（網路優先，確保更新即時生效） */
-const CACHE = 'my-ledger-v4';
+/* 我的記帳本 — 離線快取 v5（網路優先，確保更新即時生效；v5：新圖示、只有主頁會寫進 App 殼快取） */
+const CACHE = 'my-ledger-v18';
 const CORE = [
   './',
   './index.html',
@@ -35,7 +35,9 @@ self.addEventListener('fetch', e => {
         const cached = await cache.match('./index.html');
         return fetch(req)
           .then(res => {
-            if (res && res.status === 200) cache.put('./index.html', res.clone());
+            const path = new URL(req.url).pathname;
+            const isMain = path.endsWith('/') || path.endsWith('/index.html');
+            if (res && res.status === 200 && isMain) cache.put('./index.html', res.clone());
             return res;
           })
           .catch(() => cached);
