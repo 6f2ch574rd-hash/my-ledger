@@ -474,6 +474,9 @@ body.sheet-open #app{transform:translateY(calc(var(--sat) + 10px)) scale(.92);bo
 html[data-look="glass"]{--label2:rgba(60,60,67,.74);}
 @media (prefers-color-scheme: dark){html[data-look="glass"]{--label2:rgba(235,235,245,.72);}}
 html[data-look="glass"] #app{background:var(--wall);}
+/* iPhone 主畫面 App 的顯示區有時比螢幕短，多出來的那條會用根元素的背景畫：讓它跟玻璃背景一致，才不會出現一條空白 */
+html[data-look="glass"],html[data-look="glass"] body{background:var(--wall);background-repeat:no-repeat;}
+html[data-look="glass"] body.sheet-open{background:#000;}
 html[data-look="glass"] .screen{background:transparent;}
 html[data-look="glass"] .screen.sub{background:var(--wall);}
 html[data-look="glass"] .card,html[data-look="glass"] .group{background:var(--glass-card);
@@ -982,9 +985,18 @@ function playTick(){
     const o=_ctx.createOscillator(),g=_ctx.createGain();o.type='sine';o.frequency.value=1900;g.gain.value=0.035;
     o.connect(g);g.connect(_ctx.destination);o.start();o.stop(_ctx.currentTime+0.018);}catch(e){}
 }
-function _pulse(){const t=$('haptic-trigger');if(t){try{t.click();}catch(e){}}}
+/* iOS 18 起，Safari 在使用者點擊的當下切換一個 <input switch> 會觸發 Taptic Engine。
+   每次都建立一個新的隱藏開關、立刻點它、再移除（社群驗證過最穩定的做法）。 */
+let _lastPulse=0;
+function _pulse(){
+  _lastPulse=Date.now();
+  try{const l=document.createElement('label');l.setAttribute('aria-hidden','true');l.style.display='none';
+    const i=document.createElement('input');i.type='checkbox';i.setAttribute('switch','');l.appendChild(i);
+    document.head.appendChild(l);l.click();l.remove();}catch(e){}
+}
 function haptic(kind){
   if(!settings.haptic)return;
+  if(!kind&&Date.now()-_lastPulse<60)return;   // 同一下點擊已經震過了
   playTick();
   const n=kind==='error'?3:kind==='success'?2:1;
   if('vibrate' in navigator){try{navigator.vibrate(n===1?10:n===2?[12,60,12]:[18,60,18,60,18]);}catch(e){}}
@@ -1705,7 +1717,7 @@ function renderSettingsRoot(){
   <div class="sec"><div class="sec-h">回饋</div><div class="group">
     ${rowToggle('haptic','wave','pink','觸覺回饋',!!settings.haptic)}
     ${rowToggle('sound','sound','purple','點擊音效',settings.sound===true)}
-  </div><div class="sec-f">觸覺回饋需要 iOS 17.4 以上，並把 App 加入主畫面使用。</div></div>
+  </div><div class="sec-f">觸覺回饋需要 iOS 18 以上；在 iPhone「設定 › 聲音與觸覺」裡也要開啟「系統觸覺回饋」。</div></div>
   <div class="sec"><div class="sec-h">外觀</div><div class="group">
     <div class="row" style="--inset:58px">${sic('paint','purple')}<div class="rt"><div class="t">外觀樣式</div></div></div>
     <div class="srow" style="padding:0 16px 12px"><div class="seg" data-segkey="look" style="width:100%"><button data-look="std" class="${curLook()==='std'?'on':''}">標準</button><button data-look="glass" class="${curLook()==='glass'?'on':''}">玻璃</button><button data-look="frost" class="${curLook()==='frost'?'on':''}">毛玻璃</button></div></div>
@@ -2324,6 +2336,15 @@ async function chooseBook(){
     setTimeout(()=>toast('預覽模式：示範資料，不會影響你手機上的記錄',{ms:3200}),600);
   }
 })();
+
+/* 所有可點的元件都給一下輕觸回饋；若這次點擊已經由程式觸發過（例如成功／錯誤的節奏），就不重複 */
+document.addEventListener('click',e=>{
+  if(!e.isTrusted||!settings.haptic)return;
+  const t=e.target.closest&&e.target.closest('button,[role="button"],[role="tab"],[role="option"],.tap,.tab,.key,.chip,.pill,.cat,.sw,.wtile,label.switch,[data-key],[data-act],[data-go]');
+  if(!t||t.disabled)return;
+  if(Date.now()-_lastPulse<60)return;
+  _pulse();
+});
 </script>
 </body>
 </html>
