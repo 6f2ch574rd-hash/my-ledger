@@ -1389,7 +1389,7 @@ function bump(el){if(!el||reduceMotion())return;el.classList.remove('bump');void
 const numMem={};
 function countTo(el,key,to){
   if(!el)return;const from=numMem[key];numMem[key]=to;
-  if(from===to||reduceMotion()){el.textContent=money(to);return;}
+  if(from===to||reduceMotion()||GESTURE){el.textContent=money(to);return;}
   const start=from===undefined?0:from,t0=performance.now(),dur=from===undefined?700:480;
   el.textContent=money(start);
   const step=now=>{if(!el.isConnected)return;const p=Math.min(1,(now-t0)/dur),e=1-Math.pow(1-p,3);
@@ -1999,9 +1999,11 @@ function pushSectionHTML(){
     foot='iPhone 只讓「加入主畫面」的網頁 App 推播（iOS 16.4 以上）。用 Safari 分享 ›「加入主畫面」，再從主畫面打開。';
   }else if(pushOn()){
     rows=`<div class="row" style="--inset:58px">${sic('phone','red')}<div class="rt"><div class="t">推播通知</div><div class="s">已開啟・${esc(nagCfg().time)} 開始，記完帳當天就停</div></div><span class="v" style="color:var(--c-green)">開啟中</span></div>
+      ${rowToggle('pushCard','card','indigo','信用卡繳款提醒',!!settings.pushCard)}
+      ${rowToggle('pushBud','target','red','預算提醒',!!settings.pushBud)}
       ${rowBtn('pushTest','wave','blue','傳一則測試通知','幾秒內會跳出來')}
       <button class="row action left tap destructive" data-act="pushOff">關閉推播通知</button>`;
-    foot='通知會從「我的記帳本」跳出來，App 關著也會。伺服器只知道這支手機的推播地址、時區、提醒時間、煩人程度和最後記帳的日期，不會收到金額或任何記錄內容。';
+    foot=`通知會從「我的記帳本」跳出來，App 關著也會。<br>・<b>信用卡繳款提醒</b>：繳款截止前 3 天、前 1 天、當天早上 10 點提醒。<br>・<b>預算提醒</b>：這個月預算用到 80%、超支時各提醒一次（10:00–22:00）。<br>伺服器平常只知道推播地址、時區、提醒時間、煩人程度和最後記帳的日期；打開上面兩個提醒，才會另外收到卡片名稱、繳款日、應繳金額，或預算用了幾 %、還剩多少。不會收到任何記帳明細。`;
   }else{
     rows=rowBtn('pushOn','phone','red','開啟推播通知','App 關著也會跳通知，記完帳當天就停');
     foot='按下去 iPhone 會問要不要允許通知，選「允許」就好。伺服器只會知道推播地址、時區、提醒時間、煩人程度和最後記帳的日期，不會收到金額或任何記錄內容。';
@@ -2019,8 +2021,22 @@ function pushKeyPrefetch(){if(!pushReady()||settings.pushKey)return;pushFetch('/
 function pushPayload(st){
   st=st||nagState();const c=st.c;
   let tz='Asia/Taipei';try{tz=Intl.DateTimeFormat().resolvedOptions().timeZone||tz;}catch(e){}
-  return {time:c.time,level:c.level,on:!!c.on,tz,logged:st.logged?today():st.last,snooze:c.snoozeUntil||0};
+  return {time:c.time,level:c.level,on:!!c.on,tz,logged:st.logged?today():st.last,snooze:c.snoozeUntil||0,x:pushExtra()};
 }
+/* 信用卡、預算提醒：只有打開設定才會把需要的最少資料傳給推播伺服器 */
+function pushExtra(){
+  if(!settings.pushCard&&!settings.pushBud)return null;
+  const d=D(),x={};
+  if(settings.pushCard)x.cards=payDueList(d).filter(c=>c.next&&c.next.amt>=1).map(c=>({n:c.a.name,d:c.next.due,a:Math.round(c.next.amt)}));
+  if(settings.pushBud&&d.budget>0){const now=new Date(),m=ym(now),exp=ledgerTx(d).filter(r=>r.type==='expense'&&r.date.startsWith(m)).reduce((s,r)=>s+r.amount,0);
+    const left=d.budget-exp,daysLeft=new Date(now.getFullYear(),now.getMonth()+1,0).getDate()-now.getDate()+1;
+    x.bud={m,p:Math.round(exp/d.budget*100),left:Math.round(left),day:left>0?Math.floor(left/daysLeft):0};}
+  return x;
+}
+/* 照煩人程度算出今天會推播的時間（跟伺服器的排程一樣；過了午夜就不推） */
+const PUSH_PLAN={gentle:[0],nag:[0,30,60,120],hell:[0,15,30,45,60,90,120,150,180,240,300]};
+function pushTimes(c){c=c||nagCfg();const [h,m]=c.time.split(':').map(Number),b=h*60+m;
+  return PUSH_PLAN[c.level].map(o=>b+o).filter(t=>t<24*60).map(t=>`${pad2(Math.floor(t/60))}:${pad2(t%60)}`);}
 async function pushEnable(){
   if(!pushReady()){alertMsg('這支手機不支援推播','需要 iOS 16.4 以上，而且要從主畫面打開記帳本。');return;}
   if(!isStandaloneApp()){alertMsg('要從主畫面打開','iPhone 只讓「加入主畫面」的網頁 App 推播。用 Safari 分享 ›「加入主畫面」，再從主畫面打開記帳本。');return;}
@@ -2083,9 +2099,14 @@ function pushSync(st){
 }
 /* 給 service worker 看的狀態：收到推播時用它決定通知文字（幾天沒記、煩人程度） */
 let _pushStateSig='';
+let _clearedNag='';
+function clearNagNotes(){const t=today();if(_clearedNag===t||!('serviceWorker' in navigator))return;_clearedNag=t;
+  navigator.serviceWorker.ready.then(r=>r.getNotifications?r.getNotifications():[]).then(ns=>ns.forEach(n=>{if(/^ledger-nag/.test(n.tag||''))n.close();})).catch(()=>{});}
 function pushState(st){
   if(PREVIEW||!('caches' in window))return;
   st=st||nagState();const data={last:st.logged?today():st.last,level:st.c.level,any:!!st.any,on:!!st.c.on};
+  if(pushOn()&&settings.push){data.api=PUSH_API;data.id=settings.push.id;data.token=settings.push.token;}
+  if(st.logged)clearNagNotes();
   const sig=JSON.stringify(data);if(sig===_pushStateSig)return;_pushStateSig=sig;
   caches.open('ledger-nag').then(c=>c.put('./__nagstate',new Response(sig,{headers:{'Content-Type':'application/json'}}))).catch(()=>{});
 }
@@ -2205,7 +2226,10 @@ function barChart({id,vals,labels,showLabel,sel,color,negColor,avg,avgLabel,futu
    一根手指：點一下選一根、按住左右拖曳看數值
    兩根手指：同時按住兩根長條就選取中間那一段，手指左右移動可以即時調整範圍
    已選一段時：按住範圍的頭或尾拖曳可以調整；點一下其他地方取消 */
-let HELD=null;   // 手勢進行中，保留手指底下那個 .hit（重畫圖表時換回去，iPhone 才不會中斷觸控）
+let HELD=null,GESTURE=false,_stRaf=0,_catsShown=null;
+/* 拖曳中：畫面合併成每幀最多重畫一次、數字不跑動畫、分類清單等放開再算，手指才跟得上 */
+function scheduleStatsTop(){if(_stRaf)return;_stRaf=requestAnimationFrame(()=>{_stRaf=0;renderStatsTop();});}
+function gestureEnd(){if(!GESTURE)return;GESTURE=false;if(curTab==='stats'){if(_stRaf){cancelAnimationFrame(_stRaf);_stRaf=0;}renderStatsTop();}}   // 手勢進行中，保留手指底下那個 .hit（重畫圖表時換回去，iPhone 才不會中斷觸控）
 function restoreHeldHit(){if(!HELD)return;const svg=[...document.querySelectorAll(`[data-chart="${HELD.id}"]`)].find(x=>x.getBoundingClientRect().width>0);
   const nh=svg&&svg.querySelector('.hit');if(nh&&nh!==HELD.el)nh.replaceWith(HELD.el);}
 (function setupChartScrub(){
@@ -2219,17 +2243,17 @@ function restoreHeldHit(){if(!HELD)return;const svg=[...document.querySelectorAl
       if(e.touches.length<2)return;
       const hits=[...e.touches].map(t=>{const el=document.elementFromPoint(t.clientX,t.clientY);return el&&el.closest&&el.closest('.hit');});
       const hit=hits.find(Boolean);if(!hit)return;const id=hit.closest('[data-chart]').dataset.chart;if(!RANGE_CHARTS.has(id))return;
-      e.preventDefault();HELD={id,el:hit};multi={id,hit};scrub=null;edge=null;setRange(id,hit,[...e.touches].map(t=>t.clientX));
+      e.preventDefault();HELD={id,el:hit};GESTURE=true;multi={id,hit};scrub=null;edge=null;setRange(id,hit,[...e.touches].map(t=>t.clientX));
     },{passive:false});
     document.addEventListener('touchmove',e=>{if(!multi)return;e.preventDefault();if(e.touches.length>=2)setRange(multi.id,multi.hit,[...e.touches].slice(0,2).map(t=>t.clientX));},{passive:false});
-    const tend=e=>{if(multi&&e.touches.length<2){multi=null;multiEndAt=Date.now();if(!e.touches.length)HELD=null;}};
+    const tend=e=>{if(multi&&e.touches.length<2){multi=null;multiEndAt=Date.now();if(!e.touches.length){HELD=null;gestureEnd();}}};
     document.addEventListener('touchend',tend);document.addEventListener('touchcancel',tend);
   }
   document.addEventListener('pointerdown',e=>{
     if(e.target.closest('.avghit'))return;
     const hit=e.target.closest('.hit');if(!hit)return;
     const id=hit.closest('[data-chart]').dataset.chart;const i=idxAt(hit,e.clientX);
-    HELD={id,el:hit};
+    HELD={id,el:hit};GESTURE=true;
     pts.set(e.pointerId,{hit,x:e.clientX});
     if(!(T&&e.pointerType==='touch')){const same=[...pts.values()].filter(p=>p.hit===hit);
       if(same.length>=2&&RANGE_CHARTS.has(id)){multi={id,hit,ptr:true};scrub=null;edge=null;setRange(id,hit,same.map(p=>p.x));return;}}
@@ -2243,30 +2267,31 @@ function restoreHeldHit(){if(!HELD)return;const svg=[...document.querySelectorAl
     if(edge){if(Math.abs(e.clientX-edge.x0)<4&&!edge.moved)return;edge.moved=true;const i=idxAt(edge.hit,e.clientX),r=stSel.slice();r[edge.which]=i;
       if(r[0]>r[1]){r.reverse();edge.which=1-edge.which;}chartRange(edge.id,r[0],r[1]);return;}
     if(!scrub)return;if(Math.abs(e.clientX-scrub.x0)<6&&!scrub.moved)return;
-    scrub.moved=true;const i=idxAt(scrub.hit,e.clientX);chartSelect(scrub.id,i,true);
+    scrub.moved=true;const i=idxAt(scrub.hit,e.clientX);
+    if(RANGE_CHARTS.has(scrub.id))chartRange(scrub.id,Math.min(scrub.start,i),Math.max(scrub.start,i));else chartSelect(scrub.id,i,true);
   });
   const end=e=>{pts.delete(e.pointerId);
     if(multi&&multi.ptr){if(![...pts.values()].some(p=>p.hit===multi.hit)){multi=null;multiEndAt=Date.now();}scrub=null;}
     else if(multi||Date.now()-multiEndAt<400){scrub=null;}
     else if(edge){if(!edge.moved)chartSelect(edge.id,-1,false);edge=null;}
     else if(scrub&&!scrub.moved)chartSelect(scrub.id,scrub.start,false);
-    scrub=null;if(!pts.size&&!multi)HELD=null;};
+    scrub=null;if(!pts.size&&!multi){HELD=null;gestureEnd();}};
   document.addEventListener('pointerup',end);
-  document.addEventListener('pointercancel',e=>{pts.delete(e.pointerId);scrub=null;edge=null;if(multi&&multi.ptr&&!pts.size)multi=null;if(!pts.size&&!multi)HELD=null;});
+  document.addEventListener('pointercancel',e=>{pts.delete(e.pointerId);scrub=null;edge=null;if(multi&&multi.ptr&&!pts.size)multi=null;if(!pts.size&&!multi){HELD=null;gestureEnd();}});
 })();
 const RANGE_CHARTS=new Set(['stats']);
 function chartRange(id,a,b){
   if(id!=='stats')return;avgOn[id]=false;
   const nv=a===b?a:[a,b];
   if(JSON.stringify(nv)===JSON.stringify(stSel))return;
-  stSel=nv;haptic();renderStatsTop();
+  stSel=nv;haptic();if(GESTURE)scheduleStatsTop();else renderStatsTop();
 }
 const avgOn={};
 function toggleAvg(id){avgOn[id]=!avgOn[id];haptic();
   if(id==='week'){if(avgOn[id])homeSel=null;renderHome();}else if(id==='stats'){if(avgOn[id])stSel=null;renderStatsTop();}}
 function chartSelect(id,i,scrubbing){avgOn[id]=false;
   if(id==='week'){const nv=(!scrubbing&&homeSel===i)?null:i;if(nv===homeSel&&scrubbing)return;homeSel=nv;haptic();renderHome();}
-  else if(id==='stats'){const nv=(i<0||(!scrubbing&&(stSel===i||Array.isArray(stSel))))?null:i;if(nv===stSel&&scrubbing)return;stSel=nv;haptic();renderStatsTop();}
+  else if(id==='stats'){const nv=(i<0||(!scrubbing&&(stSel===i||Array.isArray(stSel))))?null:i;if(nv===stSel&&scrubbing)return;stSel=nv;haptic();if(GESTURE&&scrubbing)scheduleStatsTop();else renderStatsTop();}
 }
 
 /* =====================================================================
@@ -2402,11 +2427,11 @@ function renderStatsTop(){
       </div>
       <div id="stMain"><div class="statshead${peekPay?' peeking':''}">${peekBtn()}${head}</div>
       ${barChart({id:'stats',vals,labels:P.bk.map(b=>b.label),showLabel:P.show,sel:stSel,color:stType==='expense'?'var(--accent)':'var(--income)',negColor:'var(--c-red)',avg:net?0:avg,avgLabel:stRange==='year'?'每月平均':P.all?'每年平均':'每日平均',future:P.bk.map(b=>b.future),anim:ANIM})}
-      <div class="chint">${Array.isArray(stSel)?'按住頭尾拖曳可以調整範圍，點一下其他地方取消':stSel!=null?'再點一下同一根可以取消選取':'兩根手指按住長條、左右移動，可以選一段期間'}</div></div>
+      <div class="chint">${Array.isArray(stSel)?'按住頭尾拖曳可以調整範圍，點一下其他地方取消':stSel!=null?'再點一下同一根取消；按住左右拖可以選一段':'點一下看單根；按住左右拖，可以選一段期間'}</div></div>
     </div><div id="statsCats"></div>`;
   runCounts($('statsBody'));
   syncSegs($('scrStats'));
-  renderStatsCats();
+  if(GESTURE&&_catsShown){const b=$('statsCats');if(b&&_catsShown)b.replaceWith(_catsShown);}else{renderStatsCats();_catsShown=$('statsCats');}
   restoreHeldHit();
 }
 function renderStatsCats(){
@@ -2783,6 +2808,9 @@ async function settingsAction(act){
 async function toggleSetting(key,on,input){
   if(key==='nag'){const c=nagCfg();c.on=on;if(on)c.since=today();settings.nag=c;saveSettings();nagRender();
     if(on)toast(`已開啟，每天 ${c.time} 開始提醒`);setTimeout(refreshSettingsTop,360);return;}
+  if(key==='pushCard'||key==='pushBud'){settings[key]=on;saveSettings();haptic('success');if(settings.push)settings.push.last='';pushSync();
+    if(on&&key==='pushCard'&&!payDueList(D()).some(c=>c.next))toast('信用卡要先設定結帳日和繳款日，才知道什麼時候提醒');
+    else if(on&&key==='pushBud'&&!(D().budget>0))toast('先在首頁設定每月預算，才會有預算提醒');return;}
   if(key==='haptic'){settings.haptic=on;saveSettings();applyHapticSetting();if(on)haptic();return;}
   // 等開關滑完（約 .3 秒）再換外觀，畫面用淡入淡出銜接
   if(key==='darkFrost'){settings.darkFrost=on;saveSettings();lookTransition(()=>{applyLook();syncLookUI();},reduceMotion()?0:300);return;}
@@ -3613,6 +3641,9 @@ function _holdEnd(){if(!_hold)return;clearTimeout(_hold.t);_hold.el.classList.re
 document.addEventListener('pointerup',_holdEnd,true);
 document.addEventListener('pointercancel',_holdEnd,true);
 /* 設定頁 */
+function pushTimesNote(c){const t=pushTimes(c),lv=c.level;
+  return `推播時間：${t.join('、')}（記了帳當天就停；伺服器每 15 分鐘檢查一次，可能晚幾分鐘）。`+
+    (lv==='gentle'?'語氣溫和，鎖定畫面永遠只留一則。':lv==='nag'?'會碎念今天第幾次了；連續兩天沒記，通知會一則一則疊在鎖定畫面。':'越來越兇；連續兩天沒記，通知會一則一則疊在鎖定畫面，直到你記帳。');}
 function renderNagPage(box){
   const c=nagCfg(),lvBtns=Object.keys(NAG_LV).map(k=>`<button data-naglv="${k}" class="${c.level===k?'on':''}">${NAG_LV[k].n}</button>`).join('');
   const N={gentle:1,nag:3,hell:8}[c.level];
@@ -3626,7 +3657,7 @@ function renderNagPage(box){
   <div class="sec"><div class="sec-h">煩人程度</div><div class="group">
     <div class="srow" style="padding:12px 16px"><div class="seg" data-segkey="naglv" style="width:100%">${lvBtns}</div></div>
     <div class="row"><div class="rt"><div class="t nagdesc" id="nagDesc">${NAG_LV[c.level].d}</div></div></div>
-  </div></div>
+  </div><div class="sec-f" id="nagTimes">${pushTimesNote(c)}</div></div>
   ${pushSectionHTML()}
   <div class="sec"><div class="sec-h">${pushReady()?'其他方式':'App 關著的時候'}</div><div class="group">
     ${rowBtn('nagCal','clock','red','加入 iPhone 行事曆鬧鐘',`照「${NAG_LV[c.level].n}」每天響 ${N} 次`)}
@@ -3639,7 +3670,7 @@ document.addEventListener('click',e=>{
   const b=e.target.closest&&e.target.closest('[data-naglv]');if(!b)return;
   const c=nagCfg();c.level=b.dataset.naglv;settings.nag=c;saveSettings();haptic();
   const seg=b.closest('.seg');qsa('button[data-naglv]',seg).forEach(x=>x.classList.toggle('on',x===b));syncSegs(seg.parentNode);
-  const d=$('nagDesc');if(d)d.textContent=NAG_LV[c.level].d;
+  const d=$('nagDesc');if(d)d.textContent=NAG_LV[c.level].d;const tt=$('nagTimes');if(tt)tt.textContent=pushTimesNote(c);
   setTimeout(()=>{refreshSettingsTop();nagRender();},260);
 });
 document.addEventListener('change',e=>{
