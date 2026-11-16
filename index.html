@@ -1687,6 +1687,7 @@ function renderHome(){
   h+=`<div class="sec"><div class="sec-h big"><span>最近交易</span><button class="link" data-go="list">顯示全部</button></div>
     <div class="group">${recent.map(r=>txRowHTML(r,{showDate:true})).join('')}</div></div>`;
   $('homeBody').innerHTML=h;
+  restoreHeldHit();
   runCounts($('homeBody'));
   if(ANIM)stagger($('homeBody'));
 }
@@ -2200,31 +2201,58 @@ function barChart({id,vals,labels,showLabel,sel,color,negColor,avg,avgLabel,futu
   s+=`</svg>`;
   return s;
 }
+/* 圖表手勢
+   一根手指：點一下選一根、按住左右拖曳看數值
+   兩根手指：同時按住兩根長條就選取中間那一段，手指左右移動可以即時調整範圍
+   已選一段時：按住範圍的頭或尾拖曳可以調整；點一下其他地方取消 */
+let HELD=null;   // 手勢進行中，保留手指底下那個 .hit（重畫圖表時換回去，iPhone 才不會中斷觸控）
+function restoreHeldHit(){if(!HELD)return;const svg=[...document.querySelectorAll(`[data-chart="${HELD.id}"]`)].find(x=>x.getBoundingClientRect().width>0);
+  const nh=svg&&svg.querySelector('.hit');if(nh&&nh!==HELD.el)nh.replaceWith(HELD.el);}
 (function setupChartScrub(){
-  // 一根手指：點一下選一根、拖曳看數值；兩根手指同時按住兩根長條：選取中間那一段
-  let scrub=null;const pts=new Map();let multi=null;
-  const idxAt=(hit,x)=>{const r=hit.getBoundingClientRect();const n=Number(hit.dataset.n);return Math.max(0,Math.min(n-1,Math.floor((x-r.left)/r.width*n)));};
-  const rangeNow=()=>{const xs=[...pts.values()].filter(p=>p.hit===multi.hit).map(p=>idxAt(multi.hit,p.x));if(xs.length<2)return;
-    const a=Math.min(...xs),b=Math.max(...xs);chartRange(multi.id,a,b);};
+  let scrub=null,multi=null,edge=null,multiEndAt=0;const pts=new Map();
+  const idxAt=(hit,x)=>{const r=hit.getBoundingClientRect();const n=Number(hit.dataset.n);if(!r.width)return 0;return Math.max(0,Math.min(n-1,Math.floor((x-r.left)/r.width*n)));};
+  const setRange=(id,hit,xs)=>{const is=xs.map(x=>idxAt(hit,x));chartRange(id,Math.min(...is),Math.max(...is));};
+  // iPhone：用 touch 事件處理兩指（可以擋掉捲動和縮放，拖動才不會被打斷）
+  const T=('ontouchstart' in window);
+  if(T){
+    document.addEventListener('touchstart',e=>{
+      if(e.touches.length<2)return;
+      const hits=[...e.touches].map(t=>{const el=document.elementFromPoint(t.clientX,t.clientY);return el&&el.closest&&el.closest('.hit');});
+      const hit=hits.find(Boolean);if(!hit)return;const id=hit.closest('[data-chart]').dataset.chart;if(!RANGE_CHARTS.has(id))return;
+      e.preventDefault();HELD={id,el:hit};multi={id,hit};scrub=null;edge=null;setRange(id,hit,[...e.touches].map(t=>t.clientX));
+    },{passive:false});
+    document.addEventListener('touchmove',e=>{if(!multi)return;e.preventDefault();if(e.touches.length>=2)setRange(multi.id,multi.hit,[...e.touches].slice(0,2).map(t=>t.clientX));},{passive:false});
+    const tend=e=>{if(multi&&e.touches.length<2){multi=null;multiEndAt=Date.now();if(!e.touches.length)HELD=null;}};
+    document.addEventListener('touchend',tend);document.addEventListener('touchcancel',tend);
+  }
   document.addEventListener('pointerdown',e=>{
     if(e.target.closest('.avghit'))return;
     const hit=e.target.closest('.hit');if(!hit)return;
     const id=hit.closest('[data-chart]').dataset.chart;const i=idxAt(hit,e.clientX);
+    HELD={id,el:hit};
     pts.set(e.pointerId,{hit,x:e.clientX});
-    const same=[...pts.values()].filter(p=>p.hit===hit).length;
-    if(same>=2&&RANGE_CHARTS.has(id)){multi={id,hit};scrub=null;rangeNow();return;}
+    if(!(T&&e.pointerType==='touch')){const same=[...pts.values()].filter(p=>p.hit===hit);
+      if(same.length>=2&&RANGE_CHARTS.has(id)){multi={id,hit,ptr:true};scrub=null;edge=null;setRange(id,hit,same.map(p=>p.x));return;}}
+    if(multi)return;
+    if(id==='stats'&&Array.isArray(stSel)&&(Math.abs(i-stSel[0])<=0||Math.abs(i-stSel[1])<=0)){edge={id,hit,which:i===stSel[0]?0:1,x0:e.clientX,moved:false};scrub=null;return;}
     scrub={id,hit,start:i,moved:false,x0:e.clientX};
   });
   document.addEventListener('pointermove',e=>{
     const p=pts.get(e.pointerId);if(p)p.x=e.clientX;
-    if(multi){if(p)rangeNow();return;}
+    if(multi){if(multi.ptr&&p){const same=[...pts.values()].filter(q=>q.hit===multi.hit);if(same.length>=2)setRange(multi.id,multi.hit,same.map(q=>q.x));}return;}
+    if(edge){if(Math.abs(e.clientX-edge.x0)<4&&!edge.moved)return;edge.moved=true;const i=idxAt(edge.hit,e.clientX),r=stSel.slice();r[edge.which]=i;
+      if(r[0]>r[1]){r.reverse();edge.which=1-edge.which;}chartRange(edge.id,r[0],r[1]);return;}
     if(!scrub)return;if(Math.abs(e.clientX-scrub.x0)<6&&!scrub.moved)return;
     scrub.moved=true;const i=idxAt(scrub.hit,e.clientX);chartSelect(scrub.id,i,true);
   });
   const end=e=>{pts.delete(e.pointerId);
-    if(multi){if(![...pts.values()].some(p=>p.hit===multi.hit))multi=null;scrub=null;return;}
-    if(scrub&&!scrub.moved)chartSelect(scrub.id,scrub.start,false);scrub=null;};
-  document.addEventListener('pointerup',end);document.addEventListener('pointercancel',e=>{pts.delete(e.pointerId);scrub=null;if(multi&&![...pts.values()].length)multi=null;});
+    if(multi&&multi.ptr){if(![...pts.values()].some(p=>p.hit===multi.hit)){multi=null;multiEndAt=Date.now();}scrub=null;}
+    else if(multi||Date.now()-multiEndAt<400){scrub=null;}
+    else if(edge){if(!edge.moved)chartSelect(edge.id,-1,false);edge=null;}
+    else if(scrub&&!scrub.moved)chartSelect(scrub.id,scrub.start,false);
+    scrub=null;if(!pts.size&&!multi)HELD=null;};
+  document.addEventListener('pointerup',end);
+  document.addEventListener('pointercancel',e=>{pts.delete(e.pointerId);scrub=null;edge=null;if(multi&&multi.ptr&&!pts.size)multi=null;if(!pts.size&&!multi)HELD=null;});
 })();
 const RANGE_CHARTS=new Set(['stats']);
 function chartRange(id,a,b){
@@ -2238,7 +2266,7 @@ function toggleAvg(id){avgOn[id]=!avgOn[id];haptic();
   if(id==='week'){if(avgOn[id])homeSel=null;renderHome();}else if(id==='stats'){if(avgOn[id])stSel=null;renderStatsTop();}}
 function chartSelect(id,i,scrubbing){avgOn[id]=false;
   if(id==='week'){const nv=(!scrubbing&&homeSel===i)?null:i;if(nv===homeSel&&scrubbing)return;homeSel=nv;haptic();renderHome();}
-  else if(id==='stats'){const nv=(!scrubbing&&(stSel===i||Array.isArray(stSel)))?null:i;if(nv===stSel&&scrubbing)return;stSel=nv;haptic();renderStatsTop();}
+  else if(id==='stats'){const nv=(i<0||(!scrubbing&&(stSel===i||Array.isArray(stSel))))?null:i;if(nv===stSel&&scrubbing)return;stSel=nv;haptic();renderStatsTop();}
 }
 
 /* =====================================================================
@@ -2374,11 +2402,12 @@ function renderStatsTop(){
       </div>
       <div id="stMain"><div class="statshead${peekPay?' peeking':''}">${peekBtn()}${head}</div>
       ${barChart({id:'stats',vals,labels:P.bk.map(b=>b.label),showLabel:P.show,sel:stSel,color:stType==='expense'?'var(--accent)':'var(--income)',negColor:'var(--c-red)',avg:net?0:avg,avgLabel:stRange==='year'?'每月平均':P.all?'每年平均':'每日平均',future:P.bk.map(b=>b.future),anim:ANIM})}
-      <div class="chint">${Array.isArray(stSel)?'點一下圖表可以取消選取':stSel!=null?'再點一下同一根可以取消選取':'兩根手指同時按住兩根長條，可以看中間那一段'}</div></div>
+      <div class="chint">${Array.isArray(stSel)?'按住頭尾拖曳可以調整範圍，點一下其他地方取消':stSel!=null?'再點一下同一根可以取消選取':'兩根手指按住長條、左右移動，可以選一段期間'}</div></div>
     </div><div id="statsCats"></div>`;
   runCounts($('statsBody'));
   syncSegs($('scrStats'));
   renderStatsCats();
+  restoreHeldHit();
 }
 function renderStatsCats(){
   const box=$('statsCats');if(!box)return;
