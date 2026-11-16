@@ -235,6 +235,14 @@ html[data-nohap] .hap-ov{display:none;}
 .sortlist .sortrow{position:relative;transition:transform .22s var(--ease);}
 .sortlist .sortrow.dragging{transition:none;background:var(--cell);z-index:5;box-shadow:0 10px 28px rgba(0,0,0,.22);border-radius:12px;}
 .grip{flex:none;display:grid;place-items:center;width:44px;height:44px;margin:-10px -10px -10px 0;color:var(--label3);touch-action:none;cursor:grab;}
+.capr{display:flex;align-items:center;gap:6px;}
+.peekbtn{position:relative;z-index:6;display:inline-flex;align-items:center;gap:4px;height:26px;padding:0 10px 0 8px;border-radius:13px;font-size:.706rem;font-weight:600;color:var(--label2);
+  background:color-mix(in srgb,var(--label) 7%,transparent);-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;touch-action:none;transition:background .15s,color .15s,transform .2s var(--spring);}
+.card .cap .peekbtn .ico,.peekbtn .ico{width:15px;height:15px;color:inherit;stroke:currentColor;opacity:1;}
+.peekbtn.on{background:var(--label);color:var(--bg);transform:scale(1.04);}
+.statshead{position:relative;}
+.statshead .peekbtn{position:absolute;top:0;right:0;}
+.statshead.peeking .hero{color:var(--c-indigo,var(--label));}
 .amt.pend{color:var(--label2);font-weight:500;}
 .paydue .rt .s{white-space:normal;line-height:1.4;}
 .paydue .s.warn{color:var(--c-red);}
@@ -1195,11 +1203,26 @@ function sortArr(kind){const d=D();return kind==='accts'?d.accounts:(catMgrType=
 function addCatTo(arr,full){const i=arr.length-1;if(i>=0&&catName(arr[i])==='其他'&&catName(full)!=='其他')arr.splice(i,0,full);else arr.push(full);}
 let dbVer=0;
 function saveDB(){dbVer++;return LS.set('ll_db',DB);}
-/* 信用卡兩種算法（設定 › 帳戶 › 信用卡）：
-   預設「刷卡就算支出」：刷卡當下算支出，繳卡費是戶頭轉到卡上（不算支出）。
-   開啟「繳卡費才算支出」：刷卡先記在卡上（待繳），繳卡費那天才算一筆「卡費」支出。 */
+/* 信用卡算法：平常「刷卡就算支出」（刷卡當下算支出，繳卡費是戶頭轉到卡上，不算支出）。
+   首頁、統計有一顆「按住看繳費制」：按著的時候暫時改成「繳卡費才算支出」（刷卡算待繳、繳卡費那天才算），放開就還原。 */
 const CARD_PAY_CAT='💳 卡費';
-const cardPayMode=()=>!!(settings&&settings.cardPayMode);
+let peekPay=false;
+const cardPayMode=()=>peekPay;
+const hasCard=()=>D().accounts.some(a=>acctKind(a)==='credit');
+const peekBtn=()=>hasCard()?`<button class="peekbtn${peekPay?' on':''}" data-peek aria-label="按住暫時看繳卡費才算支出的數字">${glyph('card')}<span>${peekPay?'繳費制':'按住看繳費制'}</span></button>`:'';
+(function setupPeek(){
+  // 按著的時候重畫畫面，但保留手指底下那顆按鈕（換掉的話 iPhone 會把這次觸控取消）
+  let held=null;
+  const set=v=>{if(peekPay===v)return;peekPay=v;if(v)haptic();
+    const scr=held&&held.closest('.tabscreen');renderTab(curTab);
+    if(held){const nb=scr&&scr.querySelector('[data-peek]');if(nb&&nb!==held)nb.replaceWith(held);
+      held.classList.toggle('on',v);const sp=held.querySelector('span');if(sp)sp.textContent=v?'繳費制':'按住看繳費制';}
+    if(!v)held=null;};
+  document.addEventListener('pointerdown',e=>{const b=e.target.closest('[data-peek]');if(b){e.preventDefault();held=b;set(true);}});
+  ['pointerup','pointercancel'].forEach(t=>document.addEventListener(t,()=>set(false)));
+  window.addEventListener('blur',()=>set(false));document.addEventListener('visibilitychange',()=>{if(document.hidden)set(false);});
+  document.addEventListener('contextmenu',e=>{if(e.target.closest('[data-peek]'))e.preventDefault();});
+})();
 const isCardAcct=(d,id)=>{if(!id)return false;const a=d.accounts.find(x=>x.id===id);return !!a&&acctKind(a)==='credit';};
 const isPendingTx=(d,r)=>cardPayMode()&&isCardAcct(d,r.account);
 let _ledger={d:null,v:-1,sig:'',rows:null};
@@ -1632,8 +1655,8 @@ function renderHome(){
   const entries=Object.entries(cat).sort((a,b)=>b[1]-a[1]);
   const top=entries.slice(0,4);
   let h=`<div class="card tap${ANIM?' anim':''}" data-go="stats" role="button" tabindex="0" aria-label="本月支出 ${money(exp)}，查看統計">
-    <div class="cap"><span>${now.getMonth()+1}月支出</span>${ICON.chev}</div>
-    <div class="hero num" data-count="homeExp" data-to="${exp}">${money(exp)}</div><div class="cmp">${esc(cmp)}</div>
+    <div class="cap"><span>${now.getMonth()+1}月支出${peekPay?'（繳費制）':''}</span><span class="capr">${peekBtn()}${ICON.chev}</span></div>
+    <div class="hero num" data-count="homeExp" data-to="${exp}"${peekPay?' style="color:var(--c-indigo)"':''}>${money(exp)}</div><div class="cmp">${esc(cmp)}</div>
     ${stackBar(entries,exp)}
     <div class="legend">${top.map(([c,v],i)=>`<div><i class="dot" style="--cc:${segColor(c,i,entries.length)}"></i><span>${esc(catName(c))}</span><b class="num">${compact(v)}</b></div>`).join('')}</div>
     <div class="kv"><div>收入<b class="num">${money(inc)}</b></div><div>結餘<b class="num ${inc-exp<0?'neg':''}">${money(inc-exp)}</b></div></div>
@@ -2349,7 +2372,7 @@ function renderStatsTop(){
         <div class="seg" id="typeSeg2" style="flex:0 1 230px"><button data-st-type="expense" class="${stType==='expense'?'on':''}">支出</button><button data-st-type="income" class="${stType==='income'?'on':''}">收入</button><button data-st-type="net" class="${net?'on':''}">結餘</button></div>
         <button class="nbtn" data-st-shift="1" ${nextDisabled?dis:''} aria-label="下一段期間"><span style="display:inline-block;transform:scaleX(-1)">${ICON.chevL}</span></button>
       </div>
-      <div id="stMain"><div class="statshead">${head}</div>
+      <div id="stMain"><div class="statshead${peekPay?' peeking':''}">${peekBtn()}${head}</div>
       ${barChart({id:'stats',vals,labels:P.bk.map(b=>b.label),showLabel:P.show,sel:stSel,color:stType==='expense'?'var(--accent)':'var(--income)',negColor:'var(--c-red)',avg:net?0:avg,avgLabel:stRange==='year'?'每月平均':P.all?'每年平均':'每日平均',future:P.bk.map(b=>b.future),anim:ANIM})}
       <div class="chint">${Array.isArray(stSel)?'點一下圖表可以取消選取':stSel!=null?'再點一下同一根可以取消選取':'兩根手指同時按住兩根長條，可以看中間那一段'}</div></div>
     </div><div id="statsCats"></div>`;
@@ -2641,8 +2664,8 @@ function renderAccountsPage(box){
       <div class="rt"><div class="t">${esc(a.name)}</div><div class="s">${ACCT_KINDS[acctKind(a)].n}${acctSub(d,a)?'・'+esc(acctSub(d,a)):''}</div></div><span class="amt num">${money(acctBalance(d,a))}</span>${ICON.chev}</button></div>`).join('')}</div>
     <div class="sec-f">點一下設定類型、名稱，信用卡的結帳日和繳款日、簽帳卡的扣款戶頭也在這裡；往左滑刪除（已有記錄的帳戶不能刪除）。</div></div>
     <div class="sec"><div class="group"><button class="row action left tap" data-act="addAcct">新增帳戶…</button></div></div>
-    <div class="sec"><div class="sec-h">信用卡</div><div class="group">${rowToggle('cardPayMode','card','indigo','繳卡費才算支出',cardPayMode())}<div class="frow"><span class="lb">「將要支付」顯示在</span><select data-paydue aria-label="將要支付顯示在">${[['home','首頁'],['stats','統計'],['both','首頁和統計'],['off','不顯示']].map(([v,l])=>`<option value="${v}" ${payDueAt()===v?'selected':''}>${l}</option>`).join('')}</select></div></div>
-    <div class="sec-f">${cardPayMode()?'現在：刷卡先記在卡上、列為「將要支付」，不算支出；繳卡費（或自動扣繳）那天才算一筆「卡費」支出。支出會跟戶頭實際流出的錢一致，但統計只看得到「卡費」，看不出買了什麼。':'現在：刷卡當下就算支出，分類和預算馬上反映；繳卡費是從戶頭轉到卡上，不算支出，同一筆錢不會算兩次。想讓支出跟戶頭實際流出的錢一致，可以打開「繳卡費才算支出」。'}</div></div>`;
+    <div class="sec"><div class="sec-h">信用卡</div><div class="group"><div class="frow"><span class="lb">「將要支付」顯示在</span><select data-paydue aria-label="將要支付顯示在">${[['home','首頁'],['stats','統計'],['both','首頁和統計'],['off','不顯示']].map(([v,l])=>`<option value="${v}" ${payDueAt()===v?'selected':''}>${l}</option>`).join('')}</select></div></div>
+    <div class="sec-f">刷卡當下就算支出，分類和預算馬上反映；繳卡費是從戶頭轉到卡上，不算支出，同一筆錢不會算兩次。想看「繳卡費才算支出」的數字（跟戶頭實際流出的錢一致），在首頁或統計<b>按住「按住看繳費制」</b>，放開就回來。</div></div>`;
 }
 let catMgrType='expense';
 function renderCatsPage(box){
@@ -2731,7 +2754,6 @@ async function settingsAction(act){
 async function toggleSetting(key,on,input){
   if(key==='nag'){const c=nagCfg();c.on=on;if(on)c.since=today();settings.nag=c;saveSettings();nagRender();
     if(on)toast(`已開啟，每天 ${c.time} 開始提醒`);setTimeout(refreshSettingsTop,360);return;}
-  if(key==='cardPayMode'){settings.cardPayMode=on;saveSettings();haptic('success');toast(on?'改成繳卡費才算支出':'改回刷卡就算支出');renderAll();setTimeout(refreshSettingsTop,320);return;}
   if(key==='haptic'){settings.haptic=on;saveSettings();applyHapticSetting();if(on)haptic();return;}
   // 等開關滑完（約 .3 秒）再換外觀，畫面用淡入淡出銜接
   if(key==='darkFrost'){settings.darkFrost=on;saveSettings();lookTransition(()=>{applyLook();syncLookUI();},reduceMotion()?0:300);return;}
@@ -3343,6 +3365,7 @@ window.addEventListener('resize',fitSafe);window.addEventListener('pageshow',fit
    ===================================================================== */
 document.addEventListener('click',e=>{
   const t=e.target;let el;
+  if(t.closest('[data-peek]')){e.preventDefault();return;}
   if((el=t.closest('[data-avg]'))){toggleAvg(el.dataset.avg);return;}
   if((el=t.closest('.tab'))){if(Date.now()-tabDragUsed<350)return;switchTab(el.dataset.tab);return;}
   if((el=t.closest('button[data-look]'))){setLook(el.dataset.look);return;}
