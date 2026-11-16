@@ -232,6 +232,17 @@ html[data-nohap] .hap-ov{display:none;}
 @keyframes avgIn{from{opacity:0;transform:translateY(4px) scale(.9)}to{opacity:1;transform:none}}
 .chart .bar{transition:opacity .2s;}
 .chart .bar.dim{opacity:.32;}
+.chint{font-size:.7rem;color:var(--label3);text-align:center;margin:2px 0 -2px;}
+.chart .grid.zero{stroke:var(--label3);stroke-width:.9;}
+.chart .selband{fill:color-mix(in srgb,var(--label) 7%,transparent);}
+.chart.grow .bar.neg{transform-origin:50% 0;}
+.netcmp{display:flex;flex-direction:column;gap:12px;}
+.netcmp .ln{display:grid;grid-template-columns:3em 1fr auto;align-items:center;gap:10px;font-size:.88rem;}
+.netcmp .ln b{font-weight:600;}
+.netcmp .trk{height:10px;border-radius:5px;background:color-mix(in srgb,var(--label) 7%,transparent);overflow:hidden;}
+.netcmp .trk i{display:block;height:100%;border-radius:5px;}
+.netcmp .ft{font-size:.765rem;color:var(--label2);line-height:1.5;}
+.selchip{display:inline-flex;align-items:center;gap:4px;font-size:.765rem;font-weight:600;color:var(--label2);padding:3px 10px;border-radius:999px;background:color-mix(in srgb,var(--label) 7%,transparent);}
 .chart .hit{cursor:pointer;}
 .statshead{padding:4px 2px 10px;min-height:5.4em;}
 .statshead .lbl{font-size:.765rem;font-weight:600;color:var(--label2);}
@@ -863,7 +874,7 @@ html[data-look="glass"] .wtile{background:var(--glass-card);-webkit-backdrop-fil
       <header class="navbar"><span></span><div class="ntitle">統計</div><span></span></header>
       <div class="ltitle"><h1>統計</h1></div>
       <div class="seg-wrap"><div class="seg" id="rangeSeg" role="tablist">
-        <button data-v="week" role="tab">週</button><button data-v="month" role="tab">月</button><button data-v="year" role="tab">年</button>
+        <button data-v="week" role="tab">週</button><button data-v="month" role="tab">月</button><button data-v="year" role="tab">年</button><button data-v="all" role="tab">全部</button>
       </div></div>
       <div id="statsBody"></div>
     </div>
@@ -2058,23 +2069,33 @@ function txRowHTML(r,opts){
 
 /* ---------- 長條圖（可點、可拖曳看數值） ---------- */
 function niceMax(v){if(v<=0)return 1;const m=Math.pow(10,Math.floor(Math.log10(v)));for(const s of [1,1.2,1.5,2,2.5,3,4,5,6,8,10])if(s*m>=v)return s*m;return 10*m;}
-function barChart({id,vals,labels,showLabel,sel,color,avg,avgLabel,future,h,anim}){
+function barChart({id,vals,labels,showLabel,sel,color,negColor,avg,avgLabel,future,h,anim}){
   h=h||190;const W=340,H=h,pl=2,pr=38,pt=12,pb=22,pw=W-pl-pr,ph=H-pt-pb,n=vals.length;
-  const max=niceMax(Math.max(...vals,avg||0,1)),bw=pw/n,barW=Math.max(2.5,Math.min(bw*0.6,26));
+  const vis=vals.filter((v,i)=>!(future&&future[i]));
+  const hiV=Math.max(...vis,avg||0,0),loV=Math.min(...vis,0);
+  // 有負數（結餘）時，零線往上移，負的長條往下畫
+  let max,min;
+  if(loV<0){const span=niceMax(Math.max(hiV,0)-loV);const st=span/4;max=Math.ceil(Math.max(hiV,0)/st)*st;min=max-span;if(max<=0){max=st;min=-span+st;}}
+  else{max=niceMax(Math.max(hiV,1));min=0;}
+  const yOf=v=>pt+ph*(max-v)/(max-min),y0=yOf(0);
+  const bw=pw/n,barW=Math.max(2.5,Math.min(bw*0.6,26));
+  const rng=Array.isArray(sel)?sel:null,inSel=i=>sel==null?true:rng?(i>=rng[0]&&i<=rng[1]):sel===i;
   let s=`<svg viewBox="0 0 ${W} ${H}" class="chart${anim&&!reduceMotion()?' grow':''}" data-chart="${id}" role="img" aria-label="長條圖">`;
-  for(let k=0;k<=2;k++){const y=pt+ph-ph*k/2;s+=`<line x1="${pl}" x2="${pl+pw}" y1="${y}" y2="${y}" class="grid"/><text x="${W-pr+6}" y="${y+3.5}" class="ax">${compact(max*k/2)}</text>`;}
+  const ticks=min<0?[max,0,min]:[max,max/2,0];
+  ticks.forEach(t=>{const y=yOf(t);s+=`<line x1="${pl}" x2="${pl+pw}" y1="${y.toFixed(1)}" y2="${y.toFixed(1)}" class="grid${t===0&&min<0?' zero':''}"/><text x="${W-pr+6}" y="${(y+3.5).toFixed(1)}" class="ax">${t<0?'−':''}${compact(Math.abs(t))}</text>`;});
+  if(rng){const x1=pl+bw*rng[0],x2=pl+bw*(rng[1]+1);s+=`<rect x="${x1.toFixed(1)}" y="${pt-6}" width="${(x2-x1).toFixed(1)}" height="${(ph+6).toFixed(1)}" rx="6" class="selband"/>`;}
   vals.forEach((v,i)=>{
-    if(future&&future[i])return;
-    const bh=v>0?Math.max(2,v/max*ph):0,x=pl+bw*i+(bw-barW)/2,y=pt+ph-bh;
-    if(bh>0)s+=`<rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${barW.toFixed(1)}" height="${bh.toFixed(1)}" rx="${Math.min(4,barW/2).toFixed(1)}" class="bar${sel!=null&&sel!==i?' dim':''}" style="fill:${color};--bi:${i}"/>`;
+    if(future&&future[i])return;if(!v)return;
+    const neg=v<0,bh=Math.max(2,Math.abs(yOf(v)-y0)),x=pl+bw*i+(bw-barW)/2,y=neg?y0:y0-bh;
+    s+=`<rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${barW.toFixed(1)}" height="${bh.toFixed(1)}" rx="${Math.min(4,barW/2).toFixed(1)}" class="bar${neg?' neg':''}${inSel(i)?'':' dim'}" style="fill:${neg&&negColor?negColor:color};--bi:${i}"/>`;
   });
   vals.forEach((v,i)=>{if(showLabel(i))s+=`<text x="${(pl+bw*i+bw/2).toFixed(1)}" y="${H-5}" text-anchor="middle" class="ax">${esc(labels[i])}</text>`;});
   let avgY=null;
-  if(avg>0){const y=pt+ph-avg/max*ph;avgY=y;s+=`<line x1="${pl}" x2="${pl+pw}" y1="${y.toFixed(1)}" y2="${y.toFixed(1)}" class="avg${avgOn[id]?' on':''}"/>`;}
-  if(sel!=null){const x=pl+bw*sel+bw/2;s+=`<line x1="${x.toFixed(1)}" x2="${x.toFixed(1)}" y1="${pt-6}" y2="${pt+ph}" stroke="var(--label3)" stroke-width="1"/>`;}
+  if(avg>0&&!rng){const y=yOf(avg);avgY=y;s+=`<line x1="${pl}" x2="${pl+pw}" y1="${y.toFixed(1)}" y2="${y.toFixed(1)}" class="avg${avgOn[id]?' on':''}"/>`;}
+  if(sel!=null&&!rng){const x=pl+bw*sel+bw/2;s+=`<line x1="${x.toFixed(1)}" x2="${x.toFixed(1)}" y1="${pt-6}" y2="${pt+ph}" stroke="var(--label3)" stroke-width="1"/>`;}
   s+=`<rect x="${pl}" y="0" width="${pw}" height="${H}" fill="transparent" class="hit" data-n="${n}"/>`;
   if(avgY!=null){
-    if(avgOn[id]){const t=`${avgLabel||'平均'} ${money(Math.round(avg))}`,tw=[...t].reduce((a,ch)=>a+(/[\u4e00-\u9fff]/.test(ch)?10.5:ch===' '?3:6.2),0)+14;
+    if(avgOn[id]){const t=`${avgLabel||'平均'} ${money(Math.round(avg))}`,tw=[...t].reduce((a,ch)=>a+(/[一-鿿]/.test(ch)?10.5:ch===' '?3:6.2),0)+14;
       const ty=avgY>pt+18?avgY-20:avgY+4;
       s+=`<g class="avgtag" role="note"><rect x="${pl+2}" y="${ty.toFixed(1)}" width="${tw.toFixed(1)}" height="16" rx="8"/><text x="${pl+9}" y="${(ty+11.6).toFixed(1)}">${esc(t)}</text></g>`;}
     s+=`<rect x="${pl}" y="${(avgY-11).toFixed(1)}" width="${pw}" height="22" fill="transparent" class="avghit" data-avg="${id}" role="button" aria-label="${esc(avgLabel||'平均')} ${esc(money(Math.round(avg)))}"/>`;
@@ -2083,27 +2104,44 @@ function barChart({id,vals,labels,showLabel,sel,color,avg,avgLabel,future,h,anim
   return s;
 }
 (function setupChartScrub(){
-  let scrub=null;
+  // 一根手指：點一下選一根、拖曳看數值；兩根手指同時按住兩根長條：選取中間那一段
+  let scrub=null;const pts=new Map();let multi=null;
   const idxAt=(hit,x)=>{const r=hit.getBoundingClientRect();const n=Number(hit.dataset.n);return Math.max(0,Math.min(n-1,Math.floor((x-r.left)/r.width*n)));};
+  const rangeNow=()=>{const xs=[...pts.values()].filter(p=>p.hit===multi.hit).map(p=>idxAt(multi.hit,p.x));if(xs.length<2)return;
+    const a=Math.min(...xs),b=Math.max(...xs);chartRange(multi.id,a,b);};
   document.addEventListener('pointerdown',e=>{
     if(e.target.closest('.avghit'))return;
     const hit=e.target.closest('.hit');if(!hit)return;
     const id=hit.closest('[data-chart]').dataset.chart;const i=idxAt(hit,e.clientX);
+    pts.set(e.pointerId,{hit,x:e.clientX});
+    const same=[...pts.values()].filter(p=>p.hit===hit).length;
+    if(same>=2&&RANGE_CHARTS.has(id)){multi={id,hit};scrub=null;rangeNow();return;}
     scrub={id,hit,start:i,moved:false,x0:e.clientX};
   });
   document.addEventListener('pointermove',e=>{
+    const p=pts.get(e.pointerId);if(p)p.x=e.clientX;
+    if(multi){if(p)rangeNow();return;}
     if(!scrub)return;if(Math.abs(e.clientX-scrub.x0)<6&&!scrub.moved)return;
     scrub.moved=true;const i=idxAt(scrub.hit,e.clientX);chartSelect(scrub.id,i,true);
   });
-  const end=()=>{if(scrub&&!scrub.moved)chartSelect(scrub.id,scrub.start,false);scrub=null;};
-  document.addEventListener('pointerup',end);document.addEventListener('pointercancel',()=>{scrub=null;});
+  const end=e=>{pts.delete(e.pointerId);
+    if(multi){if(![...pts.values()].some(p=>p.hit===multi.hit))multi=null;scrub=null;return;}
+    if(scrub&&!scrub.moved)chartSelect(scrub.id,scrub.start,false);scrub=null;};
+  document.addEventListener('pointerup',end);document.addEventListener('pointercancel',e=>{pts.delete(e.pointerId);scrub=null;if(multi&&![...pts.values()].length)multi=null;});
 })();
+const RANGE_CHARTS=new Set(['stats']);
+function chartRange(id,a,b){
+  if(id!=='stats')return;avgOn[id]=false;
+  const nv=a===b?a:[a,b];
+  if(JSON.stringify(nv)===JSON.stringify(stSel))return;
+  stSel=nv;haptic();renderStatsTop();
+}
 const avgOn={};
 function toggleAvg(id){avgOn[id]=!avgOn[id];haptic();
   if(id==='week'){if(avgOn[id])homeSel=null;renderHome();}else if(id==='stats'){if(avgOn[id])stSel=null;renderStatsTop();}}
 function chartSelect(id,i,scrubbing){avgOn[id]=false;
   if(id==='week'){const nv=(!scrubbing&&homeSel===i)?null:i;if(nv===homeSel&&scrubbing)return;homeSel=nv;haptic();renderHome();}
-  else if(id==='stats'){const nv=(!scrubbing&&stSel===i)?null:i;if(nv===stSel&&scrubbing)return;stSel=nv;haptic();renderStatsTop();}
+  else if(id==='stats'){const nv=(!scrubbing&&(stSel===i||Array.isArray(stSel)))?null:i;if(nv===stSel&&scrubbing)return;stSel=nv;haptic();renderStatsTop();}
 }
 
 /* =====================================================================
@@ -2170,42 +2208,74 @@ function stPeriod(){
     return {from:ymd(s),to:ymd(new Date(s.getFullYear(),s.getMonth(),last,12)),title:`${s.getFullYear()}年${s.getMonth()+1}月`,bk,prevFrom:ymd(ps),prevTo:ymd(pl),cmpWord:'上個月',avgUnit:'日',
       show:i=>[0,7,14,21,28].includes(i)};
   }
+  if(stRange==='all'){
+    const ys=D().tx.map(r=>Number(r.date.slice(0,4))).filter(Boolean),cy=now.getFullYear(),y0=ys.length?Math.min(cy,...ys):cy,bk=[];
+    for(let y=y0;y<=cy;y++)bk.push({from:`${y}-01-01`,to:`${y}-12-31`,label:cy-y0>5?`'${String(y).slice(2)}`:String(y),full:`${y}年`,future:false});
+    return {from:`${y0}-01-01`,to:`${cy}-12-31`,title:y0===cy?`${cy}年（全部）`:`${y0} – ${cy}年`,bk,prevFrom:null,prevTo:null,cmpWord:'',avgUnit:'年',show:()=>true,all:true};
+  }
   const y=now.getFullYear()+stOffset,bk=[];
   for(let m=0;m<12;m++){const last=new Date(y,m+1,0).getDate();const from=`${y}-${pad2(m+1)}-01`;bk.push({from,to:`${y}-${pad2(m+1)}-${pad2(last)}`,label:String(m+1),full:`${y}年${m+1}月`,future:from>t});}
   return {from:`${y}-01-01`,to:`${y}-12-31`,title:`${y}年`,bk,prevFrom:`${y-1}-01-01`,prevTo:`${y-1}-12-31`,cmpWord:'去年',avgUnit:'月',show:()=>true};
 }
-function sumRange(type,from,to){return D().tx.reduce((s,r)=>r.type===type&&r.date>=from&&r.date<=to?s+r.amount:s,0);}
+function sumRange(type,from,to){
+  if(type==='net')return D().tx.reduce((s,r)=>r.date>=from&&r.date<=to?s+(r.type==='income'?r.amount:-r.amount):s,0);
+  return D().tx.reduce((s,r)=>r.type===type&&r.date>=from&&r.date<=to?s+r.amount:s,0);}
+/* 目前選取（單根或一段）對應的日期範圍；沒選就是整段期間 */
+function stSpan(P){
+  if(stSel==null)return {from:P.from,to:P.to,sel:false};
+  const [a,b]=Array.isArray(stSel)?stSel:[stSel,stSel];
+  if(!P.bk[a]||!P.bk[b])return {from:P.from,to:P.to,sel:false};
+  let to=P.bk[b].to;const t=today();if(to>t&&P.bk[b].from<=t)to=t;
+  return {from:P.bk[a].from,to,a,b,sel:true,
+    label:a===b?P.bk[a].full:`${P.bk[a].full.replace(/ 星期.$/,'')} – ${P.bk[b].full.replace(/ 星期.$/,'')}`,units:P.bk.slice(a,b+1).filter(x=>!x.future).length||1};
+}
+const signMoney=v=>(v<0?'−':v>0?'+':'')+money(Math.abs(Math.round(v)));
 function renderStats(){
   qsa('#rangeSeg button').forEach(b=>{const on=b.dataset.v===stRange;b.classList.toggle('on',on);b.setAttribute('aria-selected',on?'true':'false');});
   renderStatsTop();
 }
 function renderStatsTop(){
-  const P=stPeriod(),t=today();
+  const P=stPeriod(),t=today(),net=stType==='net';
+  if(Array.isArray(stSel)&&(!P.bk[stSel[0]]||!P.bk[stSel[1]]))stSel=null;
+  if(stSel!=null&&!Array.isArray(stSel)&&!P.bk[stSel])stSel=null;
   const vals=P.bk.map(b=>sumRange(stType,b.from,b.to));
   const total=vals.reduce((a,b)=>a+b,0);
   const isCur=P.from<=t&&t<=P.to;
   let units=P.bk.filter(b=>!b.future).length||P.bk.length;
   const avg=total/Math.max(1,units);
   let cmpTxt='';
-  let prevTo=P.prevTo;
-  if(isCur){const elapsed=P.bk.filter(b=>!b.future).length;
-    if(stRange==='year'){prevTo=`${Number(P.prevFrom.slice(0,4))}-${t.slice(5)}`;}
-    else prevTo=ymd(addDays(parseD(P.prevFrom),elapsed-1));}
-  const prev=sumRange(stType,P.prevFrom,prevTo<P.prevTo?prevTo:P.prevTo);
-  if(prev>0&&total>0){const diff=total-prev,pct=Math.round(Math.abs(diff)/prev*100);cmpTxt=`比${P.cmpWord}${isCur?'同期':''}${diff<0?'少':'多'} ${pct}%`;}
-  const word=stType==='expense'?'支出':'收入';
+  if(!P.all){
+    let prevTo=P.prevTo;
+    if(isCur){const elapsed=P.bk.filter(b=>!b.future).length;
+      if(stRange==='year'){prevTo=`${Number(P.prevFrom.slice(0,4))}-${t.slice(5)}`;}
+      else prevTo=ymd(addDays(parseD(P.prevFrom),elapsed-1));}
+    const prev=sumRange(stType,P.prevFrom,prevTo<P.prevTo?prevTo:P.prevTo);
+    if(net){const anyPrev=D().tx.some(r=>r.date>=P.prevFrom&&r.date<=P.prevTo);if(anyPrev&&Math.round(total-prev)){const diff=total-prev;cmpTxt=`比${P.cmpWord}${isCur?'同期':''}${diff>0?'多存':'少存'} ${money(Math.abs(Math.round(diff)))}`;}}
+    else if(prev>0&&total>0){const diff=total-prev,pct=Math.round(Math.abs(diff)/prev*100);cmpTxt=`比${P.cmpWord}${isCur?'同期':''}${diff<0?'少':'多'} ${pct}%`;}
+  }
+  const word=net?'結餘':stType==='expense'?'支出':'收入';
+  const SP=stSpan(P);
   let head;
-  if(stSel!=null&&P.bk[stSel]){head=`<div class="lbl">${esc(P.bk[stSel].full)}</div><div class="hero num" data-count="stHero" data-to="${vals[stSel]}">${money(vals[stSel])}</div><div class="sub">占這段期間的 ${total?Math.round(vals[stSel]/total*100):0}%</div>`;}
-  else head=`<div class="lbl">${esc(P.title)} · 總${word}</div><div class="hero num" data-count="stHero" data-to="${total}">${money(total)}</div><div class="sub">平均每${P.avgUnit} ${money(Math.round(avg))}${cmpTxt?'　·　'+cmpTxt:''}</div>`;
-  const nextDisabled=stOffset>=0;
+  if(SP.sel){
+    const v=sumRange(stType,SP.from,SP.to),rng=Array.isArray(stSel);
+    const inc=sumRange('income',SP.from,SP.to),exp=sumRange('expense',SP.from,SP.to);
+    const sub=net?`收入 ${money(inc)} − 支出 ${money(exp)}`:rng?`${SP.units} ${P.avgUnit==='月'?'個月':P.avgUnit}・平均每${P.avgUnit} ${money(Math.round(v/SP.units))}・占 ${total?Math.round(v/total*100):0}%`:`占這段期間的 ${total?Math.round(v/total*100):0}%`;
+    head=`<div class="lbl">${esc(SP.label)}${rng?'　<span class="selchip">已選一段</span>':''}</div><div class="hero num" data-count="stHero" data-to="${v}">${net?signMoney(v):money(v)}</div><div class="sub">${sub}</div>`;
+  }else if(net){
+    const inc=sumRange('income',P.from,P.to),exp=sumRange('expense',P.from,P.to),rate=inc>0?Math.round(total/inc*100):null;
+    head=`<div class="lbl">${esc(P.title)} · 總結餘</div><div class="hero num" data-count="stHero" data-to="${total}" style="color:${total<0?'var(--c-red)':'inherit'}">${signMoney(total)}</div><div class="sub">${rate!=null?`儲蓄率 ${rate}%`:'這段期間沒有收入'}${cmpTxt?'　·　'+cmpTxt:''}</div>`;
+  }else head=`<div class="lbl">${esc(P.title)} · 總${word}</div><div class="hero num" data-count="stHero" data-to="${total}">${money(total)}</div><div class="sub">平均每${P.avgUnit} ${money(Math.round(avg))}${cmpTxt?'　·　'+cmpTxt:''}</div>`;
+  const nextDisabled=stOffset>=0||P.all,prevDisabled=P.all;
+  const dis='disabled style="opacity:.3"';
   $('statsBody').innerHTML=`<div class="card" style="padding-top:10px">
       <div style="display:flex;align-items:center;justify-content:space-between;margin:0 -8px">
-        <button class="nbtn" data-st-shift="-1" aria-label="上一段期間">${ICON.chevL}</button>
-        <div class="seg" id="typeSeg2" style="flex:0 1 180px"><button data-st-type="expense" class="${stType==='expense'?'on':''}">支出</button><button data-st-type="income" class="${stType==='income'?'on':''}">收入</button></div>
-        <button class="nbtn" data-st-shift="1" ${nextDisabled?'disabled style="opacity:.3"':''} aria-label="下一段期間"><span style="display:inline-block;transform:scaleX(-1)">${ICON.chevL}</span></button>
+        <button class="nbtn" data-st-shift="-1" ${prevDisabled?dis:''} aria-label="上一段期間">${ICON.chevL}</button>
+        <div class="seg" id="typeSeg2" style="flex:0 1 230px"><button data-st-type="expense" class="${stType==='expense'?'on':''}">支出</button><button data-st-type="income" class="${stType==='income'?'on':''}">收入</button><button data-st-type="net" class="${net?'on':''}">結餘</button></div>
+        <button class="nbtn" data-st-shift="1" ${nextDisabled?dis:''} aria-label="下一段期間"><span style="display:inline-block;transform:scaleX(-1)">${ICON.chevL}</span></button>
       </div>
       <div id="stMain"><div class="statshead">${head}</div>
-      ${barChart({id:'stats',vals,labels:P.bk.map(b=>b.label),showLabel:P.show,sel:stSel,color:stType==='expense'?'var(--accent)':'var(--income)',avg,avgLabel:stRange==='year'?'每月平均':'每日平均',future:P.bk.map(b=>b.future),anim:ANIM})}</div>
+      ${barChart({id:'stats',vals,labels:P.bk.map(b=>b.label),showLabel:P.show,sel:stSel,color:stType==='expense'?'var(--accent)':'var(--income)',negColor:'var(--c-red)',avg:net?0:avg,avgLabel:stRange==='year'?'每月平均':P.all?'每年平均':'每日平均',future:P.bk.map(b=>b.future),anim:ANIM})}
+      <div class="chint">${Array.isArray(stSel)?'點一下圖表可以取消選取':stSel!=null?'再點一下同一根可以取消選取':'兩根手指同時按住兩根長條，可以看中間那一段'}</div></div>
     </div><div id="statsCats"></div>`;
   runCounts($('statsBody'));
   syncSegs($('scrStats'));
@@ -2213,11 +2283,25 @@ function renderStatsTop(){
 }
 function renderStatsCats(){
   const box=$('statsCats');if(!box)return;
-  const P=stPeriod(),rows=D().tx.filter(r=>r.type===stType&&r.date>=P.from&&r.date<=P.to);
+  const P=stPeriod(),SP=stSpan(P),spanTxt=SP.sel?esc(SP.label):'';
+  if(stType==='net'){
+    const inc=sumRange('income',SP.from,SP.to),exp=sumRange('expense',SP.from,SP.to),net=inc-exp,mx=Math.max(inc,exp,1);
+    if(!inc&&!exp){box.innerHTML=`<div class="empty" style="padding-top:20px">${ICON.chart.replace('class="ico"','class="ico ei"')}<h3>沒有資料</h3><p>這段期間沒有收入或支出記錄。</p></div>`;return;}
+    const rate=inc>0?Math.round(net/inc*100):null;
+    box.innerHTML=`<div class="sec"><div class="sec-h big"><span>收支對照</span>${SP.sel?`<span class="selchip">${spanTxt}</span>`:''}</div>
+      <div class="card${ANIM?' anim':''}" style="margin:0 0 10px;width:100%;padding:16px"><div class="netcmp">
+        <div class="ln"><span>收入</span><div class="trk"><i style="width:${(inc/mx*100).toFixed(1)}%;background:var(--income)"></i></div><b class="num">${money(inc)}</b></div>
+        <div class="ln"><span>支出</span><div class="trk"><i style="width:${(exp/mx*100).toFixed(1)}%;background:var(--accent)"></i></div><b class="num">${money(exp)}</b></div>
+        <div class="ln" style="border-top:.5px solid var(--sep);padding-top:12px"><span>結餘</span><span></span><b class="num" style="color:${net<0?'var(--c-red)':'var(--income)'}">${signMoney(net)}</b></div>
+        <div class="ft">${net>=0?(rate!=null?`收入的 ${rate}% 存了下來。`:''):`支出比收入多 ${money(-net)}${inc?`，超出 ${Math.round(-net/inc*100)}%`:''}。`}點「支出」或「收入」可以看分類。</div>
+      </div></div></div>`;
+    return;
+  }
+  const rows=D().tx.filter(r=>r.type===stType&&r.date>=SP.from&&r.date<=SP.to);
   const m={},cnt={};rows.forEach(r=>{m[r.category]=(m[r.category]||0)+r.amount;cnt[r.category]=(cnt[r.category]||0)+1;});
   const entries=Object.entries(m).sort((a,b)=>b[1]-a[1]),total=entries.reduce((s,x)=>s+x[1],0);
-  if(!entries.length){box.innerHTML=`<div class="empty" style="padding-top:20px">${ICON.chart.replace('class="ico"','class="ico ei"')}<h3>沒有資料</h3><p>這段期間沒有${stType==='expense'?'支出':'收入'}記錄。</p></div>`;return;}
-  box.innerHTML=`<div class="sec"><div class="sec-h big"><span>分類</span></div>
+  if(!entries.length){box.innerHTML=`<div class="empty" style="padding-top:20px">${ICON.chart.replace('class="ico"','class="ico ei"')}<h3>沒有資料</h3><p>${SP.sel?'選取的這段':'這段期間'}沒有${stType==='expense'?'支出':'收入'}記錄。</p></div>`;return;}
+  box.innerHTML=`<div class="sec"><div class="sec-h big"><span>分類</span>${SP.sel?`<span class="selchip">${spanTxt}</span>`:''}</div>
     <div class="card${ANIM?' anim':''}" style="margin:0 0 10px;width:100%;padding:14px 16px">${stackBar(entries,total)}
     <div style="font-size:.765rem;color:var(--label2)">最多的是「${esc(catName(entries[0][0]))}」，占 ${Math.round(entries[0][1]/total*100)}%</div></div>
     <div class="group">${entries.map(([c,v])=>`<button class="row tap" data-cat-open="${encodeURIComponent(c)}" style="--inset:66px">${catIcon(c)}
@@ -2225,10 +2309,10 @@ function renderStatsCats(){
       <span class="amt num">${money(v)}</span>${ICON.chev}</button>`).join('')}</div></div>`;
 }
 function openCatSheet(cat){
-  const P=stPeriod(),rows=D().tx.filter(r=>r.type===stType&&r.category===cat&&r.date>=P.from&&r.date<=P.to).sort(byDateDesc);
+  const P=stPeriod(),SP=stSpan(P),rows=D().tx.filter(r=>r.type===stType&&r.category===cat&&r.date>=SP.from&&r.date<=SP.to).sort(byDateDesc);
   $('catTitle').textContent=catName(cat);
   const total=rows.reduce((s,r)=>s+r.amount,0);
-  $('catBody').innerHTML=`<div class="sumline">${esc(P.title)} · ${rows.length} 筆<b class="num">${money(total)}</b></div>
+  $('catBody').innerHTML=`<div class="sumline">${esc(SP.sel?SP.label:P.title)} · ${rows.length} 筆<b class="num">${money(total)}</b></div>
     <div class="sec"><div class="group">${rows.map(r=>txRowHTML(r,{showDate:true})).join('')}</div></div>`;
   openSheet('catSheet');haptic();
 }
@@ -3039,7 +3123,10 @@ function impBuild(){
     let cat=null;
     if(kind==='tx'){
       const list=type==='income'?d.catsInc:d.catsExp,cv=c.cat!=null?String(r[c.cat]||'').trim():'';
-      if(cv){cat=list.find(x=>x===cv||catName(x)===cv)||(cv.includes(' ')?cv:(type==='income'?'💰 ':'🧾 ')+cv);}
+      const nv=c.note!=null?(String(r[c.note]||'').match(/原(?:始)?(?:類別|分類)\s*[:：]\s*([^,，;；\s]+)/)||[])[1]:'';
+      const orig=nv&&list.find(x=>catName(x)===nv);
+      if(orig)cat=orig;
+      else if(cv){cat=list.find(x=>x===cv||catName(x)===cv)||(cv.includes(' ')?cv:(type==='income'?'💰 ':'🧾 ')+cv);}
       else cat=guessCat(name,type,d);
       if(IMP.catOver[ri])cat=IMP.catOver[ri];
     }
@@ -3067,7 +3154,7 @@ function renderImport(){
       <select id="impTarget" aria-label="匯入到哪個帳戶">${d.accounts.map(a=>opt(a.id,a.name,IMP.target)).join('')}${opt('+credit','＋ 新增信用卡…','')}${opt('+bank','＋ 新增戶頭…','')}</select></div>
       ${IMP.signed?`<div class="frow"><span class="lb">金額正負</span><select id="impSign" aria-label="金額正負">${opt('out','正數是支出，負數是退款',IMP.sign)}${opt('in','正數是收入，負數是支出',IMP.sign)}</select></div>`:''}</div>
       ${(()=>{const t=d.accounts.find(a=>a.id===IMP.target);return IMP.isCard&&t&&acctKind(t)!=='credit'?`<div class="imp-warn">這份看起來是信用卡帳單，但現在選的是「${esc(t.name)}」。信用卡的消費要選那張卡，帳單和繳款才會算對。</div>`:'';})()}
-      <div class="sec-f">${IMP.isCard?'看起來是信用卡帳單：正數是消費、負數是退款或回饋，「繳款」那幾行會記成繳卡費（轉帳），不算收入。':'檢查一下上面的支出、收入合計對不對；不對的話切換「金額正負」。'}</div></div>`;
+      <div class="sec-f">${IMP.isCard?'看起來是信用卡帳單：正數是消費、負數是退款或回饋，「繳款」那幾行會記成繳卡費（轉帳），不算收入。':IMP.signed?'檢查一下上面的支出、收入合計對不對；不對的話切換「金額正負」。':'檔案裡有「類型」欄，支出和收入照檔案標的匯入。檢查一下上面的合計對不對。'}</div></div>`;
   }else{
     const names=Object.keys(IMP.unknown);
     if(names.length)h+=`<div class="sec"><div class="sec-h">這些帳戶這裡沒有（${names.length}）</div><div class="group">${names.map(nm=>{const cur=IMP.map[nm];
@@ -3194,7 +3281,7 @@ document.addEventListener('click',e=>{
   if((el=t.closest('[data-catmgr]'))){catMgrType=el.dataset.catmgr;haptic();refreshSettingsTop();return;}
   if((el=t.closest('[data-cat-open]'))){openCatSheet(decodeURIComponent(el.dataset.catOpen));return;}
   if((el=t.closest('[data-st-shift]'))){if(el.disabled)return;const dir=Number(el.dataset.stShift);stOffset+=dir;if(stOffset>0)stOffset=0;stSel=null;haptic();ANIM=true;renderStats();ANIM=false;slideIn($('stMain'),dir);return;}
-  if((el=t.closest('[data-st-type]'))){if(stType===el.dataset.stType)return;stType=el.dataset.stType;stSel=null;haptic();ANIM=true;renderStats();ANIM=false;stagger($('statsCats'));return;}
+  if((el=t.closest('[data-st-type]'))){if(stType===el.dataset.stType)return;stType=el.dataset.stType;haptic();ANIM=true;renderStats();ANIM=false;stagger($('statsCats'));return;}
   if((el=t.closest('#rangeSeg button'))){if(stRange===el.dataset.v)return;stRange=el.dataset.v;stOffset=0;stSel=null;haptic();ANIM=true;renderStats();ANIM=false;stagger($('statsBody'));return;}
   if((el=t.closest('#listSeg button'))){if(listType===el.dataset.v)return;listType=el.dataset.v;haptic();renderList();stagger($('listBody'),6);return;}
   if((el=t.closest('[data-pill]'))){listAccount=el.dataset.pill||null;haptic();renderList();return;}
