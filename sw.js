@@ -1,5 +1,5 @@
 /* 我的記帳本 — 離線快取＋推播通知（v19：黑白圖示、推播提醒） */
-const CACHE = 'my-ledger-v19';
+const CACHE = 'my-ledger-v20';
 const CORE = [
   './',
   './index.html',
@@ -7,7 +7,8 @@ const CORE = [
   './icons/icon-180.png',
   './icons/icon-192.png',
   './icons/icon-512.png',
-  './icons/icon-dark-180.png'
+  './icons/icon-dark-180.png',
+  './icons/icon-gray-180.png'
 ];
 
 self.addEventListener('install', e => {
