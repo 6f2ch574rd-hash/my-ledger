@@ -737,6 +737,13 @@ html[data-look="glass"] .wtile{background:var(--glass-card);-webkit-backdrop-fil
 .sw:active .dot2{transform:scale(.9);}
 html[data-look="glass"] .sw.on .dot2{box-shadow:0 0 0 2.5px rgba(255,255,255,.7),0 0 0 4px var(--label);}
 .iconprev{display:flex;align-items:center;gap:16px;}
+.hicons{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;padding:16px 10px 14px;}
+.hic{display:flex;flex-direction:column;align-items:center;gap:8px;font-size:.706rem;color:var(--label2);text-align:center;line-height:1.3;}
+.hic .appicon{width:68px;height:68px;border-radius:16px;transition:transform .2s,box-shadow .2s;}
+.hic.on{color:var(--label);font-weight:600;}
+.hic.on .appicon{box-shadow:0 0 0 2.5px var(--cell),0 0 0 4.5px var(--c-blue),0 6px 18px rgba(0,0,0,.18);}
+.hic:active .appicon{transform:scale(.92);}
+.tlink{flex:none;color:var(--c-blue);font-size:.941rem;padding:4px 0 4px 10px;}
 .appicon{flex:none;width:76px;height:76px;border-radius:18px;overflow:hidden;box-shadow:0 6px 18px rgba(0,0,0,.18),0 0 0 .5px rgba(0,0,0,.08);}
 .appicon svg{width:100%;height:100%;display:block;}
 .iconprev p{margin:0;font-size:.765rem;color:var(--label2);line-height:1.5;}
@@ -2462,8 +2469,10 @@ function renderThemePage(box){
   const cur=currentPresetKey();
   box.innerHTML=`<div class="sec"><div class="sec-h">主題色</div><div class="card swatches" style="margin:0;width:100%">${PRESETS.map(p=>`<button class="sw${cur===p.k?' on':''}" data-preset="${p.k}" style="--sc:${p.c}" aria-label="${p.n}" aria-pressed="${cur===p.k}"><span class="dot2">${ICON.check.replace('class="ico check"','class="ico"')}</span><span>${p.n}</span></button>`).join('')}</div>
     ${cur?'':`<div class="sec-f">目前使用兌換碼主題「${esc(themeName())}」。</div>`}</div>
-    <div class="sec"><div class="sec-h">App 圖示</div><div class="card iconprev" style="margin:0;width:100%"><div class="appicon">${appIconSVG()}</div>
-      <p><b>主畫面圖示統一是黑白的</b>淺色模式下加入主畫面是白色圖示，深色模式下是黑色圖示；換主題色不會改變。iPhone 只在「加入主畫面」那一刻決定，之後不會自動切換。舊圖示要刪掉重新加入才會更新。<b style="display:inline;color:var(--red);font-size:inherit">刪掉圖示會連資料一起刪除</b>，請先匯出完整備份，加回來後再還原。</p></div></div>
+    <div class="sec"><div class="sec-h">主畫面圖示</div><div class="card hicons" style="margin:0;width:100%">${HOME_ICONS.map(x=>`<button class="hic${homeIconKey()===x.k?' on':''}" data-homeicon="${x.k}" aria-pressed="${homeIconKey()===x.k}"><span class="appicon">${x.svg()}</span><span>${x.n}${x.k==='light'?'（預設）':x.k==='gray'?'（深淺通用）':''}</span></button>`).join('')}</div>
+      <div class="sec-f">iPhone 不會讓網頁 App 的圖示跟著深色模式自動變色，圖示是在「加入主畫面」那一刻決定的。想在深色主畫面也好看，可以選灰色。</div></div>
+    <div class="sec"><div class="sec-h">怎麼換成這個圖示</div><div class="group">${isStandaloneApp()?`<div class="row"><span class="cic" style="--cc:var(--c-blue)">1</span><div class="rt"><div class="t" style="white-space:normal;line-height:1.4">選好上面的顏色</div></div></div><div class="row" style="--inset:66px"><span class="cic" style="--cc:var(--c-blue)">2</span><div class="rt"><div class="t" style="white-space:normal;line-height:1.4">匯出完整備份</div></div><button class="tlink" data-act="backupJSON">現在匯出</button></div><div class="row" style="--inset:66px"><span class="cic" style="--cc:var(--c-blue)">3</span><div class="rt"><div class="t" style="white-space:normal;line-height:1.4">拷貝加入用網址</div></div><button class="tlink" data-act="copyIconURL">拷貝</button></div><div class="row" style="--inset:66px"><span class="cic" style="--cc:var(--c-blue)">4</span><div class="rt"><div class="t" style="white-space:normal;line-height:1.4">長按主畫面的記帳本圖示，選「移除 App」→「從主畫面移除」</div></div></div><div class="row" style="--inset:66px"><span class="cic" style="--cc:var(--c-blue)">5</span><div class="rt"><div class="t" style="white-space:normal;line-height:1.4">打開 Safari，貼上網址前往</div></div></div><div class="row" style="--inset:66px"><span class="cic" style="--cc:var(--c-blue)">6</span><div class="rt"><div class="t" style="white-space:normal;line-height:1.4">點下方「分享」→「加入主畫面」→「加入」</div></div></div><div class="row" style="--inset:66px"><span class="cic" style="--cc:var(--c-blue)">7</span><div class="rt"><div class="t" style="white-space:normal;line-height:1.4">打開新的圖示，到「設定」→「從完整備份還原」</div></div></div>`:`<div class="row"><span class="cic" style="--cc:var(--c-blue)">1</span><div class="rt"><div class="t" style="white-space:normal;line-height:1.4">選好上面的顏色</div></div></div><div class="row" style="--inset:66px"><span class="cic" style="--cc:var(--c-blue)">2</span><div class="rt"><div class="t" style="white-space:normal;line-height:1.4">點 Safari 下方的「分享」</div></div></div><div class="row" style="--inset:66px"><span class="cic" style="--cc:var(--c-blue)">3</span><div class="rt"><div class="t" style="white-space:normal;line-height:1.4">選「加入主畫面」→「加入」</div></div></div>`}</div>
+      <div class="sec-f">${isStandaloneApp()?'<b style="color:var(--red)">移除主畫面圖示會刪掉這個 App 裡的所有記錄</b>，第 2 步一定要先做，加回來後再還原。':'如果主畫面上已經有記帳本，要先在那個 App 裡匯出完整備份，再把它從主畫面移除，加入新的之後再還原。<b style="color:var(--red)">移除圖示會刪掉它裡面的記錄。</b>'}</div></div>
     <div class="sec"><div class="sec-h">兌換主題</div><div class="group"><div class="frow"><input class="left" id="themeCode" placeholder="輸入主題兌換碼" autocomplete="off" autocapitalize="characters"></div></div>
     <div style="padding:12px 4px 0"><button class="pbtn sm" data-act="redeem">兌換</button></div></div>
     ${settings.theme&&!cur?`<div class="sec"><div class="group"><button class="row destructive tap" data-act="resetTheme">恢復預設主題</button></div></div>`:''}`;
@@ -2516,6 +2525,7 @@ async function settingsAction(act){
     case 'redeem':redeemTheme();break;
     case 'resetTheme':resetTheme();break;
     case 'backupJSON':exportJSON();break;
+    case 'copyIconURL':copyIconURL();break;
     case 'backupCSV':exportCSV();break;
     case 'restoreJSON':$('fileJSON').value='';$('fileJSON').click();break;
     case 'importCSV':$('fileCSV').value='';$('fileCSV').click();break;
@@ -2594,16 +2604,21 @@ function parseTheme(code){
 }
 const ICON_KEYS=['graphite','burgundy','ocean','emerald','coral','violet','rose','amber','mint'];
 function applyIcon(){
-  // 圖示統一黑白：淺色模式用白色版、深色模式用黑色版（iPhone 在「加入主畫面」那一刻決定用哪一張）
-  const dk=darkMQ.matches?'-dark':'';
+  // 用使用者選的主畫面圖示（預設白色）；iPhone 在「加入主畫面」那一刻決定用哪一張
+  const dk=homeIcon().f;
   const t={mf:'./manifest.webmanifest',at:`./icons/icon${dk}-180.png`,fi:`./icons/icon${dk}-192.png`};
   const m=qs('link[rel="manifest"]');if(m)m.href=t.mf;const a=qs('link[rel="apple-touch-icon"]');if(a)a.href=t.at;const f=qs('link[rel="icon"]');if(f)f.href=t.fi;
 }
 function applyTheme(th){const r=document.documentElement.style,c=th.c;
   r.setProperty('--wine',c[0]);r.setProperty('--wine-d',c[1]);r.setProperty('--wine-l',c[2]);r.setProperty('--green',c[3]);r.setProperty('--green-l',c[4]);
   applyIcon(th);syncMono();applyWall();}
-try{darkMQ.addEventListener('change',()=>applyIcon());}catch(e){}
-function initTheme(){syncMono();applyIcon();if(settings.theme){const th=parseTheme(settings.theme);if(th)applyTheme(th);}}
+function readIconParam(){try{const q=new URLSearchParams(location.search).get('icon');if(q&&HOME_ICONS.some(x=>x.k===q)){settings.homeIcon=q;saveSettings();}}catch(e){}}
+function homeIconURL(k){return location.origin+location.pathname+'?icon='+(k||homeIconKey());}
+function setHomeIcon(k){if(!homeIcon(k)||homeIconKey()===k)return;settings.homeIcon=k;saveSettings();applyIcon();haptic('success');refreshSettingsTop();}
+async function copyIconURL(){const u=homeIconURL();
+  try{await navigator.clipboard.writeText(u);haptic('success');toast('已拷貝加入用網址');}
+  catch(e){alertMsg('加入用網址','請手動拷貝這個網址：\n'+u);}}
+function initTheme(){readIconParam();syncMono();applyIcon();if(settings.theme){const th=parseTheme(settings.theme);if(th)applyTheme(th);}}
 function redeemTheme(){
   const inp=$('themeCode'),code=(inp?inp.value:'').trim();
   if(!code){toast('請先輸入主題兌換碼');return;}
@@ -2670,7 +2685,12 @@ function appIconLight(){
   <path d="M772 262v128M802 286c-7-11-18-16-31-16-18 0-32 10-32 25 0 33 68 19 68 54 0 16-15 26-36 26-15 0-28-6-37-17" fill="none" stroke="#fff" stroke-width="17" stroke-linecap="round" stroke-linejoin="round"/>
 </svg>`;
 }
-const appIconSVG=dark=>(dark==null?darkMQ.matches:dark)?appIconDark():appIconLight();
+/* 主畫面圖示三選一：白色（預設）、黑色、灰色（深淺模式都順眼）。iPhone 只在「加入主畫面」那一刻讀取，之後不會自動切換 */
+const appIconGray=()=>iconSVG('#1C1C1E',['#8E8E93','#48484A']);
+const HOME_ICONS=[{k:'light',n:'白色',f:'',svg:()=>appIconLight()},{k:'dark',n:'黑色',f:'-dark',svg:()=>appIconDark()},{k:'gray',n:'灰色',f:'-gray',svg:()=>appIconGray()}];
+const homeIconKey=()=>HOME_ICONS.some(x=>x.k===settings.homeIcon)?settings.homeIcon:'light';
+const homeIcon=k=>HOME_ICONS.find(x=>x.k===(k||homeIconKey()));
+const appIconSVG=dark=>dark==null?homeIcon().svg():(dark?appIconDark():appIconLight());
 function iconSVG(c,bg){
   const id='ai'+(++_icoN),L=bg?bg[0]:hexMix(c,'#FFFFFF',.2),Dk=bg?bg[1]:hexMix(c,'#000000',.3);
   return `<svg viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><defs>
@@ -3118,6 +3138,7 @@ document.addEventListener('click',e=>{
   if((el=t.closest('.tab'))){if(Date.now()-tabDragUsed<350)return;switchTab(el.dataset.tab);return;}
   if((el=t.closest('button[data-look]'))){setLook(el.dataset.look);return;}
   if((el=t.closest('[data-preset]'))){setPreset(el.dataset.preset);return;}
+  if((el=t.closest('[data-homeicon]'))){setHomeIcon(el.dataset.homeicon);return;}
   if((el=t.closest('[data-wall]'))){setWall(el.dataset.wall);return;}
   if(t.closest('#fab')||t.closest('[data-new]')){const f=$('fab');if(t.closest('#fab')&&!reduceMotion()){f.classList.remove('spin');void f.offsetWidth;f.classList.add('spin');setTimeout(()=>f.classList.remove('spin'),450);}openTxSheet(null);return;}
   if((el=t.closest('[data-dismiss]'))){requestCloseSheet(el.dataset.dismiss);return;}
