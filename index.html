@@ -597,6 +597,113 @@ html[data-frost]{--label2:rgba(40,40,46,.72);}
 @media (prefers-reduced-transparency: reduce){html[data-frost] .card,html[data-frost] .group,html[data-frost] .sheet .panel{-webkit-backdrop-filter:none;backdrop-filter:none;}
   html[data-frost] .card,html[data-frost] .group{background:var(--cell);}html[data-frost] #app,html[data-frost] .screen.sub{background:var(--bg);}}
 
+/* ============ 匯入說明頁 ============ */
+.hhero{display:flex;flex-direction:column;align-items:center;text-align:center;gap:6px;padding:8px 24px 22px;}
+.hhero .hico .sic{width:60px;height:60px;border-radius:15px;}
+.hhero .hico .sic .ico{width:34px;height:34px;}
+.hhero h2{margin:6px 0 0;font-size:1.35rem;font-weight:700;}
+.hhero p{margin:0;font-size:.85rem;line-height:1.5;color:var(--label2);max-width:34em;text-wrap:balance;}
+.row.hgo{justify-content:center;font-weight:600;}
+.hstep{align-items:flex-start;--inset:56px;}
+.hnum{flex:none;width:26px;height:26px;margin:1px 14px 0 2px;border-radius:50%;display:grid;place-items:center;font-size:.8rem;font-weight:700;font-variant-numeric:tabular-nums;color:var(--on-accent,#fff);background:var(--accent);}
+.hstep .s,.hkv .s{white-space:normal;line-height:1.45;}
+.hkv .t{font-size:.94rem;}
+
+/* ============ 匯入確認 ============ */
+.imp-sum{margin:4px 16px 18px;padding:16px;border-radius:20px;background:var(--cell);}
+.imp-sum>b{font-size:2rem;font-weight:700;letter-spacing:-.02em;margin-right:4px;}
+.imp-sum>span{display:block;color:var(--label2);font-size:.85rem;margin-top:2px;}
+.imp-kv{display:flex;flex-wrap:wrap;gap:6px 16px;margin-top:10px;font-size:.88rem;color:var(--label2);}
+.imp-kv b{color:var(--label);font-weight:600;}
+.imp-skip{margin-top:8px;font-size:.8rem;color:var(--c-orange);}
+.imp-warn{padding:10px 16px 12px;font-size:.82rem;line-height:1.45;color:var(--c-red);font-weight:600;}
+.imp-acct .lb{display:flex;flex-direction:column;min-width:0;max-width:46%;}
+.imp-acct .lb small{font-size:.72rem;color:var(--label2);}
+.imp-acct select{max-width:54%;}
+.imp-cols{margin:0 0 22px;}
+.imp-cols summary{list-style:none;cursor:pointer;padding:0 32px 8px;font-size:.8rem;color:var(--label2);text-transform:none;display:flex;gap:8px;align-items:center;}
+.imp-cols summary::-webkit-details-marker{display:none;}
+.imp-cols summary::after{content:'›';transition:transform .2s;}
+.imp-cols[open] summary::after{transform:rotate(90deg);}
+.imp-cols summary em{font-style:normal;color:var(--c-red);}
+.imp-dup{display:flex;align-items:center;gap:6px;font-size:.78rem;font-weight:500;color:var(--label2);text-transform:none;letter-spacing:0;}
+.imp-row .rt{min-width:0;}
+.imp-row.off{opacity:.42;}
+.imp-cat{margin-top:4px;font:inherit;font-size:.78rem;color:var(--accent);background:var(--fill);border:0;border-radius:8px;padding:3px 8px;max-width:100%;-webkit-appearance:none;appearance:none;}
+.amt.pos{color:var(--c-green);}
+html[data-look="glass"] .imp-sum{background:var(--glass-card);-webkit-backdrop-filter:blur(24px);backdrop-filter:blur(24px);}
+
+/* ============ 信用卡／簽帳卡 ============ */
+.rt .s.warn{color:var(--c-red);}
+.amt.dim{color:var(--label2);}
+.acct-hint{padding:0 16px 12px;font-size:.8rem;line-height:1.4;color:var(--label2);background:var(--cell);}
+.acct-hint.warn{color:var(--c-red);font-weight:600;}
+html[data-look="glass"] .acct-hint{background:transparent;}
+.chero{margin:4px 16px 18px;padding:16px;border-radius:20px;background:var(--cell);}
+.chead{display:flex;align-items:center;gap:12px;}
+.chead small{display:block;font-size:.75rem;color:var(--label2);}
+.cbig{font-size:1.9rem;font-weight:700;letter-spacing:-.02em;line-height:1.15;}
+.cbar{height:8px;border-radius:4px;background:var(--fill2);overflow:hidden;margin-top:14px;}
+.cbar i{display:block;height:100%;border-radius:4px;background:var(--accent);transition:width .5s var(--ease);}
+.cbar.hot i{background:var(--c-red);}
+.ccap{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;margin-top:6px;font-size:.75rem;color:var(--label2);font-variant-numeric:tabular-nums;}
+.stv{display:flex;flex-direction:column;align-items:flex-end;gap:3px;flex:none;}
+.chip{font-style:normal;font-size:.68rem;font-weight:600;padding:1px 8px;border-radius:8px;white-space:nowrap;}
+.chip.c-green{color:var(--c-green);background:color-mix(in srgb,var(--c-green) 14%,transparent);}
+.chip.c-orange{color:var(--c-orange);background:color-mix(in srgb,var(--c-orange) 14%,transparent);}
+.chip.c-red{color:var(--c-red);background:color-mix(in srgb,var(--c-red) 14%,transparent);}
+.chip.c-gray{color:var(--label2);background:var(--fill);}
+em.est{font-style:normal;font-size:.68rem;font-weight:600;margin-left:6px;padding:1px 6px;border-radius:6px;background:var(--fill);color:var(--label2);vertical-align:2px;}
+.row.action.destructive{color:var(--c-red);}
+.card.cardnote{position:relative;padding:14px 16px;background-image:linear-gradient(135deg,rgba(0,122,255,.16),rgba(0,122,255,.04));}
+.card.cardnote .nagic{background:var(--c-blue);}
+.card.cardnote.due{background-image:linear-gradient(135deg,rgba(242,135,58,.24),rgba(242,135,58,.06));}
+.card.cardnote.due .nagic{background:var(--c-orange);}
+.card.cardnote.late{background-image:linear-gradient(135deg,rgba(229,72,77,.26),rgba(229,72,77,.07));}
+.card.cardnote.late .nagic{background:var(--c-red);}
+html[data-look="glass"] .chero{background:var(--glass-card);-webkit-backdrop-filter:blur(24px);backdrop-filter:blur(24px);}
+
+/* ============ 記帳提醒（給拖延症的你） ============ */
+.card.nagcard{position:relative;padding:14px 16px;background-image:linear-gradient(135deg,rgba(242,135,58,.24),rgba(242,135,58,.06));}
+.card.nagcard.t2,.card.nagcard.t3,.card.nagcard.t4{background-image:linear-gradient(135deg,rgba(229,72,77,.26),rgba(229,72,77,.07));}
+.nagtop{display:flex;gap:12px;align-items:flex-start;}
+.nagic{flex:none;width:34px;height:34px;border-radius:11px;display:grid;place-items:center;background:var(--c-orange);color:#fff;}
+.nagcard.t2 .nagic,.nagcard.t3 .nagic,.nagcard.t4 .nagic{background:var(--c-red);}
+.nagic .ico{width:20px;height:20px;stroke-width:2.2;}
+.nagtop b{display:block;font-size:1rem;line-height:1.35;}
+.nagtop small{display:block;margin-top:3px;color:var(--label2);font-size:.8rem;line-height:1.35;}
+.nagbtns{display:flex;gap:8px;margin-top:12px;}
+.nagbtns button{flex:1;height:40px;border-radius:20px;font-weight:600;font-size:.94rem;padding:0 12px;}
+.nagbtns .ghost{background:var(--fill);color:var(--label);}
+html[data-nag="nag"] .nagcard.t3,html[data-nag="nag"] .nagcard.t4,html[data-nag="hell"] .nagcard{animation:nwShake 4s 1s infinite;}
+html[data-nag="nag"] .fab,html[data-nag="hell"] .fab{animation:fabNag 2.6s 1s infinite;}
+@keyframes fabNag{0%,70%,100%{transform:none}76%{transform:translateY(-8px) scale(1.06)}82%{transform:none}88%{transform:translateY(-4px)}94%{transform:none}}
+html[data-nag] .tab[data-tab="home"]{position:relative;}
+html[data-nag] .tab[data-tab="home"]::after{content:'';position:absolute;top:7px;left:calc(50% + 7px);width:8px;height:8px;border-radius:50%;background:var(--c-red);box-shadow:0 0 0 2px var(--cell);pointer-events:none;}
+.nagwall{position:fixed;inset:0;z-index:850;display:none;align-items:center;justify-content:center;padding:calc(var(--sat) + 24px) 28px calc(var(--sabv) + 24px);
+  color:#fff;text-align:center;background:radial-gradient(120% 80% at 50% 0%,#7A1E22,#2A0B0D 72%);}
+.nagwall.on{display:flex;animation:nwIn .4s var(--ease) both;}
+.nagwall.away{display:none;}
+.nagwall .nwin{width:100%;max-width:360px;display:flex;flex-direction:column;align-items:center;gap:12px;animation:nwShake 5s 1.5s infinite;}
+.nwbig{font-size:5.5rem;font-weight:800;line-height:1;letter-spacing:-.04em;font-variant-numeric:tabular-nums;}
+.nwbig small{display:block;font-size:1rem;font-weight:600;opacity:.75;letter-spacing:0;margin-top:6px;}
+.nwbig .ico{width:76px;height:76px;stroke-width:1.6;}
+.nagwall h2{margin:8px 0 0;font-size:1.5rem;line-height:1.3;font-weight:800;}
+.nagwall p{margin:0 0 14px;opacity:.8;font-size:.95rem;line-height:1.4;}
+.nagwall .pbtn{width:100%;height:54px;border-radius:27px;font-size:1.1rem;background:#fff;color:#7A1E22;}
+.nwhold{position:relative;overflow:hidden;width:100%;min-height:48px;padding:8px 16px;border-radius:24px;background:rgba(255,255,255,.14);color:#fff;font-weight:600;font-size:.95rem;
+  touch-action:none;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;}
+.nwhold.ghost{background:transparent;box-shadow:inset 0 0 0 1px rgba(255,255,255,.28);opacity:.85;font-size:.85rem;min-height:42px;}
+.nwhold::before{content:'';position:absolute;inset:0;background:rgba(255,255,255,.3);transform:scaleX(0);transform-origin:left;}
+.nwhold.holding::before{transform:scaleX(1);transition:transform var(--hold,2s) linear;}
+.nwhold span{position:relative;}
+.nwx{margin-top:6px;color:rgba(255,255,255,.75);font-size:.85rem;padding:8px 14px;}
+@keyframes nwIn{from{opacity:0;transform:scale(1.04)}to{opacity:1;transform:none}}
+@keyframes nwShake{0%,86%,100%{transform:none}88%{transform:translateX(-10px) rotate(-1deg)}90%{transform:translateX(9px) rotate(1deg)}92%{transform:translateX(-7px)}94%{transform:translateX(5px)}96%{transform:translateX(-2px)}}
+@media (prefers-reduced-motion: reduce){.nagwall .nwin,.nagwall.on,html[data-nag] .fab,html[data-nag] .nagcard{animation:none!important;}}
+.ntime{margin-left:auto;font:inherit;font-size:1rem;font-variant-numeric:tabular-nums;color:var(--accent);background:var(--fill);border:0;border-radius:10px;padding:6px 10px;min-width:92px;min-height:34px;text-align:center;-webkit-appearance:none;appearance:none;}
+.nagdesc,.rt .t.nagdesc{white-space:normal;overflow:visible;text-overflow:clip;line-height:1.45;font-size:.9rem;color:var(--label2);}
+
 /* ============ 背景選擇 ============ */
 .wgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;}
 .wtile{display:flex;flex-direction:column;align-items:flex-start;gap:3px;padding:8px 8px 12px;border-radius:20px;background:var(--cell);text-align:left;
@@ -611,6 +718,10 @@ html[data-frost]{--label2:rgba(40,40,46,.72);}
 .wname{font-size:.941rem;font-weight:600;padding:0 4px;display:flex;align-items:center;gap:6px;}
 .wname em{font-style:normal;font-size:.647rem;font-weight:600;padding:1px 7px;border-radius:8px;background:var(--fill2);color:var(--label2);}
 .wdesc{font-size:.706rem;color:var(--label2);padding:0 4px;}
+.wprev.empty{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;background:var(--fill);color:var(--label2);
+  box-shadow:inset 0 0 0 1.5px var(--sep,rgba(127,127,127,.25));}
+.wprev.empty .ico{width:26px;height:26px;stroke-width:1.8;}
+.wprev.empty b{font-size:.8rem;font-weight:600;}
 html[data-look="glass"] .wtile{background:var(--glass-card);-webkit-backdrop-filter:blur(24px);backdrop-filter:blur(24px);}
 
 /* ============ 主題色票 ============ */
@@ -775,6 +886,8 @@ html[data-look="glass"] .sw.on .dot2{box-shadow:0 0 0 2.5px rgba(255,255,255,.7)
           <div class="frow"><input class="left" id="fName" placeholder="名稱（留空用分類名）" autocomplete="off" enterkeyhint="done" aria-label="名稱"></div>
           <div class="frow"><span class="lb">日期</span><input type="date" id="fDate" aria-label="日期"></div>
           <div class="frow"><span class="lb">帳戶</span><select id="fAcct" aria-label="帳戶"></select></div>
+          <div class="frow" id="fInstRow" hidden><span class="lb">分期</span><select id="fInst" aria-label="分期期數"><option value="1">不分期</option><option value="3">3 期</option><option value="6">6 期</option><option value="10">10 期</option><option value="12">12 期</option><option value="18">18 期</option><option value="24">24 期</option><option value="30">30 期</option></select></div>
+          <div class="acct-hint" id="fAcctHint" hidden></div>
           <div class="frow"><input class="left" id="fNote" placeholder="備註" autocomplete="off" enterkeyhint="done" aria-label="備註"></div>
         </div>
         <div class="sugg" id="txSugg"></div>
@@ -788,6 +901,30 @@ html[data-look="glass"] .sw.on .dot2{box-shadow:0 0 0 2.5px rgba(255,255,255,.7)
 </div>
 
 <!-- 分類明細 Sheet -->
+<div class="sheet" id="importSheet" aria-hidden="true">
+  <div class="dim" data-dismiss="importSheet"></div>
+  <div class="panel" role="dialog" aria-modal="true" aria-labelledby="impTitle">
+    <div class="grab" data-drag="importSheet"></div>
+    <div class="sheet-nav" data-drag="importSheet">
+      <button class="l" data-dismiss="importSheet">取消</button>
+      <div class="title" id="impTitle">匯入確認</div>
+      <div class="r"><button class="pbtn sm" id="impGo">匯入</button></div>
+    </div>
+    <div class="sheet-body" id="impBody"></div>
+  </div>
+</div>
+<div class="sheet" id="cardSheet" aria-hidden="true">
+  <div class="dim" data-dismiss="cardSheet"></div>
+  <div class="panel" role="dialog" aria-modal="true" aria-labelledby="cardTitle">
+    <div class="grab" data-drag="cardSheet"></div>
+    <div class="sheet-nav" data-drag="cardSheet">
+      <span></span>
+      <div class="title" id="cardTitle"></div>
+      <div class="r"><button class="pbtn sm" data-dismiss="cardSheet">完成</button></div>
+    </div>
+    <div class="sheet-body" id="cardBody"></div>
+  </div>
+</div>
 <div class="sheet" id="catSheet" aria-hidden="true">
   <div class="dim" data-dismiss="catSheet"></div>
   <div class="panel" role="dialog" aria-modal="true" aria-labelledby="catTitle">
@@ -899,7 +1036,9 @@ function catInfo(cat){const n=catName(cat);
   return {g:esc([...n][0]||'？'),c:`var(--c-${CAT_POOL[h%CAT_POOL.length]})`};}
 const catGlyph=cat=>catInfo(cat).g;
 const catColor=cat=>catInfo(cat).c;
-function acctInfo(a){const t=(a&&(a.name||''))+' '+(a&&a.icon||'');
+function acctInfo(a){const t=(a&&(a.name||''))+' '+(a&&a.icon||''),k=a&&a.kind;
+  if(k==='cash')return [glyph('note'),'green'];if(k==='bank')return [glyph('bank'),'blue'];
+  if(k==='credit')return [glyph('card'),'purple'];if(k==='debit')return [glyph('card'),'indigo'];
   if(/現金|💵|💴|💰/.test(t))return [glyph('note'),'green'];if(/銀行|🏦|帳戶|存款/.test(t))return [glyph('bank'),'blue'];
   if(/卡|💳/.test(t))return [glyph('card'),'purple'];if(/pay|支付|錢包|📱|悠遊|一卡通/i.test(t))return [glyph('phone'),'teal'];
   return [esc([...(a&&a.name||'？')][0]),'gray'];}
@@ -1069,7 +1208,8 @@ function closeSheet(id){const s=$(id);if(!s)return;s.classList.remove('open');s.
   const p=qs('.panel',s);p.style.transform='';
   const i=sheetStack.indexOf(id);if(i>=0)sheetStack.splice(i,1);
   if(!sheetStack.length)document.body.classList.remove('sheet-open');
-  if(document.activeElement&&s.contains(document.activeElement))document.activeElement.blur();}
+  if(document.activeElement&&s.contains(document.activeElement))document.activeElement.blur();
+  if(id==='txSheet')setTimeout(()=>{const w=$('nagwall');if(w)w.classList.remove('away');nagRender();},380);}
 async function requestCloseSheet(id){
   const g=sheetGuards[id];
   if(g&&!(await g()))return false;
@@ -1237,10 +1377,17 @@ const WALLS={
   night:{n:'夜空',d:'靛藍與紫，安靜深邃',blobs:['#5468D8','#8456D8','#2F95C9'],deep:true},
   plain:{n:'素面',d:'中性灰白，沒有顏色',blobs:[]}
 };
-const WALL_ORDER=['auto','glow','dawn','ocean','dusk','night','plain'];
+const WALL_ORDER=['auto','glow','dawn','ocean','dusk','night','plain','photo'];
+/* 自己的照片：縮小、壓成 JPEG 存在這支手機（ll_wallimg），不會上傳到任何地方 */
+let _wallImg=sGet('ll_wallimg')||null;
+function wallImg(){return _wallImg;}
+function photoCSS(dark,img){img=img||_wallImg;if(!img)return '';
+  const veil=dark?'rgba(0,0,0,.38)':'rgba(255,255,255,.10)';
+  return `linear-gradient(${veil},${veil}),url('${img}') center/cover no-repeat ${dark?'#111':'#e9e9ec'}`;}
 function autoWallKey(d){const h=(d||new Date()).getHours();return h>=5&&h<10?'dawn':h>=10&&h<16?'glow':h>=16&&h<19?'dusk':'night';}
-function wallKey(){const k=settings.wall||'auto';return k==='auto'?autoWallKey():(WALLS[k]?k:'glow');}
+function wallKey(){const k=settings.wall||'auto';if(k==='photo')return _wallImg?'photo':'glow';return k==='auto'?autoWallKey():(WALLS[k]?k:'glow');}
 function wallCSS(key,dark,muted,accent,auto){
+  if(key==='photo')return photoCSS(dark);
   const W=WALLS[key];const gray=dark?'#707078':'#A6A6AC';
   const tone=c=>{let x=c;if(muted)x=hexMix(x,gray,.62);if(dark)x=hexMix(x,'#000000',W.deep?.15:.22);return x;};
   const a=dark?(muted?.5:.62):(muted?.5:.46);
@@ -1260,17 +1407,58 @@ function applyWall(){
 setInterval(()=>{if((settings.wall||'auto')==='auto')applyWall();},5*60*1000);
 document.addEventListener('visibilitychange',()=>{if(!document.hidden&&(settings.wall||'auto')==='auto')applyWall();});
 try{darkMQ.addEventListener('change',applyWall);}catch(e){}
-function setWall(k){if(!WALL_ORDER.includes(k)||(settings.wall||'auto')===k)return;settings.wall=k;saveSettings();haptic();
+function setWall(k){if(k==='photo'&&(!_wallImg||(settings.wall||'auto')==='photo')){pickWallPhoto();return;}
+  if(!WALL_ORDER.includes(k)||(settings.wall||'auto')===k)return;settings.wall=k;saveSettings();haptic();
   const root=$('setStack');if(root)qsa('.wtile',root).forEach(b=>{b.classList.toggle('on',b.dataset.wall===k);b.setAttribute('aria-pressed',b.dataset.wall===k);});
   lookTransition(()=>{applyWall();const v=qs('[data-act="wall"] .v',root);if(v)v.textContent=wallLabel();},0);}
-function wallLabel(){const k=settings.wall||'auto';return k==='auto'?`自動・${WALLS[autoWallKey()].n}`:WALLS[k].n;}
+function wallLabel(){const k=settings.wall||'auto';if(k==='photo')return _wallImg?'我的照片':WALLS.glow.n;return k==='auto'?`自動・${WALLS[autoWallKey()].n}`:WALLS[k].n;}
+function pickWallPhoto(){
+  let f=$('fileWall');
+  if(!f){f=document.createElement('input');f.type='file';f.accept='image/*';f.id='fileWall';f.hidden=true;document.body.appendChild(f);
+    f.addEventListener('change',()=>{const file=f.files&&f.files[0];f.value='';if(file)setWallPhoto(file);});}
+  f.click();
+}
+function loadImg(file){
+  return new Promise((res,rej)=>{const u=URL.createObjectURL(file),im=new Image();
+    im.onload=()=>{res(im);setTimeout(()=>URL.revokeObjectURL(u),1000);};im.onerror=()=>{URL.revokeObjectURL(u);rej(new Error('img'));};im.src=u;});
+}
+async function setWallPhoto(file){
+  if(!/^image\//.test(file.type||'image/')){toast('請選一張照片',{tone:'error'});return;}
+  toast('處理照片中…',{ms:1500});
+  let im;try{im=await loadImg(file);}catch(e){toast('這張照片打不開，換一張試試',{tone:'error'});return;}
+  let url='';
+  for(const [max,q] of [[1800,.82],[1500,.76],[1200,.7]]){
+    const sc=Math.min(1,max/Math.max(im.naturalWidth,im.naturalHeight)),w=Math.round(im.naturalWidth*sc),h=Math.round(im.naturalHeight*sc);
+    const cv=document.createElement('canvas');cv.width=w;cv.height=h;const cx=cv.getContext('2d');cx.drawImage(im,0,0,w,h);
+    url=cv.toDataURL('image/jpeg',q);if(url.length<900000)break;
+  }
+  if(!url||url.length<100){toast('這張照片打不開，換一張試試',{tone:'error'});return;}
+  if(!sSet('ll_wallimg',url))return;
+  _wallImg=url;settings.wall='photo';saveSettings();haptic('success');
+  lookTransition(()=>{applyWall();refreshSettingsTop();},0);
+  if(curLook()==='std')toast('背景在「玻璃」或「毛玻璃」外觀才看得到',{action:'換成玻璃',onAction:()=>setLook('glass'),ms:6000});
+  else toast('已換成你的照片');
+}
+async function removeWallPhoto(){
+  const i=await actionSheet({title:'移除背景照片？',message:'背景會換回「自動」。',actions:[{label:'移除照片',style:'destructive'}]});
+  if(i!==0)return;
+  try{if(PREVIEW)delete MEM.ll_wallimg;else localStorage.removeItem('ll_wallimg');}catch(e){}
+  _wallImg=null;if((settings.wall||'auto')==='photo'){settings.wall='auto';saveSettings();}
+  lookTransition(()=>{applyWall();refreshSettingsTop();},0);toast('已移除照片');
+}
 function renderWallPage(box){
   const cur=settings.wall||'auto',dark=darkMQ.matches,acc=settings.theme?accentHex():null,ak=autoWallKey();
-  const tile=(k)=>{const auto=k==='auto',key=auto?ak:k,css=wallCSS(key,dark,!!settings.muted,acc,auto);
+  const tile=(k)=>{
+    if(k==='photo'){const has=!!_wallImg;
+      return `<button class="wtile wphoto${cur===k&&has?' on':''}" data-wall="photo" aria-pressed="${cur===k&&has}"><span class="wprev${has?'':' empty'}" ${has?`style="background:${photoCSS(dark)}"`:''}>${has?'<i></i><i></i>':`${ICON.photo}<b>上傳照片</b>`}</span>
+        <span class="wname">我的照片</span><span class="wdesc">${has?(cur==='photo'?'再點一下可以換一張':'用你上傳的照片'):'從相簿選一張'}</span></button>`;}
+    const auto=k==='auto',key=auto?ak:k,css=wallCSS(key,dark,!!settings.muted,acc,auto);
     return `<button class="wtile${cur===k?' on':''}" data-wall="${k}" aria-pressed="${cur===k}"><span class="wprev" style="background:${css}"><i></i><i></i></span>
       <span class="wname">${auto?'自動':WALLS[k].n}${auto?'<em>建議</em>':''}</span><span class="wdesc">${auto?`現在是「${WALLS[ak].n}」`:WALLS[k].d}</span></button>`;};
   box.innerHTML=`<div class="sec"><div class="sec-h">背景</div><div class="wgrid">${WALL_ORDER.map(tile).join('')}</div>
-    <div class="sec-f">「自動」會依時段變化：早上 5–10 點晨曦、白天柔光、傍晚 4–7 點暮色、晚上夜空，也會帶入你的主題色；開啟低飽和模式或深色模式時會自動調整。背景只在「玻璃」和「毛玻璃」外觀下看得到。</div></div>`;
+    <div class="sec-f">「自動」會依時段變化：早上 5–10 點晨曦、白天柔光、傍晚 4–7 點暮色、晚上夜空，也會帶入你的主題色；開啟低飽和模式或深色模式時會自動調整。背景只在「玻璃」和「毛玻璃」外觀下看得到。</div></div>
+    ${_wallImg?`<div class="sec"><div class="group">${rowBtn('wallPick','photo','pink','換一張照片','')}${rowBtn('wallDel','tray','red','移除背景照片','')}</div>
+    <div class="sec-f">照片只存在這支手機，會先縮小再存；深色模式時會自動調暗，讓文字看得清楚。</div></div>`:''}`;
 }
 function syncLookUI(){
   const root=$('setStack');if(!root)return;const l=curLook();
@@ -1314,9 +1502,9 @@ function switchTab(t,silent){
     const tb=qs(`.tab[data-tab="${t}"]`);if(tb){tb.classList.remove('pop');void tb.offsetWidth;tb.classList.add('pop');setTimeout(()=>tb.classList.remove('pop'),500);}}
 }
 function renderTab(t){
-  if(t==='home')renderHome();else if(t==='list')renderList();else if(t==='stats')renderStats();else if(t==='settings')refreshSettingsTop();
+  if(t==='home'){renderHome();nagRender();cardBanners();}else if(t==='list')renderList();else if(t==='stats')renderStats();else if(t==='settings')refreshSettingsTop();
 }
-function renderAll(){renderTab(curTab);setTimeout(()=>{flashId=null;},1700);}
+function renderAll(){renderTab(curTab);nagRender();if(sheetStack.includes('cardSheet'))renderCardSheet();setTimeout(()=>{flashId=null;},1700);}
 document.addEventListener('scroll',e=>{const s=e.target;if(s&&s.classList&&s.classList.contains('screen'))s.classList.toggle('scrolled',s.scrollTop>(s.classList.contains('sub')?4:44));},true);
 
 /* =====================================================================
@@ -1390,16 +1578,451 @@ function renderHome(){
   runCounts($('homeBody'));
   if(ANIM)stagger($('homeBody'));
 }
-function acctBalance(d,a){let bal=Number(a.opening)||0;d.tx.forEach(r=>{if(r.account===a.id)bal+=r.type==='income'?r.amount:-r.amount;});return bal;}
+/* =====================================================================
+   帳戶類型、信用卡帳單、簽帳卡
+   - 刷卡當下就算支出；繳卡費是「轉帳」（戶頭 → 卡），只動餘額，不算支出，避免重複計算
+   - 銀行帳單照「入帳日」算：消費日 + 入帳天數（預設 1 天）落在哪個結帳日之前，就算哪一期
+   - 預估金額可以用銀行帳單上的實際金額覆蓋
+   ===================================================================== */
+const ACCT_KINDS={cash:{n:'現金',ic:'💵'},bank:{n:'戶頭',ic:'🏦'},debit:{n:'簽帳卡',ic:'💳'},credit:{n:'信用卡',ic:'💳'},other:{n:'其他',ic:'📱'}};
+const KIND_ORDER=['cash','bank','debit','credit','other'];
+function acctKind(a){if(!a)return 'other';if(ACCT_KINDS[a.kind])return a.kind;const t=(a.name||'')+' '+(a.icon||'');
+  if(a.id==='a-card'||/信用卡/.test(t))return 'credit';if(/簽帳|金融卡|debit/i.test(t))return 'debit';
+  if(a.id==='a-cash'||/現金|💵/.test(t))return 'cash';if(a.id==='a-bank'||/銀行|🏦|戶頭|存款/.test(t))return 'bank';return 'other';}
+const md=s=>`${+s.slice(5,7)}/${+s.slice(8,10)}`;
+const daysTo=s=>Math.round((parseD(s)-parseD(today()))/86400000);
+const dimOf=(y,m)=>new Date(y,m+1,0).getDate();
+function dayIn(y,m,day){const b=new Date(y,m,1),Y=b.getFullYear(),M=b.getMonth();return new Date(Y,M,Math.min(day,dimOf(Y,M)),12);}
+function cardOf(a){return {C:+a.closeDay||0,D:+a.dueDay||0,lag:a.lag==null?1:Math.max(0,Math.min(7,+a.lag||0))};}
+function cardReady(a){return acctKind(a)==='credit'&&+a.closeDay>0&&+a.dueDay>0;}
+function closeFor(a,dateStr){const {C}=cardOf(a),p=parseD(dateStr);let c=dayIn(p.getFullYear(),p.getMonth(),C);if(ymd(p)>ymd(c))c=dayIn(p.getFullYear(),p.getMonth()+1,C);return c;}
+const nextClose=(a,c)=>dayIn(c.getFullYear(),c.getMonth()+1,cardOf(a).C);
+const prevClose=(a,c)=>dayIn(c.getFullYear(),c.getMonth()-1,cardOf(a).C);
+function dueFor(a,close){const {C,D}=cardOf(a);return dayIn(close.getFullYear(),close.getMonth()+(D>C?0:1),D);}
+function postDate(a,r){return r.post&&/^\d{4}-\d\d-\d\d$/.test(r.post)?r.post:ymd(addDays(parseD(r.date),cardOf(a).lag));}
+/* 每一期的消費（含分期攤到後面幾期） */
+function cardCharges(d,a){
+  const m=new Map();
+  d.tx.forEach(r=>{if(r.account!==a.id)return;
+    const sign=r.type==='income'?-1:1,n=r.type==='expense'&&r.inst>1?Math.round(r.inst):1;
+    let c=closeFor(a,postDate(a,r));const base=Math.floor(r.amount/n*100)/100;
+    for(let i=0;i<n;i++){const v=i===n-1?Math.round((r.amount-base*(n-1))*100)/100:base,k=ymd(c);
+      const o=m.get(k)||{amt:0,n:0,inst:0};o.amt+=sign*v;o.n++;if(n>1)o.inst+=v;m.set(k,o);c=nextClose(a,c);}
+  });
+  return m;
+}
+function stmtOf(d,a,close,ch){
+  ch=ch||cardCharges(d,a);const k=ymd(close),est=Math.round(((ch.get(k)||{}).amt||0)*100)/100,bill=(a.bills||{})[k];
+  const amt=bill&&bill.amt!=null?bill.amt:Math.max(0,est);
+  const min=bill&&bill.min!=null?bill.min:Math.min(amt,Math.ceil(amt*0.1+((ch.get(k)||{}).inst||0)*0.9));
+  const paid=Math.round((a.payments||[]).filter(p=>p.stmt===k).reduce((s,p)=>s+p.amount,0)*100)/100;
+  const due=ymd(dueFor(a,close)),left=Math.max(0,Math.round((amt-paid)*100)/100);
+  let st;if(amt<=0)st='none';else if(left<=0.5)st='paid';else if(paid>0&&paid>=min)st='min';else if(due<today())st='late';else st='open';
+  return {key:k,start:ymd(addDays(prevClose(a,close),1)),end:k,due,est,amt,min,paid,left,st,real:!!bill,closed:k<today()};
+}
+const STMT_ST={none:['不用繳','gray'],paid:['已繳清','green'],min:['已繳最低','orange'],late:['逾期未繳','red'],open:['未繳','red']};
+function cardSummary(d,a){
+  const ch=cardCharges(d,a),curC=closeFor(a,today()),cur=stmtOf(d,a,curC,ch),list=[];
+  let c=prevClose(a,curC);for(let i=0;i<6;i++){list.push(stmtOf(d,a,c,ch));c=prevClose(a,c);}
+  let future=0;ch.forEach((o,k)=>{if(k>cur.key)future+=o.amt;});
+  return {cur,list,future:Math.round(future*100)/100,owed:Math.max(0,-acctBalance(d,a))};
+}
+/* 自動扣繳：到了繳款截止日，自動記一筆從戶頭轉到卡的繳款 */
+function cardAutopay(d){
+  let changed=false;
+  d.accounts.forEach(a=>{
+    if(!cardReady(a)||!a.autopay||!d.accounts.some(x=>x.id===a.autopay))return;
+    const since=a.autoSince||today(),ch=cardCharges(d,a);let c=prevClose(a,closeFor(a,today()));
+    for(let i=0;i<3;i++){const s=stmtOf(d,a,c,ch);c=prevClose(a,c);
+      if(s.due>today()||s.due<since||s.amt<=0)continue;
+      if((a.payments||[]).some(p=>p.stmt===s.key&&p.auto))continue;
+      const want=a.autoMode==='min'?Math.max(0,s.min-s.paid):s.left;if(want<=0)continue;
+      (a.payments=a.payments||[]).push({id:uid(),date:s.due,amount:Math.round(want*100)/100,from:a.autopay,stmt:s.key,auto:true});changed=true;}
+  });
+  if(changed)saveDB();
+}
+function acctBalance(d,a){
+  const k=acctKind(a);
+  if(k==='debit'&&a.linked&&d.accounts.some(x=>x.id===a.linked&&x!==a))return 0;
+  const ids=new Set([a.id]);
+  if(k!=='debit')d.accounts.forEach(x=>{if(x!==a&&acctKind(x)==='debit'&&x.linked===a.id)ids.add(x.id);});
+  let bal=Number(a.opening)||0;
+  d.tx.forEach(r=>{if(ids.has(r.account))bal+=r.type==='income'?r.amount:-r.amount;});
+  d.accounts.forEach(x=>(x.payments||[]).forEach(p=>{if(x===a)bal+=p.amount;if(p.from===a.id)bal-=p.amount;}));
+  return Math.round(bal*100)/100;
+}
+function monthSpend(d,a){const m=ym(new Date());return d.tx.reduce((s,r)=>s+(r.account===a.id&&r.date.startsWith(m)?(r.type==='income'?-r.amount:r.amount):0),0);}
+function acctSub(d,a){
+  const k=acctKind(a);
+  if(k==='credit'){
+    if(!cardReady(a))return '點一下設定結帳日和繳款日';
+    const S=cardSummary(d,a),due=S.list.find(x=>x.st==='open'||x.st==='late');
+    if(due){const n=daysTo(due.due);return `帳單 ${money(due.left)}・${n<0?`已逾期 ${-n} 天`:n===0?'今天截止':`${n} 天後截止`}`;}
+    return `本期 ${money(S.cur.amt)}・${md(S.cur.end)} 結帳`;
+  }
+  if(k==='debit'){const b=d.accounts.find(x=>x.id===a.linked&&x!==a);return b?`從「${b.name}」扣款・本月 ${money(monthSpend(d,a))}`:'點一下設定扣款戶頭';}
+  return '';
+}
 function accountsSection(d){
-  return `<div class="sec"><div class="sec-h big"><span>帳戶</span></div><div class="group">${d.accounts.map(a=>{const bal=acctBalance(d,a);
-    return `<button class="row tap" data-acct-view="${esc(a.id)}" style="--inset:66px">${acctGlyph(a)}
-      <div class="rt"><div class="t">${esc(a.name)}</div></div><span class="amt num ${bal<0?'neg':''}">${money(bal)}</span>${ICON.chev}</button>`;}).join('')}</div></div>`;
+  return `<div class="sec"><div class="sec-h big"><span>帳戶</span></div><div class="group">${d.accounts.map(a=>{
+    const k=acctKind(a),linked=k==='debit'&&a.linked&&d.accounts.some(x=>x.id===a.linked&&x!==a),bal=linked?-monthSpend(d,a):acctBalance(d,a),sub=acctSub(d,a);
+    const attr=k==='credit'?`data-card-view="${esc(a.id)}"`:`data-acct-view="${esc(a.id)}"`;
+    return `<button class="row tap" ${attr} style="--inset:66px">${acctGlyph(a)}
+      <div class="rt"><div class="t">${esc(a.name)}</div>${sub?`<div class="s${/逾期|今天截止/.test(sub)?' warn':''}">${esc(sub)}</div>`:''}</div><span class="amt num ${bal<0?'neg':''}${linked?' dim':''}">${money(bal)}</span>${ICON.chev}</button>`;}).join('')}</div></div>`;
+}
+/* ---------- 首頁提醒：快到期／逾期／新帳單 ---------- */
+function cardBanners(){
+  const hb=$('homeBody');if(!hb)return;qsa('.cardnote',hb).forEach(x=>x.remove());
+  const d=D();cardAutopay(d);const out=[];
+  d.accounts.forEach(a=>{if(!cardReady(a))return;const S=cardSummary(d,a),rem=a.remind==null?3:+a.remind;
+    const due=S.list.slice().reverse().find(x=>x.st==='open'||x.st==='late');
+    if(due&&rem>=0&&!a.autopay){const n=daysTo(due.due);
+      if(n<=rem)out.push({t:n<0?'late':'due',a,txt:n<0?`「${a.name}」帳單已逾期 ${-n} 天，還有 ${money(due.left)} 沒繳`:n===0?`今天是「${a.name}」繳款截止日，應繳 ${money(due.left)}`:`「${a.name}」帳單 ${money(due.left)}，${md(due.due)} 截止（還有 ${n} 天）`,
+        sub:due.real?`最低應繳 ${money(Math.max(0,due.min-due.paid))}`:`金額是預估的，拿到帳單後可以改成實際金額`,key:due.key});}
+    const last=S.list[0];
+    if(last&&last.amt>0&&!last.real&&daysTo(last.end)>=-4&&(a.seen||'')<last.key)
+      out.push({t:'new',a,txt:`「${a.name}」${md(last.end)} 結帳了，預估這期 ${money(last.amt)}`,sub:`繳款截止 ${md(last.due)}。拿到銀行帳單後，核對一下金額。`,key:last.key});
+  });
+  const at=$('nagBanner');let ref=at&&at.parentNode===hb?at.nextSibling:hb.firstChild;
+  out.slice(0,3).forEach(o=>{const el=document.createElement('div');el.className='card cardnote '+o.t;
+    el.innerHTML=`<div class="nagtop"><span class="nagic">${ICON.card||glyph('card')}</span><div><b>${esc(o.txt)}</b><small>${esc(o.sub)}</small></div></div>
+      <div class="nagbtns">${o.t==='new'?`<button class="pbtn" data-bill-enter="${esc(o.a.id)}|${o.key}">輸入帳單金額</button><button class="ghost" data-bill-seen="${esc(o.a.id)}|${o.key}">金額沒問題</button>`
+        :`<button class="pbtn" data-card-pay="${esc(o.a.id)}|${o.key}">記錄繳款</button><button class="ghost" data-card-view="${esc(o.a.id)}">查看卡片</button>`}</div>`;
+    hb.insertBefore(el,ref);});
+}
+/* ---------- 卡片頁（sheet） ---------- */
+let cardId=null;
+function openCard(id){cardId=id;renderCardSheet();$('cardBody').scrollTop=0;openSheet('cardSheet');haptic();}
+function renderCardSheet(){
+  const d=D(),a=d.accounts.find(x=>x.id===cardId);if(!a){closeSheet('cardSheet');return;}
+  cardAutopay(d);$('cardTitle').textContent=a.name;
+  const S=cardSummary(d,a),lim=+a.limit||0,pct=lim?Math.min(100,Math.round(S.owed/lim*100)):0,ready=cardReady(a);
+  const auto=a.autopay&&d.accounts.find(x=>x.id===a.autopay);
+  let h=`<div class="chero"><div class="chead">${acctGlyph(a)}<div><small>目前欠款（含還沒結帳和之後的分期）</small><div class="cbig num">${money(S.owed)}</div></div></div>
+    ${lim?`<div class="cbar${pct>=90?' hot':''}"><i style="width:${pct}%"></i></div><div class="ccap"><span>已用 ${pct}%</span><span>可用 ${money(Math.max(0,lim-S.owed))} / 額度 ${money(lim)}</span></div>`:''}</div>`;
+  if(!ready){
+    h+=`<div class="sec"><div class="group"><div class="row"><div class="rt"><div class="t nagdesc">設定結帳日和繳款截止日之後，這裡會算出每一期的帳單、提醒你繳款。日期印在銀行帳單上，或在銀行 App 的「帳單」裡。</div></div></div>
+      <button class="row action left tap" data-card-edit="${esc(a.id)}">設定結帳日和繳款日</button></div></div>`;
+  }else{
+    const n=daysTo(S.cur.end);
+    h+=`<div class="sec"><div class="sec-h">本期（還沒結帳）</div><div class="group">
+      <div class="row"><div class="rt"><div class="t">${md(S.cur.start)} – ${md(S.cur.end)}</div><div class="s">${n===0?'今天結帳':`還有 ${n} 天結帳`}・${md(S.cur.due)} 繳款</div></div><span class="amt num">${money(S.cur.amt)}</span></div>
+      ${S.future>0?`<div class="row"><div class="rt"><div class="t">之後幾期的分期</div><div class="s">已經刷了，會分到後面的帳單</div></div><span class="amt num">${money(S.future)}</span></div>`:''}
+    </div></div>
+    <div class="sec"><div class="sec-h">最近帳單</div><div class="group">${!S.list.some(s=>s.amt>0||s.paid>0)?`<div class="row"><div class="rt"><div class="t">還沒有已結帳的帳單</div><div class="s">${md(S.cur.end)} 結帳後，這裡會出現第一期</div></div></div>`:''}${S.list.filter(s=>s.amt>0||s.paid>0).map(s=>{const [lab,col]=STMT_ST[s.st];
+      return `<button class="row tap" data-stmt="${esc(a.id)}|${s.key}"><div class="rt"><div class="t">${+s.end.slice(5,7)}月帳單${s.real?'':'<em class="est">預估</em>'}</div>
+        <div class="s">${md(s.start)}–${md(s.end)}・${md(s.due)} 截止${s.st==='min'?`・還差 ${money(s.left)}`:''}</div></div>
+        <span class="stv"><span class="amt num">${money(s.amt)}</span><i class="chip c-${col}">${lab}</i></span></button>`;}).join('')}</div>
+      <div class="sec-f">預估金額照「刷卡日＋入帳 ${cardOf(a).lag} 天」算，結帳日前後刷的可能跑到下一期。點一下帳單可以記錄繳款，或輸入銀行帳單上的實際金額。</div></div>`;
+    const pays=(a.payments||[]).slice().sort((x,y)=>y.date<x.date?-1:1).slice(0,12);
+    if(pays.length)h+=`<div class="sec"><div class="sec-h">繳款紀錄</div><div class="group">${pays.map(p=>{const f=d.accounts.find(x=>x.id===p.from);
+      return `<button class="row tap" data-pay-del="${esc(a.id)}|${esc(p.id)}"><div class="rt"><div class="t">${md(p.date)}${p.auto?'・自動扣繳':''}</div><div class="s">${f?`從「${esc(f.name)}」`:''}繳 ${+p.stmt.slice(5,7)}月帳單</div></div><span class="amt num">${money(p.amount)}</span></button>`;}).join('')}</div>
+      <div class="sec-f">繳卡費是把錢從戶頭轉到卡上，不會算進支出，所以不會重複計算。</div></div>`;
+  }
+  h+=`<div class="sec"><div class="group">
+    ${ready?`<button class="row action left tap" data-card-pay="${esc(a.id)}|">記錄繳款</button>`:''}
+    <button class="row action left tap" data-acct-view="${esc(a.id)}">查看這張卡的消費</button>
+    <button class="row action left tap" data-card-edit="${esc(a.id)}">卡片設定</button>
+    ${ready?`<button class="row action left tap" data-card-cal="${esc(a.id)}">把繳款日加到行事曆</button>`:''}</div>
+    ${ready?`<div class="sec-f">${auto?`會在每期截止日自動從「${esc(auto.name)}」扣${a.autoMode==='min'?'最低應繳':'全額'}。`:''}繳款截止日遇到假日，銀行通常會順延。只繳最低應繳，剩下的會被收循環利息（年利率最高 15%），也可能留下信用紀錄。</div>`:''}</div>`;
+  $('cardBody').innerHTML=h;
+}
+async function enterBill(a,key){
+  const d=D(),s=stmtOf(d,a,parseD(key));
+  const v=await alertForm({title:`${+key.slice(5,7)}月帳單`,message:`照銀行帳單填。預估是 ${money(s.est)}。`,
+    fields:[{key:'amt',value:s.real?s.amt:'',placeholder:`本期應繳金額（預估 ${Math.round(s.est)}）`,inputmode:'decimal'},{key:'min',value:s.real&&a.bills[key].min!=null?a.bills[key].min:'',placeholder:'最低應繳金額（可留空）',inputmode:'decimal'}],ok:'儲存'});
+  if(!v)return;const num=x=>x===''?null:Number(String(x).replace(/[^\d.-]/g,''));
+  const amt=num(v.amt),min=num(v.min);
+  a.bills=a.bills||{};if(amt==null||isNaN(amt)){delete a.bills[key];toast('改回預估金額');}else{a.bills[key]={amt:Math.max(0,amt),min:min==null||isNaN(min)?null:Math.max(0,min)};toast('已存入帳單金額');}
+  a.seen=key>(a.seen||'')?key:a.seen;saveDB();renderAll();if(sheetStack.includes('cardSheet'))renderCardSheet();
+}
+async function payCard(a,key){
+  const d=D(),S=cardSummary(d,a);
+  let s=key?S.list.find(x=>x.key===key)||stmtOf(d,a,parseD(key)):S.list.slice().reverse().find(x=>x.st==='open'||x.st==='late'||x.st==='min')||S.list[0];
+  if(!s)return;
+  const minLeft=Math.max(0,s.min-s.paid);
+  const v=await alertForm({title:`繳 ${+s.end.slice(5,7)}月帳單`,message:`應繳 ${money(s.amt)}${s.paid?`，已繳 ${money(s.paid)}`:''}・最低 ${money(minLeft)}・${md(s.due)} 截止${s.real?'':'（金額是預估的）'}`,
+    fields:[{key:'amt',value:s.left||'',placeholder:'這次繳多少',inputmode:'decimal'}],ok:'下一步'});
+  if(!v)return;const amt=Math.round(Number(String(v.amt).replace(/[^\d.]/g,''))*100)/100;if(!(amt>0)){toast('請輸入繳款金額');return;}
+  const src=d.accounts.filter(x=>['cash','bank','other'].includes(acctKind(x)));let from='';
+  if(src.length===1)from=src[0].id;
+  else if(src.length>1){const i=await actionSheet({title:'從哪裡繳？',actions:src.map(x=>({label:`${x.name}（餘額 ${money(acctBalance(d,x))}）`}))});if(i<0)return;from=src[i].id;}
+  (a.payments=a.payments||[]).push({id:uid(),date:today(),amount:amt,from,stmt:s.key});
+  saveDB();haptic('success');toast(amt+0.5>=s.left?`${+s.end.slice(5,7)}月帳單繳清了`:amt>=minLeft?'已記錄，這期繳了最低應繳以上':'已記錄，還沒到最低應繳',{ms:3200});
+  renderAll();if(sheetStack.includes('cardSheet'))renderCardSheet();
+}
+async function stmtMenu(a,key){
+  const s=stmtOf(D(),a,parseD(key));
+  const acts=[{label:'記錄繳款'},{label:s.real?'修改帳單金額':'輸入銀行帳單金額'}];if(s.real)acts.push({label:'改回預估金額'});
+  const i=await actionSheet({title:`${+key.slice(5,7)}月帳單 ${money(s.amt)}`,message:`${md(s.start)}–${md(s.end)}・${md(s.due)} 截止・${STMT_ST[s.st][0]}`,actions:acts});
+  if(i===0)payCard(a,key);else if(i===1)enterBill(a,key);else if(i===2){delete a.bills[key];saveDB();renderAll();renderCardSheet();toast('改回預估金額');}
+}
+function cardICS(a){
+  const {D:dd}=cardOf(a),rem=a.remind==null?3:+a.remind,stamp=new Date().toISOString().replace(/[-:]/g,'').replace(/\.\d+/,'');
+  const nx=dueFor(a,prevClose(a,closeFor(a,today())));let first=nx<new Date()?dueFor(a,closeFor(a,today())):nx;
+  const f=d=>d.getFullYear()+pad2(d.getMonth()+1)+pad2(d.getDate());
+  const by=dd>=29?'-1':String(dd),title=`繳「${a.name}」卡費`;
+  const L=['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//my-ledger//card//ZH-TW','CALSCALE:GREGORIAN','METHOD:PUBLISH',
+    'BEGIN:VEVENT',`UID:my-ledger-card-${a.id}@${location.host||'local'}`,'DTSTAMP:'+stamp,'DTSTART;VALUE=DATE:'+f(first),'DTEND;VALUE=DATE:'+f(addDays(first,1)),
+    `RRULE:FREQ=MONTHLY;BYMONTHDAY=${by}`,'SUMMARY:'+title,'DESCRIPTION:信用卡繳款截止日（遇假日銀行通常順延）。繳完記得在記帳本按「記錄繳款」。','TRANSP:TRANSPARENT'];
+  [rem>0?rem:null,0].filter(x=>x!=null).forEach(n=>L.push('BEGIN:VALARM','ACTION:DISPLAY','DESCRIPTION:'+title,`TRIGGER:${n?`-P${n}D`:'PT9H'}`,'END:VALARM'));
+  L.push('END:VEVENT','END:VCALENDAR');return L.join('\r\n')+'\r\n';
+}
+async function cardCalendar(a){
+  const ok=await shareOrDownload(`${a.name}繳款日.ics`,cardICS(a),'text/calendar',false);
+  if(ok)alertMsg('加入行事曆','如果出現分享面板：選「儲存到檔案」，再打開「檔案」App 點這個檔案，按「加入」。之後每個月繳款截止日都會提醒。'+(cardOf(a).D>=29?'（截止日在月底附近，所以用每個月最後一天提醒）':''));
+}
+/* ---------- 帳戶設定頁 ---------- */
+let editAcctId=null;
+function openAcctEdit(id){editAcctId=id;
+  if(curTab!=='settings'){switchTab('settings');}
+  if(!setPages.some(p=>p.key==='accounts'))pushPage('accounts');
+  pushPage('acctEdit');}
+function renderAcctEdit(box){
+  const d=D(),a=d.accounts.find(x=>x.id===editAcctId);if(!a){box.innerHTML='';return;}
+  const k=acctKind(a),opt=(v,l,cur)=>`<option value="${v}" ${String(cur)===String(v)?'selected':''}>${l}</option>`;
+  const days=(cur,ph)=>opt('',ph,cur||'')+Array.from({length:31},(_,i)=>opt(i+1,i+1===31?'每月最後一天':`每月 ${i+1} 日`,cur)).join('');
+  const banks=d.accounts.filter(x=>x!==a&&['bank','cash','other'].includes(acctKind(x)));
+  let h=`<div class="seg-wrap"><div class="seg" data-segkey="akind">${KIND_ORDER.map(x=>`<button data-akind="${x}" class="${k===x?'on':''}">${ACCT_KINDS[x].n}</button>`).join('')}</div></div>
+  <div class="sec"><div class="group">
+    <div class="frow"><span class="lb">名稱</span><input data-ae="name" value="${esc(a.name)}" maxlength="20" placeholder="例如 玉山 Pi 卡" aria-label="名稱"></div>
+    <div class="frow"><span class="lb">圖示</span><input data-ae="icon" value="${esc(a.icon||'')}" maxlength="4" placeholder="可留空" aria-label="圖示"></div>
+    ${k==='debit'?'':`<div class="frow"><span class="lb">${k==='credit'?'開始記帳前已欠':'初始金額'}</span><input data-ae="opening" value="${k==='credit'?Math.abs(+a.opening||0):(+a.opening||0)}" inputmode="decimal" aria-label="初始金額"></div>`}
+  </div><div class="sec-f">${k==='credit'?'「開始記帳前已欠」是你開始用這個 App 之前，這張卡已經刷了還沒繳的金額。':k==='debit'?'簽帳卡沒有自己的餘額，刷的錢直接從下面的戶頭扣。':'帳戶餘額＝初始金額＋收入－支出（＋轉入的繳款）。'}</div></div>`;
+  if(k==='debit')h+=`<div class="sec"><div class="sec-h">扣款</div><div class="group">
+    <div class="frow"><span class="lb">扣款戶頭</span><select data-ae="linked" aria-label="扣款戶頭">${opt('','不指定',a.linked||'')}${banks.filter(x=>acctKind(x)==='bank').map(x=>opt(x.id,esc(x.name),a.linked||'')).join('')}</select></div>
+  </div><div class="sec-f">用這張卡記的支出，會直接從這個戶頭的餘額扣掉。戶頭餘額不夠時，記帳畫面會提醒你（真的刷卡時，餘額不夠會刷不過）。</div></div>`;
+  if(k==='credit'){const c=cardOf(a);
+    let preview='';if(cardReady(a)){const cc=closeFor(a,today());preview=`照目前設定：這期是 ${md(ymd(addDays(prevClose(a,cc),1)))}–${md(ymd(cc))}，${md(ymd(dueFor(a,cc)))} 要繳。`;}
+    h+=`<div class="sec"><div class="sec-h">帳單</div><div class="group">
+      <div class="frow"><span class="lb">結帳日</span><select data-ae="closeDay" aria-label="結帳日">${days(a.closeDay,'未設定')}</select></div>
+      <div class="frow"><span class="lb">繳款截止日</span><select data-ae="dueDay" aria-label="繳款截止日">${days(a.dueDay,'未設定')}</select></div>
+      <div class="frow"><span class="lb">入帳通常晚</span><select data-ae="lag" aria-label="入帳天數">${[0,1,2,3,5].map(n=>opt(n,n?`${n} 天`:'當天入帳',c.lag)).join('')}</select></div>
+      <div class="frow"><span class="lb">信用額度</span><input data-ae="limit" value="${a.limit||''}" inputmode="numeric" placeholder="可留空" aria-label="信用額度"></div>
+    </div><div class="sec-f" id="aePreview">${preview||'結帳日和繳款截止日印在銀行帳單上。繳款日比結帳日小，代表是下個月繳（例如每月 20 日結帳、隔月 5 日繳）。'}<br>銀行帳單是照「入帳日」算的，刷卡後通常 1～3 天才入帳，網購和海外消費可能更久。</div></div>
+    <div class="sec"><div class="sec-h">繳款</div><div class="group">
+      <div class="frow"><span class="lb">自動扣繳</span><select data-ae="autopay" aria-label="自動扣繳">${opt('','沒有自動扣繳',a.autopay||'')}${banks.map(x=>opt(x.id,'從「'+esc(x.name)+'」扣',a.autopay||'')).join('')}</select></div>
+      ${a.autopay?`<div class="frow"><span class="lb">扣多少</span><select data-ae="autoMode" aria-label="自動扣繳金額">${opt('full','全額',a.autoMode||'full')}${opt('min','最低應繳',a.autoMode||'full')}</select></div>`:''}
+      <div class="frow"><span class="lb">繳款提醒</span><select data-ae="remind" aria-label="繳款提醒">${[[-1,'不提醒'],[0,'截止當天'],[1,'前 1 天'],[3,'前 3 天'],[5,'前 5 天'],[7,'前 7 天']].map(([v,l])=>opt(v,l,a.remind==null?3:a.remind)).join('')}</select></div>
+    </div><div class="sec-f">有設自動扣繳，到了截止日會自動記一筆「從戶頭繳卡費」，首頁就不會再提醒繳款。</div></div>
+    ${cardReady(a)?`<div class="sec"><div class="group"><button class="row action left tap" data-card-cal="${esc(a.id)}">把繳款日加到 iPhone 行事曆</button></div></div>`:''}`;}
+  h+=`<div class="sec"><div class="group"><button class="row action left tap destructive" data-acct-remove="${esc(a.id)}">刪除這個帳戶</button></div></div>`;
+  box.innerHTML=h;syncSegs(box);
+}
+document.addEventListener('change',e=>{
+  const el=e.target.closest&&e.target.closest('[data-ae]');if(!el)return;
+  const d=D(),a=d.accounts.find(x=>x.id===editAcctId);if(!a)return;
+  const f=el.dataset.ae,v=el.value.trim(),num=x=>Number(String(x).replace(/[^\d.-]/g,''))||0;
+  if(f==='name'){if(!v){toast('名稱不能空白');el.value=a.name;return;}a.name=v;}
+  else if(f==='icon')a.icon=v;
+  else if(f==='opening')a.opening=acctKind(a)==='credit'?-Math.abs(num(v)):num(v);
+  else if(f==='limit')a.limit=v?Math.abs(num(v)):0;
+  else if(f==='closeDay'||f==='dueDay')a[f]=v?+v:0;
+  else if(f==='lag')a.lag=+v;
+  else if(f==='remind')a.remind=+v;
+  else if(f==='linked')a.linked=v;
+  else if(f==='autopay'){a.autopay=v;if(v)a.autoSince=today();}
+  else if(f==='autoMode')a.autoMode=v;
+  saveDB();
+  if(['closeDay','dueDay','autopay','name'].includes(f))setTimeout(refreshSettingsTop,50);else renderSettingsRoot();
+  if(f==='closeDay'||f==='dueDay')toast('已更新帳單日期');
+});
+document.addEventListener('click',e=>{
+  const t=e.target;let el;
+  if((el=t.closest('[data-akind]'))){const d=D(),a=d.accounts.find(x=>x.id===editAcctId);if(!a)return;
+    const k=el.dataset.akind,prev=acctKind(a);if(k===prev)return;
+    if(prev==='credit'&&k!=='credit')a.opening=Math.abs(+a.opening||0)*0;
+    a.kind=k;if(!a.icon||Object.values(ACCT_KINDS).some(x=>x.ic===a.icon))a.icon=ACCT_KINDS[k].ic;
+    saveDB();haptic();setTimeout(refreshSettingsTop,200);return;}
+  if((el=t.closest('[data-card-view]'))){openCard(el.dataset.cardView);return;}
+  if((el=t.closest('[data-card-edit]'))){const id=el.dataset.cardEdit;if(sheetStack.includes('cardSheet'))closeSheet('cardSheet');setTimeout(()=>openAcctEdit(id),sheetStack.length?0:300);return;}
+  if((el=t.closest('[data-card-pay]'))){const [id,k]=el.dataset.cardPay.split('|');const a=D().accounts.find(x=>x.id===id);if(a)payCard(a,k||null);return;}
+  if((el=t.closest('[data-card-cal]'))){const a=D().accounts.find(x=>x.id===el.dataset.cardCal);if(a)cardCalendar(a);return;}
+  if((el=t.closest('[data-stmt]'))){const [id,k]=el.dataset.stmt.split('|');const a=D().accounts.find(x=>x.id===id);if(a)stmtMenu(a,k);return;}
+  if((el=t.closest('[data-bill-enter]'))){const [id,k]=el.dataset.billEnter.split('|');const a=D().accounts.find(x=>x.id===id);if(a)enterBill(a,k);return;}
+  if((el=t.closest('[data-bill-seen]'))){const [id,k]=el.dataset.billSeen.split('|');const a=D().accounts.find(x=>x.id===id);if(a){a.seen=k;saveDB();renderAll();toast('好，這期就照預估金額');}return;}
+  if((el=t.closest('[data-pay-del]'))){const [id,pid]=el.dataset.payDel.split('|');const a=D().accounts.find(x=>x.id===id);if(!a)return;
+    const p=(a.payments||[]).find(x=>x.id===pid);if(!p)return;
+    actionSheet({title:`${md(p.date)} 繳款 ${money(p.amount)}`,message:p.auto?'這筆是自動扣繳記錄的。':'',actions:[{label:'刪除這筆繳款',style:'destructive'}]}).then(i=>{
+      if(i!==0)return;a.payments=a.payments.filter(x=>x!==p);if(p.auto)a.autoSince=ymd(addDays(parseD(p.date),1));saveDB();renderAll();renderCardSheet();toast('已刪除繳款紀錄');});return;}
+  if((el=t.closest('[data-acct-remove]'))){const d=D(),i=d.accounts.findIndex(x=>x.id===el.dataset.acctRemove);if(i<0)return;
+    const n=d.accounts.length;acctAction('del',i).then(()=>{if(D().accounts.length<n)popPage();});return;}
+  if((el=t.closest('#cardSheet [data-acct-view]'))){closeSheet('cardSheet');return;}
+});
+/* =====================================================================
+   推播通知：App 關著也會跳出來（伺服器在 Cloudflare，見 push/worker.js）
+   伺服器只知道：推播地址、時區、提醒時間、煩人程度、最後一次記帳的日期
+   ===================================================================== */
+const PUSH_API=/*@@PUSH_API@@*/'https://ledger-push.29cy7ty2nn.workers.dev';
+const isStandaloneApp=()=>navigator.standalone===true||(window.matchMedia&&matchMedia('(display-mode: standalone)').matches);
+function pushReady(){return !!PUSH_API&&!PREVIEW&&'serviceWorker' in navigator&&'PushManager' in window&&'Notification' in window;}
+function pushOn(){return !!(settings.push&&settings.push.on);}
+function pushSectionHTML(){
+  if(!PUSH_API)return '';
+  let rows,foot;
+  if(!pushReady()||!isStandaloneApp()){
+    rows=`<div class="row" style="--inset:58px">${sic('phone','red')}<div class="rt"><div class="t">推播通知</div><div class="s">要從主畫面打開記帳本才能開啟</div></div></div>`;
+    foot='iPhone 只讓「加入主畫面」的網頁 App 推播（iOS 16.4 以上）。用 Safari 分享 ›「加入主畫面」，再從主畫面打開。';
+  }else if(pushOn()){
+    rows=`<div class="row" style="--inset:58px">${sic('phone','red')}<div class="rt"><div class="t">推播通知</div><div class="s">已開啟・${esc(nagCfg().time)} 開始，記完帳當天就停</div></div><span class="v" style="color:var(--c-green)">開啟中</span></div>
+      ${rowBtn('pushTest','wave','blue','傳一則測試通知','幾秒內會跳出來')}
+      <button class="row action left tap destructive" data-act="pushOff">關閉推播通知</button>`;
+    foot='通知會從「我的記帳本」跳出來，App 關著也會。伺服器只知道這支手機的推播地址、時區、提醒時間、煩人程度和最後記帳的日期，不會收到金額或任何記錄內容。';
+  }else{
+    rows=rowBtn('pushOn','phone','red','開啟推播通知','App 關著也會跳通知，記完帳當天就停');
+    foot='按下去 iPhone 會問要不要允許通知，選「允許」就好。伺服器只會知道推播地址、時區、提醒時間、煩人程度和最後記帳的日期，不會收到金額或任何記錄內容。';
+  }
+  return `<div class="sec"><div class="sec-h">推播通知</div><div class="group">${rows}</div><div class="sec-f">${foot}</div></div>`;
+}
+const b64uToU8=s=>{s=s.replace(/-/g,'+').replace(/_/g,'/');while(s.length%4)s+='=';return Uint8Array.from(atob(s),c=>c.charCodeAt(0));};
+async function pushFetch(path,body,opt){
+  const r=await fetch(PUSH_API+path,Object.assign({method:body?'POST':'GET',headers:body?{'Content-Type':'application/json'}:undefined,body:body?JSON.stringify(body):undefined},opt||{}));
+  let j=null;try{j=await r.json();}catch(e){}
+  if(!r.ok)throw Object.assign(new Error((j&&j.error)||('HTTP '+r.status)),{status:r.status});
+  return j;
+}
+function pushKeyPrefetch(){if(!pushReady()||settings.pushKey)return;pushFetch('/vapid').then(j=>{if(j&&j.key){settings.pushKey=j.key;saveSettings();}}).catch(()=>{});}
+function pushPayload(st){
+  st=st||nagState();const c=st.c;
+  let tz='Asia/Taipei';try{tz=Intl.DateTimeFormat().resolvedOptions().timeZone||tz;}catch(e){}
+  return {time:c.time,level:c.level,on:!!c.on,tz,logged:st.logged?today():st.last,snooze:c.snoozeUntil||0};
+}
+async function pushEnable(){
+  if(!pushReady()){alertMsg('這支手機不支援推播','需要 iOS 16.4 以上，而且要從主畫面打開記帳本。');return;}
+  if(!isStandaloneApp()){alertMsg('要從主畫面打開','iPhone 只讓「加入主畫面」的網頁 App 推播。用 Safari 分享 ›「加入主畫面」，再從主畫面打開記帳本。');return;}
+  const key=settings.pushKey;
+  if(!key){pushKeyPrefetch();toast('正在連線推播伺服器，請再按一次');return;}
+  let sub;
+  try{
+    const reg=await navigator.serviceWorker.ready;
+    sub=await reg.pushManager.getSubscription()||await reg.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:b64uToU8(key)});
+  }catch(e){
+    if(Notification.permission==='denied')alertMsg('通知被關掉了','到 iPhone「設定 › 通知 › 我的記帳本」打開「允許通知」，再回來按一次。');
+    else toast('沒有開啟推播：'+(e&&e.message||'請再試一次'),{tone:'error'});
+    return;
+  }
+  const c=nagCfg();if(!c.on){c.on=true;c.since=today();settings.nag=c;saveSettings();}
+  try{
+    const p=settings.push||{},j=await pushFetch('/subscribe',Object.assign({id:p.id,token:p.token,sub:sub.toJSON()},pushPayload()));
+    settings.push={id:j.id,token:j.token,on:true,last:JSON.stringify(Object.assign({id:j.id,token:j.token},pushPayload()))};saveSettings();
+    haptic('success');toast(`推播已開啟，每天 ${c.time} 還沒記帳就會通知你`);
+  }catch(e){
+    if(e.status===403){settings.push={};saveSettings();toast('請再按一次開啟',{tone:'error'});}
+    else toast('連不到推播伺服器，晚點再試',{tone:'error'});
+    return;
+  }
+  nagRender();refreshSettingsTop();
+}
+async function pushDisable(){
+  const p=settings.push||{};
+  try{const reg=await navigator.serviceWorker.ready,sub=await reg.pushManager.getSubscription();if(sub)await sub.unsubscribe();}catch(e){}
+  try{if(p.id)await pushFetch('/unsubscribe',{id:p.id,token:p.token});}catch(e){}
+  settings.push={};saveSettings();toast('已關閉推播通知');refreshSettingsTop();
+}
+async function pushTest(){
+  const p=settings.push||{};
+  try{const j=await pushFetch('/test',{id:p.id,token:p.token});
+    if(j.status>=200&&j.status<300)toast('已送出，幾秒內會跳出來');
+    else if(j.status===404||j.status===410){settings.push={};saveSettings();refreshSettingsTop();toast('這支手機的推播失效了，請重新開啟',{tone:'error'});}
+    else toast('推播服務回應 '+j.status+'，晚點再試',{tone:'error'});
+  }catch(e){if(e.status===404){settings.push={};saveSettings();refreshSettingsTop();toast('請重新開啟推播',{tone:'error'});}else toast('連不到推播伺服器',{tone:'error'});}
+}
+/* 打開提醒頁時確認：iPhone 那邊如果把通知關了，就把開關改回來 */
+async function pushCheck(){
+  pushKeyPrefetch();
+  if(!pushOn()||!pushReady())return;
+  try{const reg=await navigator.serviceWorker.ready,sub=await reg.pushManager.getSubscription();
+    if(!sub||Notification.permission==='denied'){settings.push={};saveSettings();refreshSettingsTop();}}catch(e){}
+}
+/* 記帳、改時間、改等級後，把「今天記了沒」和設定告訴伺服器；內容沒變就不送 */
+let _pushT=0;
+function pushSync(st){
+  pushState(st);
+  if(!PUSH_API||PREVIEW||!pushOn())return;
+  clearTimeout(_pushT);
+  _pushT=setTimeout(()=>{
+    if(!pushOn())return;
+    const p=settings.push,body=Object.assign({id:p.id,token:p.token},pushPayload());
+    const sig=JSON.stringify(body);if(sig===p.last)return;
+    pushFetch('/ping',body,{keepalive:true}).then(()=>{p.last=sig;saveSettings();}).catch(e=>{if(e.status===404){settings.push={};saveSettings();}});
+  },1500);
+}
+/* 給 service worker 看的狀態：收到推播時用它決定通知文字（幾天沒記、煩人程度） */
+let _pushStateSig='';
+function pushState(st){
+  if(PREVIEW||!('caches' in window))return;
+  st=st||nagState();const data={last:st.logged?today():st.last,level:st.c.level,any:!!st.any,on:!!st.c.on};
+  const sig=JSON.stringify(data);if(sig===_pushStateSig)return;_pushStateSig=sig;
+  caches.open('ledger-nag').then(c=>c.put('./__nagstate',new Response(sig,{headers:{'Content-Type':'application/json'}}))).catch(()=>{});
+}
+
+/* 預覽版：把示範的信用卡設定好，讓預覽看得到帳單和提醒 */
+if(PREVIEW){try{const d=D(),a=d&&d.accounts.find(x=>x.id==='a-card');
+  if(a&&!a.closeDay){const c=addDays(parseD(today()),-10),du=addDays(c,14);
+    Object.assign(a,{kind:'credit',name:'玉山 Pi 卡',closeDay:Math.min(28,c.getDate()),dueDay:Math.min(28,du.getDate()),lag:1,limit:80000,remind:5});
+    const ch=cardCharges(d,a);let cc=prevClose(a,closeFor(a,today()));const L=[];for(let i=0;i<6;i++){L.push(stmtOf(d,a,cc,ch));cc=prevClose(a,cc);}
+    a.payments=[];L.slice(1).forEach(x=>{if(x.amt>0)a.payments.push({id:uid(),date:x.due,amount:x.amt,from:'a-bank',stmt:x.key});});
+    a.seen=L[0].key;
+    d.accounts.push({id:'a-deb',name:'Richart 簽帳卡',icon:'💳',kind:'debit',linked:'a-bank',opening:0});saveDB();}
+}catch(e){console.warn(e);}}
+/* ---------- 匯入 CSV 說明頁（照 iPhone 設定的分組列表） ---------- */
+const CSV_SAMPLE='日期,名稱,分類,帳戶,類型,金額,備註\n2026-11-01,午餐,餐飲,現金,支出,120,\n2026-11-02,Netflix,訂閱,玉山 Pi 卡,支出,390,\n2026-11-05,薪水,薪水,銀行,收入,38000,十月\n';
+function renderCsvHelp(box){
+  const step=(n,t,s)=>`<div class="row hstep"><span class="hnum">${n}</span><div class="rt"><div class="t">${t}</div>${s?`<div class="s">${s}</div>`:''}</div></div>`;
+  const kind=(ic,col,t,s)=>`<div class="row hkv" style="--inset:58px;align-items:flex-start">${sic(ic,col)}<div class="rt"><div class="t">${t}</div><div class="s">${s}</div></div></div>`;
+  const kv=(k,v)=>`<div class="row hkv"><div class="rt"><div class="t">${k}</div><div class="s">${v}</div></div></div>`;
+  box.innerHTML=`<div class="hhero"><div class="hico">${sic('tray','mint')}</div><h2>匯入 CSV</h2>
+    <p>把銀行帳單、存款明細或其他記帳 App 的紀錄搬進「${esc(book().name)}」。匯入前會先給你看確認畫面，不會直接寫進去。</p></div>
+  <div class="sec"><div class="group"><button class="row action tap hgo" data-act="importCSV">選擇 CSV 檔案…</button></div>
+    <div class="sec-f">只會匯入到目前這本帳本。檔案只在這支手機上讀取，不會上傳到任何地方。</div></div>
+  <div class="sec"><div class="sec-h">怎麼做</div><div class="group">
+    ${step(1,'下載帳單','在網路銀行或銀行 App 的「帳單」「交易明細」裡選 CSV 格式下載。只有 Excel 的話，先另存成 CSV。')}
+    ${step(2,'選擇檔案','按上面的「選擇 CSV 檔案…」，從「檔案」App 裡選。')}
+    ${step(3,'檢查確認畫面','看一下帳戶、支出收入合計和分類；不對的地方直接改。')}
+    ${step(4,'按「匯入」','完成後回到首頁就看得到。')}
+  </div></div>
+  <div class="sec"><div class="sec-h">看得懂的檔案</div><div class="group">
+    ${kind('wallet','purple','信用卡帳單','正數記支出、退款和回饋記收入，「繳款」記成繳卡費（轉帳）')}
+    ${kind('receipt','blue','存款明細','「支出／存入」分兩欄的，或只有一欄有正有負的都可以')}
+    ${kind('tray','mint','這個 App 匯出的 CSV','日期、名稱、分類、帳戶、類型、金額、備註都會照原樣匯回來')}
+    ${kind('table','gray','其他記帳 App','只要有日期和金額欄就能匯入，其他欄位可以自己對應')}
+  </div><div class="sec-f">PDF 帳單和圖片不能匯入。</div></div>
+  <div class="sec"><div class="sec-h">確認畫面會幫你處理</div><div class="group">
+    ${kv('帳戶','檔案裡的帳戶這裡沒有，會列成一張表，一次決定要併入哪個帳戶還是新增。沒有帳戶欄就選「這份是哪個帳戶的」。')}
+    ${kv('日期','2026-11-03、2026/11/3、民國 115/11/03、2026年11月3日都看得懂。')}
+    ${kv('金額','1,234、NT$900、-5,000、(300) 都看得懂；外幣金額和餘額欄會略過。')}
+    ${kv('分類','銀行帳單沒有分類，會用店名猜（全聯→購物、Uber Eats→餐飲、中油→交通），匯入前可以改。')}
+    ${kv('帳單小計','「本期應繳總額」「最低應繳」這類小計行會跳過。')}
+    ${kv('重複','同一天、同金額、同名稱的已經有了，預設跳過；同一份帳單匯兩次也不會重複。')}
+  </div></div>
+  <div class="sec"><div class="sec-h">看得懂的欄位名稱</div><div class="group">
+    ${kv('日期','消費日、交易日期、日期')}
+    ${kv('入帳日','入帳日、記帳日（信用卡帳單用它算是哪一期）')}
+    ${kv('名稱','名稱、消費明細、交易說明、摘要、商店名稱')}
+    ${kv('金額','新臺幣金額、臺幣金額、金額；或分成支出、存入兩欄')}
+    ${kv('其他','分類、帳戶、類型（收入／支出）、備註')}
+  </div><div class="sec-f">欄位名稱不一樣也沒關係：確認畫面的「欄位對應」可以自己選哪一欄是日期、哪一欄是金額。</div></div>
+  <div class="sec"><div class="group"><button class="row action left tap" data-act="csvSample">下載範例 CSV</button></div>
+    <div class="sec-f">想自己整理資料的話，照範例的欄位填就可以。用 Numbers 或 Excel 編輯後，記得輸出成 CSV（UTF-8）。</div></div>`;
+}
+
+/* ---------- 記帳畫面：這筆算哪一期、分期、餘額不足 ---------- */
+function updateAcctHint(){
+  const d=D(),a=d.accounts.find(x=>x.id===F.acct),hint=$('fAcctHint'),row=$('fInstRow');if(!hint||!row)return;
+  const k=acctKind(a);row.hidden=!(k==='credit'&&F.type==='expense');$('fInst').value=String(F.inst||1);
+  let txt='';
+  if(a&&cardReady(a)){const c=closeFor(a,ymd(addDays(parseD(F.date||today()),cardOf(a).lag))),n=F.type==='expense'&&F.inst>1?F.inst:1;
+    txt=`會算在 ${md(ymd(c))} 結帳、${md(ymd(dueFor(a,c)))} 要繳的帳單${n>1?`，之後每期 ${money(Math.floor(Number(F.amt||0)/n))}，共 ${n} 期`:''}`;}
+  else if(a&&k==='credit')txt='這張卡還沒設定結帳日，到「卡片設定」設定後就能算出帳單';
+  else if(a&&k==='debit'){const b=d.accounts.find(x=>x.id===a.linked&&x!==a);
+    if(b){const old=F.mode==='edit'?d.tx.find(x=>x.id===F.id):null,bal=acctBalance(d,b)+(old&&old.account===a.id&&old.type==='expense'?old.amount:0),amt=Number(F.amt||0);
+      txt=F.type==='expense'&&amt>bal?`「${b.name}」餘額只剩 ${money(bal)}，不夠扣這筆`:`會直接從「${b.name}」扣款（餘額 ${money(bal)}）`;}}
+  hint.textContent=txt;hint.hidden=!txt;hint.classList.toggle('warn',/不夠/.test(txt));
 }
 function txRowHTML(r,opts){
   opts=opts||{};
   const a=D().accounts.find(x=>x.id===r.account);
-  const sub=[opts.showDate?shortDate(r.date):null,catName(r.category),a?a.name:null,r.note||null].filter(Boolean).join(' · ');
+  const sub=[opts.showDate?shortDate(r.date):null,catName(r.category),a?a.name:null,r.inst>1?`分 ${r.inst} 期`:null,r.note||null].filter(Boolean).join(' · ');
   return `<div class="swipe" data-id="${esc(r.id)}"><div class="swipe-act"><button class="sa-del" data-del="${esc(r.id)}" data-full>刪除</button></div>
     <div class="row tap swipe-main${r.id===flashId?' flash':''}" data-edit="${esc(r.id)}" style="--inset:66px" role="button" tabindex="0" aria-label="${esc(r.name)} ${r.type==='income'?'收入':'支出'} ${money(r.amount)}">
     ${catIcon(r.category)}<div class="rt"><div class="t">${esc(r.name)}</div><div class="s">${esc(sub)}</div></div>
@@ -1598,8 +2221,8 @@ function lastAcct(){const d=D();let r=null;d.tx.forEach(x=>{if(!r||(x.createdAt|
 function openTxSheet(id){
   const d=D();
   if(id){const r=d.tx.find(x=>x.id===id);if(!r)return;
-    Object.assign(F,{mode:'edit',id,type:r.type,amt:String(r.amount),cat:r.category,name:r.name===catName(r.category)?'':r.name,date:r.date,acct:r.account,note:r.note||'',dirty:false});}
-  else Object.assign(F,{mode:'new',id:null,type:'expense',amt:'',cat:suggestCat('expense'),name:'',date:today(),acct:lastAcct(),note:'',dirty:false});
+    Object.assign(F,{mode:'edit',id,type:r.type,amt:String(r.amount),cat:r.category,name:r.name===catName(r.category)?'':r.name,date:r.date,acct:r.account,note:r.note||'',inst:r.inst||1,dirty:false});}
+  else Object.assign(F,{mode:'new',id:null,type:'expense',amt:'',cat:suggestCat('expense'),name:'',date:today(),acct:lastAcct(),note:'',inst:1,dirty:false});
   renderTxSheet();setKeypad(true);$('txBody').scrollTop=0;
   openSheet('txSheet');haptic();
   requestAnimationFrame(()=>{syncSegs($('txSheet'));stagger($('txCats'),8);});
@@ -1616,11 +2239,13 @@ function renderTxSheet(){
   if(F.acct&&!accts.some(a=>a.id===F.acct))accts.push({id:F.acct,name:'（已刪除的帳戶）',icon:''});
   $('fAcct').innerHTML=accts.map(a=>`<option value="${esc(a.id)}" ${a.id===F.acct?'selected':''}>${esc(a.name)}</option>`).join('');
   $('txDelSec').style.display=F.mode==='edit'?'':'none';
+  updateAcctHint();
   $('txSugg').innerHTML='';
   syncSegs($('txSheet'));
 }
 function fmtAmt(s){if(!s)return '0';const [i,dec]=s.split('.');const n=Number(i||'0').toLocaleString('zh-TW');return dec!==undefined?n+'.'+dec:n;}
 function renderAmount(){
+  if(typeof updateAcctHint==='function'&&$('fAcctHint'))updateAcctHint();
   const v=$('txAmtVal');v.textContent=fmtAmt(F.amt);v.classList.toggle('ph',!F.amt);
   const len=v.textContent.length;v.style.fontSize=len>11?'2rem':len>8?'2.5rem':'';
   $('txSave').disabled=!(Number(F.amt)>0);
@@ -1672,6 +2297,7 @@ function saveTx(){
   const old=F.mode==='edit'?d.tx.find(x=>x.id===F.id):null;
   const rec={id:old?old.id:uid(),date:F.date||today(),name:F.name.trim()||catName(cat),category:cat,amount,type:F.type,
     account:F.acct||(d.accounts[0]?d.accounts[0].id:''),note:F.note.trim(),createdAt:old?(old.createdAt||nowTs()):nowTs()};
+  {const ac=d.accounts.find(x=>x.id===rec.account);if(rec.type==='expense'&&F.inst>1&&acctKind(ac)==='credit')rec.inst=F.inst;}
   if(old){const i=d.tx.indexOf(old);d.tx[i]=rec;}else d.tx.push(rec);
   saveDB();
   F.dirty=false;closeSheet('txSheet');haptic('success');
@@ -1727,6 +2353,8 @@ function renderSettingsRoot(){
     ${settings.pass?rowNav('changePass','lock','gray','變更密碼',''):''}
     ${rowToggle('bio','face','green','Face ID 解鎖',bioOn,!bioOK||!settings.pass)}
   </div><div class="sec-f">${!bioOK?'這個瀏覽器不支援 Face ID（需要 Safari 與 HTTPS）。':!settings.pass?'先開啟密碼鎖，才能使用 Face ID 解鎖。':'App 離開超過 1 分鐘再回來會重新上鎖。'}</div></div>
+  <div class="sec"><div class="sec-h">提醒</div><div class="group">${rowNav('nag','clock','orange','記帳提醒',nagLabel())}</div>
+    <div class="sec-f">給常常忘記或一直拖著不記帳的人：時間到還沒記，就會一直煩你，直到記了為止。</div></div>
   <div class="sec"><div class="sec-h">回饋</div><div class="group">
     ${rowToggle('haptic','wave','pink','觸覺回饋',!!settings.haptic)}
     ${rowToggle('sound','sound','purple','點擊音效',settings.sound===true)}
@@ -1747,7 +2375,7 @@ function renderSettingsRoot(){
     ${rowBtn('backupJSON','share','blue','匯出完整備份','換手機前一定要做；可存到「檔案」、iCloud、LINE')}
     ${rowBtn('backupCSV','table','green','匯出 CSV','可以用 Excel、Numbers 打開')}
     ${rowBtn('restoreJSON','tray','indigo','從完整備份還原','')}
-    ${rowBtn('importCSV','tray','mint','匯入 CSV 到目前帳本','')}
+    ${rowNav('csvHelp','tray','mint','匯入 CSV','說明與選檔')}
     ${rowBtn('update','refresh','gray','檢查 App 更新','')}
   </div><div class="sec-f" id="persistNote">資料只存在這支手機。刪除主畫面圖示會一併刪除資料。</div></div>
   <div class="sec"><div class="sec-h">關於</div><div class="group">
@@ -1764,6 +2392,9 @@ const PAGES={
   cats:{title:'分類',render:renderCatsPage},
   theme:{title:'主題色與圖示',render:renderThemePage},
   wall:{title:'背景',render:renderWallPage},
+  nag:{title:'記帳提醒',render:renderNagPage},
+  acctEdit:{title:'帳戶設定',render:renderAcctEdit},
+  csvHelp:{title:'匯入 CSV',render:renderCsvHelp},
   install:{title:'加入主畫面與分享',render:renderInstallPage}
 };
 function pushPage(key){
@@ -1814,8 +2445,8 @@ function renderAccountsPage(box){
   const d=D();
   box.innerHTML=`<div class="sec"><div class="sec-h">${esc(book().name)}</div><div class="group">${d.accounts.map((a,i)=>`<div class="swipe" data-id="${esc(a.id)}"><div class="swipe-act"><button class="sa-del" data-acct-del="${i}" data-full>刪除</button></div>
       <button class="row tap swipe-main" data-acct-edit="${i}" style="--inset:66px">${acctGlyph(a)}
-      <div class="rt"><div class="t">${esc(a.name)}</div><div class="s">初始金額 ${money(a.opening||0)}</div></div><span class="amt num">${money(acctBalance(d,a))}</span>${ICON.chev}</button></div>`).join('')}</div>
-    <div class="sec-f">點一下可以修改名稱、圖示和初始金額；往左滑刪除（已有記錄的帳戶不能刪除）。</div></div>
+      <div class="rt"><div class="t">${esc(a.name)}</div><div class="s">${ACCT_KINDS[acctKind(a)].n}${acctSub(d,a)?'・'+esc(acctSub(d,a)):''}</div></div><span class="amt num">${money(acctBalance(d,a))}</span>${ICON.chev}</button></div>`).join('')}</div>
+    <div class="sec-f">點一下設定類型、名稱，信用卡的結帳日和繳款日、簽帳卡的扣款戶頭也在這裡；往左滑刪除（已有記錄的帳戶不能刪除）。</div></div>
     <div class="sec"><div class="group"><button class="row action left tap" data-act="addAcct">新增帳戶…</button></div></div>`;
 }
 let catMgrType='expense';
@@ -1831,8 +2462,8 @@ function renderThemePage(box){
   const cur=currentPresetKey();
   box.innerHTML=`<div class="sec"><div class="sec-h">主題色</div><div class="card swatches" style="margin:0;width:100%">${PRESETS.map(p=>`<button class="sw${cur===p.k?' on':''}" data-preset="${p.k}" style="--sc:${p.c}" aria-label="${p.n}" aria-pressed="${cur===p.k}"><span class="dot2">${ICON.check.replace('class="ico check"','class="ico"')}</span><span>${p.n}</span></button>`).join('')}</div>
     ${cur?'':`<div class="sec-f">目前使用兌換碼主題「${esc(themeName())}」。</div>`}</div>
-    <div class="sec"><div class="sec-h">App 圖示</div><div class="card iconprev" style="margin:0;width:100%"><div class="appicon">${iconSVG(accentHex())}</div>
-      <p><b>主畫面圖示會跟著主題色</b>已經在主畫面的圖示不會自己換，要刪掉重新「加入主畫面」才會更新。<b style="display:inline;color:var(--red);font-size:inherit">刪掉圖示會連資料一起刪除</b>，請先匯出完整備份，加回來後再還原。</p></div></div>
+    <div class="sec"><div class="sec-h">App 圖示</div><div class="card iconprev" style="margin:0;width:100%"><div class="appicon">${appIconSVG()}</div>
+      <p><b>主畫面圖示統一是黑白的</b>淺色模式下加入主畫面是白色圖示，深色模式下是黑色圖示；換主題色不會改變。iPhone 只在「加入主畫面」那一刻決定，之後不會自動切換。舊圖示要刪掉重新加入才會更新。<b style="display:inline;color:var(--red);font-size:inherit">刪掉圖示會連資料一起刪除</b>，請先匯出完整備份，加回來後再還原。</p></div></div>
     <div class="sec"><div class="sec-h">兌換主題</div><div class="group"><div class="frow"><input class="left" id="themeCode" placeholder="輸入主題兌換碼" autocomplete="off" autocapitalize="characters"></div></div>
     <div style="padding:12px 4px 0"><button class="pbtn sm" data-act="redeem">兌換</button></div></div>
     ${settings.theme&&!cur?`<div class="sec"><div class="group"><button class="row destructive tap" data-act="resetTheme">恢復預設主題</button></div></div>`:''}`;
@@ -1850,7 +2481,16 @@ function renderInstallPage(box){
 async function settingsAction(act){
   const d=D();
   switch(act){
-    case 'books':case 'accounts':case 'cats':case 'theme':case 'wall':case 'install':pushPage(act);break;
+    case 'books':case 'accounts':case 'cats':case 'theme':case 'wall':case 'nag':case 'csvHelp':case 'install':pushPage(act);break;
+    case 'csvSample':shareOrDownload('記帳本匯入範例.csv','\ufeff'+CSV_SAMPLE,'text/csv',false);break;
+    case 'nagCal':nagCalendar();break;
+    case 'wallPick':pickWallPhoto();break;
+    case 'wallDel':removeWallPhoto();break;
+    case 'nagBadge':nagAskBadge();break;
+    case 'nagTest':nagPreview();break;
+    case 'pushOn':pushEnable();break;
+    case 'pushOff':pushDisable();break;
+    case 'pushTest':pushTest();break;
     case 'budget':{
       const v=await alertForm({title:'每月預算',message:'設定這本帳每個月的支出上限，0 代表不設定。',fields:[{key:'b',type:'text',inputmode:'numeric',placeholder:'例如 20000',value:d.budget||''}],ok:'儲存'});
       if(!v)return;const n=Math.max(0,Math.round(Number(String(v.b).replace(/[^\d.]/g,''))||0));d.budget=n;saveDB();toast(n?`預算設為 ${money(n)}`:'已取消預算');renderAll();break;}
@@ -1860,9 +2500,13 @@ async function settingsAction(act){
       if(!v||!v.n)return;const b={id:uid(),name:v.n,createdAt:nowTs()};books.push(b);DB[b.id]=freshBookData();activeId=b.id;saveBooks();saveDB();
       toast(`已建立並切換到「${v.n}」`);refreshSettingsTop();break;}
     case 'addAcct':{
-      const v=await alertForm({title:'新增帳戶',fields:[{key:'icon',placeholder:'圖示（例如 🏦）',maxlength:4},{key:'name',placeholder:'帳戶名稱',maxlength:20},{key:'open',placeholder:'初始金額（可留空）',inputmode:'decimal'}],ok:'新增'});
-      if(!v)return;if(!v.name){toast('請輸入帳戶名稱');return;}
-      d.accounts.push({id:uid(),name:v.name,icon:v.icon||'💳',opening:Number(String(v.open).replace(/[^\d.-]/g,''))||0});saveDB();toast('已新增帳戶');refreshSettingsTop();break;}
+      const i=await actionSheet({title:'新增哪一種帳戶？',actions:KIND_ORDER.map(k=>({label:{cash:'現金',bank:'銀行戶頭',debit:'簽帳金融卡',credit:'信用卡',other:'其他（電子支付、悠遊卡…）'}[k]}))});
+      if(i<0)return;const k=KIND_ORDER[i],v=await alertForm({title:'新增'+ACCT_KINDS[k].n,fields:[{key:'name',placeholder:k==='credit'?'例如 玉山 Pi 卡':k==='bank'?'例如 郵局':k==='debit'?'例如 台新 Richart 卡':'名稱',maxlength:20}],ok:'下一步'});
+      if(!v)return;if(!v.name){toast('請輸入名稱');return;}
+      const a={id:uid(),name:v.name,icon:ACCT_KINDS[k].ic,kind:k,opening:0};
+      if(k==='debit'){const b=d.accounts.find(x=>acctKind(x)==='bank');if(b)a.linked=b.id;}
+      d.accounts.push(a);saveDB();refreshSettingsTop();editAcctId=a.id;pushPage('acctEdit');
+      toast(k==='credit'?'再設定結帳日和繳款日':k==='debit'?'確認一下扣款戶頭':'已新增帳戶');break;}
     case 'addCat':{
       const v=await alertForm({title:catMgrType==='expense'?'新增支出分類':'新增收入分類',fields:[{key:'e',placeholder:'圖示（例如 ☕️）',maxlength:4},{key:'n',placeholder:'分類名稱',maxlength:12}],ok:'新增'});
       if(!v)return;if(!v.n){toast('請輸入分類名稱');return;}
@@ -1879,6 +2523,8 @@ async function settingsAction(act){
   }
 }
 async function toggleSetting(key,on,input){
+  if(key==='nag'){const c=nagCfg();c.on=on;if(on)c.since=today();settings.nag=c;saveSettings();nagRender();
+    if(on)toast(`已開啟，每天 ${c.time} 開始提醒`);setTimeout(refreshSettingsTop,360);return;}
   if(key==='haptic'){settings.haptic=on;saveSettings();applyHapticSetting();if(on)haptic();return;}
   // 等開關滑完（約 .3 秒）再換外觀，畫面用淡入淡出銜接
   if(key==='darkFrost'){settings.darkFrost=on;saveSettings();lookTransition(()=>{applyLook();syncLookUI();},reduceMotion()?0:300);return;}
@@ -1908,9 +2554,7 @@ async function bookAction(kind,id){
 async function acctAction(kind,i){
   const d=D(),a=d.accounts[i];if(!a)return;
   if(kind==='edit'){
-    const v=await alertForm({title:'編輯帳戶',fields:[{key:'icon',value:a.icon||'',placeholder:'圖示',maxlength:4},{key:'name',value:a.name,placeholder:'帳戶名稱',maxlength:20},{key:'open',value:a.opening||0,placeholder:'初始金額',inputmode:'decimal'}],ok:'儲存'});
-    if(!v)return;if(!v.name){toast('名稱不能空白');return;}
-    a.icon=v.icon||'💳';a.name=v.name;a.opening=Number(String(v.open).replace(/[^\d.-]/g,''))||0;saveDB();refreshSettingsTop();return;
+    editAcctId=a.id;pushPage('acctEdit');return;
   }
   if(kind==='del'){
     closeSwipe();
@@ -1949,15 +2593,17 @@ function parseTheme(code){
     const icon=seg[1]&&['d','m','o'].includes(seg[1])?seg[1]:'d';return {name:name||'自訂主題',c,icon,preset:seg[2]||null};}catch(e){return null;}
 }
 const ICON_KEYS=['graphite','burgundy','ocean','emerald','coral','violet','rose','amber','mint'];
-function applyIcon(th){
-  const k=th&&th.preset&&ICON_KEYS.includes(th.preset)?th.preset:(th&&th.icon==='m'?'mint':null);
-  const t=k?{mf:k==='mint'?'./manifest-mint.webmanifest':'./manifest.webmanifest',at:`./icons/icon-${k}-180.png`,fi:`./icons/icon-${k}-192.png`}:{mf:'./manifest.webmanifest',at:'./icons/icon-180.png',fi:'./icons/icon-192.png'};
+function applyIcon(){
+  // 圖示統一黑白：淺色模式用白色版、深色模式用黑色版（iPhone 在「加入主畫面」那一刻決定用哪一張）
+  const dk=darkMQ.matches?'-dark':'';
+  const t={mf:'./manifest.webmanifest',at:`./icons/icon${dk}-180.png`,fi:`./icons/icon${dk}-192.png`};
   const m=qs('link[rel="manifest"]');if(m)m.href=t.mf;const a=qs('link[rel="apple-touch-icon"]');if(a)a.href=t.at;const f=qs('link[rel="icon"]');if(f)f.href=t.fi;
 }
 function applyTheme(th){const r=document.documentElement.style,c=th.c;
   r.setProperty('--wine',c[0]);r.setProperty('--wine-d',c[1]);r.setProperty('--wine-l',c[2]);r.setProperty('--green',c[3]);r.setProperty('--green-l',c[4]);
   applyIcon(th);syncMono();applyWall();}
-function initTheme(){syncMono();if(settings.theme){const th=parseTheme(settings.theme);if(th)applyTheme(th);}}
+try{darkMQ.addEventListener('change',()=>applyIcon());}catch(e){}
+function initTheme(){syncMono();applyIcon();if(settings.theme){const th=parseTheme(settings.theme);if(th)applyTheme(th);}}
 function redeemTheme(){
   const inp=$('themeCode'),code=(inp?inp.value:'').trim();
   if(!code){toast('請先輸入主題兌換碼');return;}
@@ -1998,8 +2644,35 @@ function setPreset(k){
 
 /* ---------- App 圖示（同一份設計：App 裡即時顯示，也拿來產生主畫面 PNG） ---------- */
 let _icoN=0;
-function iconSVG(c){
-  const id='ai'+(++_icoN),L=hexMix(c,'#FFFFFF',.2),Dk=hexMix(c,'#000000',.3);
+/* 主畫面圖示統一成黑白配色（不再跟著主題色變）：黑底、白色卡片、灰階長條、玻璃 $ 徽章 */
+const APP_ICON={c:'#1C1C1E',bg:['#3B3B3E','#0B0B0C']};
+/* 主畫面圖示：白色版（白底、白色前卡片、黑色後卡片、黑長條）平常用；黑色版（黑底、白卡片、黑長條）夜間模式用 */
+const appIconDark=()=>iconSVG('#1C1C1E',['#3B3B3E','#0B0B0C']);
+function appIconLight(){
+  const id='al'+(++_icoN);
+  return `<svg viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><defs>
+  <linearGradient id="${id}b" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFFFFF"/><stop offset="1" stop-color="#E2E2E7"/></linearGradient>
+  <linearGradient id="${id}g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFFFFF"/><stop offset="1" stop-color="#F1F1F4"/></linearGradient>
+  <linearGradient id="${id}bk" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3A3A3D"/><stop offset="1" stop-color="#151517"/></linearGradient>
+  <linearGradient id="${id}q" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".5"/><stop offset=".55" stop-color="#fff" stop-opacity=".08"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient>
+  <linearGradient id="${id}r" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff"/><stop offset=".5" stop-color="#fff" stop-opacity=".25"/><stop offset="1" stop-color="#fff" stop-opacity=".8"/></linearGradient>
+  <filter id="${id}s" x="-20%" y="-20%" width="140%" height="160%"><feDropShadow dx="0" dy="22" stdDeviation="30" flood-color="#000" flood-opacity=".28"/></filter>
+  <filter id="${id}k" x="-40%" y="-40%" width="180%" height="180%"><feDropShadow dx="0" dy="10" stdDeviation="14" flood-color="#000" flood-opacity=".22"/></filter></defs>
+  <rect width="1024" height="1024" fill="url(#${id}b)"/>
+  <rect x="262" y="222" width="500" height="384" rx="96" fill="url(#${id}bk)"/>
+  <rect x="184" y="318" width="640" height="482" rx="116" fill="url(#${id}g)" filter="url(#${id}s)"/>
+  <rect x="300" y="580" width="104" height="136" rx="52" fill="#1C1C1E" fill-opacity=".34"/>
+  <rect x="444" y="504" width="104" height="212" rx="52" fill="#1C1C1E" fill-opacity=".64"/>
+  <rect x="588" y="428" width="104" height="288" rx="52" fill="#1C1C1E"/>
+  <g filter="url(#${id}k)"><circle cx="772" cy="326" r="104" fill="#2C2C2E"/><circle cx="772" cy="326" r="104" fill="url(#${id}q)"/></g>
+  <circle cx="772" cy="326" r="102" fill="none" stroke="url(#${id}r)" stroke-width="5"/>
+  <ellipse cx="748" cy="268" rx="58" ry="26" fill="#fff" fill-opacity=".3"/>
+  <path d="M772 262v128M802 286c-7-11-18-16-31-16-18 0-32 10-32 25 0 33 68 19 68 54 0 16-15 26-36 26-15 0-28-6-37-17" fill="none" stroke="#fff" stroke-width="17" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>`;
+}
+const appIconSVG=dark=>(dark==null?darkMQ.matches:dark)?appIconDark():appIconLight();
+function iconSVG(c,bg){
+  const id='ai'+(++_icoN),L=bg?bg[0]:hexMix(c,'#FFFFFF',.2),Dk=bg?bg[1]:hexMix(c,'#000000',.3);
   return `<svg viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><defs>
   <linearGradient id="${id}b" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${L}"/><stop offset="1" stop-color="${Dk}"/></linearGradient>
   <radialGradient id="${id}t" cx=".5" cy="-.1" r="1"><stop offset="0" stop-color="#fff" stop-opacity=".18"/><stop offset=".6" stop-color="#fff" stop-opacity="0"/></radialGradient>
@@ -2011,9 +2684,9 @@ function iconSVG(c){
   <rect width="1024" height="1024" fill="url(#${id}b)"/><rect width="1024" height="1024" fill="url(#${id}t)"/>
   <rect x="262" y="222" width="500" height="384" rx="96" fill="#fff" fill-opacity=".2" stroke="#fff" stroke-opacity=".38" stroke-width="3"/>
   <rect x="184" y="318" width="640" height="482" rx="116" fill="url(#${id}g)" filter="url(#${id}s)"/>
-  <rect x="300" y="556" width="104" height="160" rx="52" fill="${c}" fill-opacity=".34"/>
-  <rect x="444" y="428" width="104" height="288" rx="52" fill="${c}"/>
-  <rect x="588" y="500" width="104" height="216" rx="52" fill="${c}" fill-opacity=".64"/>
+  <rect x="300" y="580" width="104" height="136" rx="52" fill="${c}" fill-opacity=".34"/>
+  <rect x="444" y="504" width="104" height="212" rx="52" fill="${c}" fill-opacity=".64"/>
+  <rect x="588" y="428" width="104" height="288" rx="52" fill="${c}"/>
   <g filter="url(#${id}k)"><circle cx="772" cy="326" r="104" fill="${c}" fill-opacity=".62"/><circle cx="772" cy="326" r="104" fill="url(#${id}q)"/></g>
   <circle cx="772" cy="326" r="102" fill="none" stroke="url(#${id}r)" stroke-width="5"/>
   <ellipse cx="748" cy="268" rx="58" ry="26" fill="#fff" fill-opacity=".35"/>
@@ -2096,7 +2769,7 @@ function drawDots(){qsa('#lockDots i').forEach((d,i)=>d.classList.toggle('f',i<p
 function passFlow(mode){
   passMode=mode;passBuf='';passFirst=null;
   $('lockTitle').textContent=mode==='unlock'?'輸入密碼':'輸入新的 4 位數密碼';
-  drawLockPad();drawDots();$('lockIcon').innerHTML=iconSVG(accentHex());$('lock').classList.add('show');
+  drawLockPad();drawDots();$('lockIcon').innerHTML=appIconSVG();$('lock').classList.add('show');
   return new Promise(r=>{passResolve=r;});
 }
 function endLock(v){$('lock').classList.remove('show');const r=passResolve;passResolve=null;passMode=null;if(r)r(v);}
@@ -2183,30 +2856,221 @@ function csvParse(text){
     else cur[cur.length-1]+=c;}
   if(cur.length>1||cur[0]!=='')rows.push(cur);return rows;
 }
-async function importCSV(){
-  let text;try{text=await readFile($('fileCSV'));}catch(e){return;}
-  const rows=csvParse(text);if(rows.length<2){alertMsg('沒有可匯入的資料','這個 CSV 檔案裡沒有記錄。');return;}
-  const head=rows[0].map(h=>h.trim().toLowerCase());
-  const idx=(...ks)=>head.findIndex(h=>ks.some(k=>h.includes(k)));
-  const iDate=idx('date','日期')>=0?idx('date','日期'):0,iName=idx('name','名稱')>=0?idx('name','名稱'):1,iCat=idx('category','分類')>=0?idx('category','分類'):2;
-  const iAmt=idx('amount','金額')>=0?idx('amount','金額'):3,iType=idx('type','類型')>=0?idx('type','類型'):(head.length>=6?4:-1);
-  const iNote=idx('note','備註')>=0?idx('note','備註'):(head.length>=6?5:-1),iAcct=idx('帳戶','account');
-  const d=D(),acct0=d.accounts[0]?d.accounts[0].id:'';let n=0;
-  rows.slice(1).forEach(c=>{
-    if(!c||!c[iDate])return;const date=c[iDate].trim().replace(/\//g,'-');if(!/^\d{4}-\d{1,2}-\d{1,2}$/.test(date))return;
-    const [yy,mm,dd]=date.split('-');const nd=`${yy}-${pad2(mm)}-${pad2(dd)}`;
-    const amt=Number(String(c[iAmt]||'').replace(/[^\d.-]/g,''));if(!amt)return;
-    let type='expense';if(iType>=0){const tv=(c[iType]||'').trim();type=(tv==='income'||tv==='收入')?'income':'expense';}
-    let cat=(c[iCat]||'其他').trim()||'其他';
-    const cats=type==='income'?d.catsInc:d.catsExp;
-    const found=cats.find(x=>x===cat||catName(x)===cat);
-    if(found)cat=found;else{if(!cat.includes(' '))cat=(type==='income'?'💰 ':'🧾 ')+cat;cats.push(cat);}
-    let aid=acct0;
-    if(iAcct>=0&&c[iAcct]){let a=d.accounts.find(x=>x.name===c[iAcct].trim());if(!a){a={id:uid(),name:c[iAcct].trim(),icon:'💳',opening:0};d.accounts.push(a);}aid=a.id;}
-    d.tx.push({id:uid(),date:nd,name:(c[iName]||catName(cat)).trim()||catName(cat),category:cat,amount:Math.abs(amt),type,account:aid,note:iNote>=0?(c[iNote]||'').trim():'',createdAt:nowTs()+n});n++;
-  });
-  saveDB();renderAll();haptic('success');toast(n?`已匯入 ${n} 筆到「${book().name}」`:'沒有找到可以匯入的記錄');
+/* =====================================================================
+   匯入 CSV：先解析、在確認畫面一次處理帳戶／分類／重複，按「匯入」才寫入
+   支援：本 App 匯出的格式、常見的信用卡帳單與存款明細欄位、民國年日期
+   ===================================================================== */
+const IMP_COLS={
+  date:{n:'日期',k:['消費日期','消費日','交易日期','交易日','日期','date']},
+  post:{n:'入帳日',k:['入帳日期','入帳日','記帳日期','記帳日','posting']},
+  name:{n:'名稱',k:['名稱','消費明細','交易說明','交易摘要','商店名稱','特店名稱','說明','摘要','明細','項目','name','description']},
+  amt:{n:'金額',k:['新臺幣金額','新台幣金額','臺幣金額','台幣金額','金額','amount'],no:/外幣|原幣|餘額|幣別|折合/},
+  out:{n:'支出欄',k:['支出金額','提款金額','支出','提款','轉出'],no:/餘額/},
+  inc:{n:'存入欄',k:['存入金額','存款金額','收入金額','存入','轉入'],no:/餘額/},
+  type:{n:'類型',k:['類型','收支','type']},
+  cat:{n:'分類',k:['分類','類別','category']},
+  acct:{n:'帳戶',k:['帳戶','卡別','account']},
+  note:{n:'備註',k:['備註','note']}
+};
+const IMP_SKIP=/本期應繳|應繳總額|最低應繳|上期|前期|本期新增|小計|合計|總計|信用額度|可用額度|帳單金額/;
+const IMP_PAY=/繳款|自動扣繳|扣繳|還款|轉帳繳|payment/i;
+const CAT_GUESS=[
+  ['訂閱',/netflix|spotify|youtube|disney|apple\.com|icloud|google\s?(one|play|storage)|kkbox|chatgpt|openai|anthropic|claude|adobe|microsoft|notion/i],
+  ['交通',/中油|台塑石化|加油|捷運|台鐵|臺鐵|高鐵|悠遊卡|一卡通|停車|計程車|大車隊|yoxi|irent|goshare|wemo|遠通|etc|uber(?!\s?eats)/i],
+  ['餐飲',/uber\s?eats|foodpanda|熊貓|麥當勞|肯德基|摩斯|漢堡王|星巴克|路易莎|cama|咖啡|餐|食|飲|茶|便當|小吃|麵|壽司|早餐|85度c|麵包|烘焙|50嵐|清心|可不可|迷客夏|鼎泰豐|火鍋|燒肉/i],
+  ['購物',/全聯|家樂福|好市多|costco|大潤發|蝦皮|shopee|momo|pchome|酷澎|coupang|博客來|屈臣氏|康是美|寶雅|ikea|uniqlo|無印|zara|h&m|7-eleven|統一超商|全家|萊爾富|ok超商|超商|百貨|outlet/i],
+  ['居家',/電費|台電|台灣電力|自來水|水費|瓦斯|天然氣|中華電信|台灣大哥大|遠傳|亞太電信|房租|管理費|第四台/],
+  ['娛樂',/威秀|秀泰|國賓|影城|電影|ktv|錢櫃|好樂迪|steam|playstation|nintendo|遊戲|點數/i],
+  ['醫療',/醫院|診所|藥局|牙醫|中醫|健保/],
+  ['旅遊',/航空|機票|飯店|酒店|旅店|民宿|agoda|booking|airbnb|klook|kkday|易遊網|雄獅|可樂旅遊|hotel|airline/i],
+  ['學習',/書局|誠品|金石堂|課程|補習|hahow|udemy|coursera/i],
+  ['其他',/循環利息|違約金|手續費|年費|利息/]
+];
+let IMP=null;
+const impNorm=t=>String(t||'').toLowerCase().replace(/[\s\-_・·.()（）「」【】]/g,'').replace(/(信用卡|簽帳金融卡|簽帳卡|金融卡|帳戶|戶頭|銀行)$/,'');
+function impDate(v){
+  v=String(v||'').trim().replace(/[年月.]/g,'/').replace(/日/g,'').replace(/-/g,'/').split(/\s|T/)[0];
+  let m=v.match(/^(\d{8})$/);if(m)v=`${m[1].slice(0,4)}/${m[1].slice(4,6)}/${m[1].slice(6)}`;
+  m=v.match(/^(\d{2,4})\/(\d{1,2})\/(\d{1,2})$/);let y,mo,d;
+  if(m){y=+m[1];mo=+m[2];d=+m[3];if(y<1000)y+=1911;}
+  else{m=v.match(/^(\d{1,2})\/(\d{1,2})$/);if(!m)return '';const t=new Date();y=t.getFullYear();mo=+m[1];d=+m[2];
+    if(`${y}-${pad2(mo)}-${pad2(d)}`>ymd(addDays(t,31)))y--;}
+  if(mo<1||mo>12||d<1||d>31||y<1970||y>2100)return '';
+  return `${y}-${pad2(mo)}-${pad2(d)}`;
 }
+function impAmt(v){
+  let t=String(v==null?'':v).trim();if(!t)return null;
+  let neg=/^\(.*\)$/.test(t)||/-\s*$/.test(t)||/^-|^−/.test(t.replace(/^(nt\$|\$|twd)\s*/i,''));
+  t=t.replace(/[^\d.]/g,'');if(!t)return null;const n=Number(t);if(!isFinite(n))return null;return neg?-n:n;
+}
+function impHeaderRow(rows){
+  let best=-1,score=0;
+  for(let i=0;i<Math.min(12,rows.length);i++){let sc=0;
+    rows[i].forEach(h=>{const x=String(h).trim().toLowerCase();if(x&&Object.values(IMP_COLS).some(c=>c.k.some(k=>x===k||x.includes(k))))sc++;});
+    if(sc>score){score=sc;best=i;}}
+  return score>=2?best:-1;
+}
+function impAutoCols(head){
+  const used=new Set(),cols={};
+  for(const pass of [0,1])for(const f of Object.keys(IMP_COLS)){if(cols[f]!=null)continue;const c=IMP_COLS[f];
+    for(const k of c.k){const i=head.findIndex((h,j)=>{if(used.has(j))return false;const x=String(h).trim().toLowerCase();if(c.no&&c.no.test(x))return false;return pass===0?x===k:x.includes(k);});
+      if(i>=0){cols[f]=i;used.add(i);break;}}}
+  return cols;
+}
+const INC_GUESS=[['薪水',/薪|salary|payroll/i],['獎金',/獎金|bonus/i],['投資',/股息|配息|股利|利息|基金|證券/],['紅包',/紅包/]];
+function guessCat(name,type,d){
+  const list=type==='income'?d.catsInc:d.catsExp,find=n=>list.find(c=>catName(c)===n);
+  if(type==='income')for(const [n,re] of INC_GUESS)if(re.test(name)){const c=find(n);if(c)return c;}
+  if(type==='expense')for(const [n,re] of CAT_GUESS)if(re.test(name)){const c=find(n);if(c)return c;}
+  return find('其他')||list[list.length-1];
+}
+function impKindFromName(n){return acctKind({name:n});}
+function impSuggest(name,d){
+  const nn=impNorm(name);let best=null;
+  d.accounts.forEach(a=>{const an=impNorm(a.name);if(!an||!nn)return;
+    if(an===nn||an.includes(nn)||nn.includes(an)){if(!best||Math.abs(an.length-nn.length)<Math.abs(impNorm(best.name).length-nn.length))best=a;}});
+  return best?'map:'+best.id:'new:'+impKindFromName(name);
+}
+async function importCSV(){
+  const f=$('fileCSV').files&&$('fileCSV').files[0];
+  let text;try{text=await readFile($('fileCSV'));}catch(e){return;}
+  if(/\uFFFD/.test(text.slice(0,2000))&&f&&window.TextDecoder){try{text=new TextDecoder('big5').decode(await f.arrayBuffer());}catch(e){}}
+  $('fileCSV').value='';
+  const rows=csvParse(text).filter(r=>r.some(c=>String(c).trim()));
+  if(rows.length<2){alertMsg('沒有可匯入的資料','這個 CSV 檔案裡沒有記錄。');return;}
+  let hi=impHeaderRow(rows),head,cols;
+  if(hi<0){hi=0;head=rows[0].map(String);cols={date:0,name:1,cat:2,amt:3,type:head.length>=6?4:null,note:head.length>=6?5:null};}
+  else{head=rows[hi].map(h=>String(h).trim());cols=impAutoCols(head);}
+  const d=D(),fname=(f&&f.name||'').replace(/\.csv$/i,'');
+  let target=null;const fn=impNorm(fname);
+  d.accounts.forEach(a=>{const an=impNorm(a.name);if(an&&fn.includes(an)&&(!target||an.length>impNorm(target.name).length))target=a;});
+  const last=d.accounts.find(a=>a.id===settings.lastImportAcct);
+  // 看檔案本身判斷是不是信用卡帳單（標題列、欄位名稱、小計行），不靠選了哪個帳戶
+  const pre=rows.slice(0,hi).map(r=>r.join(' ')).join(' ')+' '+fname,body=rows.slice(hi+1);
+  const isCard=cols.post!=null||/信用卡|卡號|消費明細|本期應繳|應繳總額|最低應繳/.test(pre+' '+head.join(' '))||body.some(r=>IMP_SKIP.test(r.join(' '))&&/應繳/.test(r.join(' ')));
+  const hasBal=head.some(h=>/餘額/.test(h));
+  if(!target&&isCard)target=d.accounts.find(a=>acctKind(a)==='credit')||null;
+  if(!target&&last&&!(isCard&&acctKind(last)!=='credit'))target=last;
+  IMP={head,body,cols,fname,isCard,sign:isCard||!hasBal?'out':'in',target:(target||d.accounts[0]||{}).id||'',map:{},catOver:{},dupOk:false};
+  impBuild();renderImport();openSheet('importSheet');
+}
+function impAcctFor(row){
+  const d=D(),c=IMP.cols;
+  if(c.acct!=null&&String(row[c.acct]||'').trim()){const nm=String(row[c.acct]).trim();const ex=d.accounts.find(a=>a.name===nm);if(ex)return {id:ex.id,kind:acctKind(ex)};
+    const m=IMP.map[nm]||(IMP.map[nm]=impSuggest(nm,d));IMP.unknown[nm]=(IMP.unknown[nm]||0)+1;
+    if(m==='skip')return {skip:true};if(m.startsWith('map:')){const a=d.accounts.find(x=>x.id===m.slice(4));return {id:a.id,kind:acctKind(a)};}
+    return {newName:nm,kind:m.slice(4)};}
+  const a=d.accounts.find(x=>x.id===IMP.target);return a?{id:a.id,kind:acctKind(a)}:{id:'',kind:'cash'};
+}
+function impBuild(){
+  const d=D(),c=IMP.cols,out=[],stat={sum:0,skipSum:0,bad:0,dup:0,pay:0,noAcct:0};
+  IMP.signed=c.amt!=null&&c.type==null&&c.out==null&&c.inc==null;
+  IMP.unknown={};
+  IMP.body.forEach((r,ri)=>{
+    const name=String(c.name!=null?r[c.name]||'':'').trim();
+    const date=impDate(c.date!=null?r[c.date]:'');
+    if(name&&IMP_SKIP.test(name)){stat.skipSum++;return;}
+    let amt=null,type='expense';
+    if(c.out!=null||c.inc!=null){const o=impAmt(c.out!=null?r[c.out]:null),i=impAmt(c.inc!=null?r[c.inc]:null);
+      if(o)amt=Math.abs(o);else if(i){amt=Math.abs(i);type='income';}}
+    else if(c.amt!=null)amt=impAmt(r[c.amt]);
+    if(!date||!amt){if(String(r.join('')).trim())stat.bad++;return;}
+    const ac=impAcctFor(r);if(ac.skip){stat.noAcct++;return;}
+    let kind='tx';
+    if(c.type!=null){const tv=String(r[c.type]||'').trim();type=/收入|income|存入/i.test(tv)?'income':'expense';amt=Math.abs(amt);}
+    else if(c.out==null&&c.inc==null){
+      const neg=amt<0;amt=Math.abs(amt);
+      if(IMP.sign==='out'){if(neg){if(IMP_PAY.test(name)&&(IMP.isCard||ac.kind==='credit')){if(ac.kind!=='credit'){stat.payNoCard=(stat.payNoCard||0)+1;return;}kind='pay';}else type='income';}}
+      else if(!neg)type='income';
+    }
+    let cat=null;
+    if(kind==='tx'){
+      const list=type==='income'?d.catsInc:d.catsExp,cv=c.cat!=null?String(r[c.cat]||'').trim():'';
+      if(cv){cat=list.find(x=>x===cv||catName(x)===cv)||(cv.includes(' ')?cv:(type==='income'?'💰 ':'🧾 ')+cv);}
+      else cat=guessCat(name,type,d);
+      if(IMP.catOver[ri])cat=IMP.catOver[ri];
+    }
+    const post=c.post!=null?impDate(r[c.post]):'';
+    const acctId=ac.id||null;
+    const pa=kind==='pay'&&acctId?d.accounts.find(y=>y.id===acctId):null;
+    const dup=(pa&&(pa.payments||[]).some(p=>p.date===date&&Math.abs(p.amount-amt)<0.01))||kind==='tx'&&acctId&&d.tx.some(x=>x.account===acctId&&x.date===date&&Math.abs(x.amount-amt)<0.01&&x.type===type&&(!name||!x.name||impNorm(x.name).includes(impNorm(name).slice(0,6))||impNorm(name).includes(impNorm(x.name).slice(0,6))));
+    if(dup)stat.dup++;if(kind==='pay')stat.pay++;
+    out.push({ri,date,post:post&&post!==date?post:'',name:name||(cat?catName(cat):'繳款'),amt:Math.round(amt*100)/100,type,kind,cat,ac,dup,
+      note:c.note!=null?String(r[c.note]||'').trim():''});
+  });
+  IMP.rows=out;IMP.stat=stat;
+}
+function impUse(){return IMP.rows.filter(x=>IMP.dupOk||!x.dup);}
+function renderImport(){
+  const d=D(),c=IMP.cols,use=impUse(),st=IMP.stat;
+  const tx=use.filter(x=>x.kind==='tx'),exp=tx.filter(x=>x.type==='expense').reduce((s,x)=>s+x.amt,0),inc=tx.filter(x=>x.type==='income').reduce((s,x)=>s+x.amt,0);
+  const dates=use.map(x=>x.date).sort(),opt=(v,l,cur)=>`<option value="${esc(v)}" ${v===cur?'selected':''}>${esc(l)}</option>`;
+  const hasAcct=c.acct!=null&&IMP.body.some(r=>String(r[c.acct]||'').trim());
+  let h=`<div class="imp-sum"><b class="num">${use.length}</b> 筆可以匯入${dates.length?`<span>${md(dates[0])} – ${md(dates[dates.length-1])}</span>`:''}
+    <div class="imp-kv"><span>支出 <b class="num">${money(exp)}</b></span><span>收入 <b class="num">${money(inc)}</b></span>${st.pay?`<span>繳款 <b class="num">${st.pay}</b> 筆</span>`:''}</div>
+    ${st.dup||st.skipSum||st.bad||st.noAcct||st.payNoCard?`<div class="imp-skip">${[st.dup&&!IMP.dupOk?`跳過可能重複 ${st.dup} 筆`:'',st.skipSum?`略過帳單小計 ${st.skipSum} 行`:'',st.bad?`看不懂 ${st.bad} 行`:'',st.noAcct?`不匯入 ${st.noAcct} 筆`:'',st.payNoCard?`繳款 ${st.payNoCard} 行沒匯入（帳戶不是信用卡）`:''].filter(Boolean).join('・')}</div>`:''}</div>`;
+  if(!hasAcct){
+    h+=`<div class="sec"><div class="sec-h">帳戶</div><div class="group"><div class="frow"><span class="lb">這份紀錄是哪個帳戶的？</span>
+      <select id="impTarget" aria-label="匯入到哪個帳戶">${d.accounts.map(a=>opt(a.id,a.name,IMP.target)).join('')}${opt('+credit','＋ 新增信用卡…','')}${opt('+bank','＋ 新增戶頭…','')}</select></div>
+      ${IMP.signed?`<div class="frow"><span class="lb">金額正負</span><select id="impSign" aria-label="金額正負">${opt('out','正數是支出，負數是退款',IMP.sign)}${opt('in','正數是收入，負數是支出',IMP.sign)}</select></div>`:''}</div>
+      ${(()=>{const t=d.accounts.find(a=>a.id===IMP.target);return IMP.isCard&&t&&acctKind(t)!=='credit'?`<div class="imp-warn">這份看起來是信用卡帳單，但現在選的是「${esc(t.name)}」。信用卡的消費要選那張卡，帳單和繳款才會算對。</div>`:'';})()}
+      <div class="sec-f">${IMP.isCard?'看起來是信用卡帳單：正數是消費、負數是退款或回饋，「繳款」那幾行會記成繳卡費（轉帳），不算收入。':'檢查一下上面的支出、收入合計對不對；不對的話切換「金額正負」。'}</div></div>`;
+  }else{
+    const names=Object.keys(IMP.unknown);
+    if(names.length)h+=`<div class="sec"><div class="sec-h">這些帳戶這裡沒有（${names.length}）</div><div class="group">${names.map(nm=>{const cur=IMP.map[nm];
+      return `<div class="frow imp-acct"><span class="lb">${esc(nm)}<small>${IMP.unknown[nm]} 筆</small></span><select data-impmap="${esc(nm)}" aria-label="${esc(nm)} 的處理方式">
+        <optgroup label="新增">${KIND_ORDER.map(k=>opt('new:'+k,'新增為'+ACCT_KINDS[k].n,cur)).join('')}</optgroup>
+        <optgroup label="併入現有帳戶">${d.accounts.map(a=>opt('map:'+a.id,'併入「'+a.name+'」',cur)).join('')}</optgroup>${opt('skip','不匯入這些紀錄',cur)}</select></div>`;}).join('')}</div>
+      <div class="sec-f">已經幫你選好最可能的處理方式，名字很像的會建議併入。新增的信用卡匯入後記得設定結帳日和繳款日。</div></div>`;
+  }
+  h+=`<details class="imp-cols"><summary>欄位對應${c.date==null||(c.amt==null&&c.out==null&&c.inc==null)?'<em>請設定日期和金額</em>':''}</summary><div class="group">${Object.keys(IMP_COLS).map(k=>
+    `<div class="frow"><span class="lb">${IMP_COLS[k].n}</span><select data-impcol="${k}" aria-label="${IMP_COLS[k].n}欄">${opt('','（沒有）',c[k]==null?'':String(c[k]))}${IMP.head.map((hh,i)=>opt(String(i),hh||`第 ${i+1} 欄`,c[k]==null?'':String(c[k]))).join('')}</select></div>`).join('')}</div>
+    <div class="sec-f">看得懂「消費日／交易日期」「入帳日」「消費明細／摘要」「新臺幣金額」「支出／存入」等常見欄位，也看得懂民國年日期。認錯了在這裡改。</div></details>`;
+  const shown=IMP.rows.slice(0,150);
+  h+=`<div class="sec"><div class="sec-h"><span>內容</span>${st.dup?`<label class="imp-dup"><input type="checkbox" id="impDup" ${IMP.dupOk?'checked':''}> 也匯入可能重複的 ${st.dup} 筆</label>`:''}</div><div class="group">${shown.map(x=>{
+    const list=x.type==='income'?d.catsInc:d.catsExp;
+    return `<div class="row imp-row${x.dup&&!IMP.dupOk?' off':''}"><div class="rt"><div class="t">${esc(x.name)}</div><div class="s">${md(x.date)}${x.post?`・${md(x.post)} 入帳`:''}${x.dup?'・可能重複':''}${x.ac.newName?`・${esc(x.ac.newName)}`:''}</div>
+      ${x.kind==='pay'?'<div class="s">繳卡費：從戶頭轉到卡上，卡片欠款會減少（不算支出也不算收入）</div>':`<select class="imp-cat" data-impcat="${x.ri}" aria-label="分類">${list.concat(list.includes(x.cat)?[]:[x.cat]).map(cc=>opt(cc,cc,x.cat)).join('')}</select>`}</div>
+      <span class="amt num ${x.type==='income'&&x.kind!=='pay'?'pos':''}">${x.type==='income'&&x.kind!=='pay'?'+':''}${money(x.amt)}</span></div>`;}).join('')}
+    ${IMP.rows.length>150?`<div class="row"><div class="rt"><div class="s">還有 ${IMP.rows.length-150} 筆沒列出來，會一起匯入</div></div></div>`:''}</div></div>`;
+  $('impBody').innerHTML=h;$('impGo').disabled=!use.length;$('impGo').textContent=use.length?`匯入 ${use.length} 筆`:'匯入';
+}
+document.addEventListener('change',async e=>{
+  const t=e.target;if(!IMP||!t.closest||!t.closest('#importSheet'))return;
+  if(t.id==='impTarget'){
+    if(t.value.startsWith('+')){const k=t.value.slice(1);
+      const v=await alertForm({title:'新增'+ACCT_KINDS[k].n,fields:[{key:'name',value:IMP.fname||'',placeholder:'名稱',maxlength:20}],ok:'新增'});
+      if(v&&v.name){const a={id:uid(),name:v.name.trim(),icon:ACCT_KINDS[k].ic,kind:k,opening:0};D().accounts.push(a);saveDB();IMP.target=a.id;IMP.newIds=(IMP.newIds||[]).concat(a.id);}
+    }else IMP.target=t.value;
+    impBuild();renderImport();return;}
+  if(t.dataset.impmap!=null){IMP.map[t.dataset.impmap]=t.value;impBuild();renderImport();return;}
+  if(t.dataset.impcol){IMP.cols[t.dataset.impcol]=t.value===''?null:+t.value;impBuild();renderImport();return;}
+  if(t.dataset.impcat!=null){IMP.catOver[t.dataset.impcat]=t.value;const x=IMP.rows.find(r=>String(r.ri)===t.dataset.impcat);if(x)x.cat=t.value;return;}
+  if(t.id==='impDup'){IMP.dupOk=t.checked;renderImport();return;}
+  if(t.id==='impSign'){IMP.sign=t.value;impBuild();renderImport();return;}
+});
+$('impGo').addEventListener('click',()=>{
+  if(!IMP)return;const d=D(),use=impUse();if(!use.length)return;
+  const created={},newCards=[];
+  const idFor=x=>{if(x.ac.id)return x.ac.id;const nm=x.ac.newName;if(created[nm])return created[nm];
+    const k=x.ac.kind,a={id:uid(),name:nm,icon:ACCT_KINDS[k].ic,kind:k,opening:0};
+    if(k==='debit'){const b=d.accounts.find(y=>acctKind(y)==='bank');if(b)a.linked=b.id;}
+    d.accounts.push(a);created[nm]=a.id;if(k==='credit')newCards.push(a);return a.id;};
+  let n=0,p=0;
+  use.forEach(x=>{const aid=idFor(x);
+    if(x.kind==='pay'){const a=d.accounts.find(y=>y.id===aid);if(!a)return;
+      const stmt=cardReady(a)?ymd(prevClose(a,closeFor(a,x.date))):'';
+      (a.payments=a.payments||[]).push({id:uid(),date:x.date,amount:x.amt,from:'',stmt,imported:true});p++;return;}
+    const list=x.type==='income'?d.catsInc:d.catsExp;if(x.cat&&!list.includes(x.cat))list.push(x.cat);
+    const rec={id:uid(),date:x.date,name:x.name,category:x.cat,amount:x.amt,type:x.type,account:aid,note:x.note,createdAt:nowTs()+n};
+    if(x.post)rec.post=x.post;d.tx.push(rec);n++;});
+  (IMP.newIds||[]).forEach(id=>{const a=d.accounts.find(y=>y.id===id);if(a&&acctKind(a)==='credit'&&!cardReady(a))newCards.push(a);});
+  if(!(d.accounts.find(a=>a.id===IMP.target)))delete settings.lastImportAcct;else{settings.lastImportAcct=IMP.target;saveSettings();}
+  saveDB();IMP=null;closeSheet('importSheet');renderAll();haptic('success');
+  const msg=`已匯入 ${n} 筆${p?`、繳款 ${p} 筆`:''}到「${book().name}」`;
+  const nc=newCards.filter(a=>!cardReady(a));
+  if(nc.length)toast(`${msg}。新增的信用卡還沒設定結帳日`,{action:'去設定',onAction:()=>openAcctEdit(nc[0].id),ms:7000});else toast(msg);
+});
 async function importJSON(){
   let text;try{text=await readFile($('fileJSON'));}catch(e){return;}
   let pack;try{pack=JSON.parse(text);}catch(e){alertMsg('無法讀取','這不是正確的備份檔。');return;}
@@ -2312,8 +3176,10 @@ $('q').addEventListener('input',e=>{listQuery=e.target.value;renderListBody();})
 });
 $('fName').addEventListener('input',e=>{F.name=e.target.value;F.dirty=true;renderSugg();});
 $('fNote').addEventListener('input',e=>{F.note=e.target.value;F.dirty=true;});
-$('fDate').addEventListener('change',e=>{F.date=e.target.value||today();F.dirty=true;});
-$('fAcct').addEventListener('change',e=>{F.acct=e.target.value;F.dirty=true;});
+$('fDate').addEventListener('change',e=>{F.date=e.target.value||today();F.dirty=true;updateAcctHint();});
+$('fAcct').addEventListener('change',e=>{F.acct=e.target.value;F.dirty=true;updateAcctHint();});
+$('fInst').addEventListener('change',e=>{F.inst=+e.target.value||1;F.dirty=true;updateAcctHint();});
+$('fInst').addEventListener('focus',()=>setKeypad(false));
 $('fDate').addEventListener('focus',()=>setKeypad(false));
 $('fAcct').addEventListener('focus',()=>setKeypad(false));
 async function chooseBook(){
@@ -2321,6 +3187,210 @@ async function chooseBook(){
   if(i<0)return;
   if(i===books.length){switchTab('settings',true);while(setPages.length)popPage();pushPage('books');return;}
   const b=books[i];if(b&&b.id!==activeId){activeId=b.id;saveBooks();homeSel=null;stSel=null;renderAll();toast(`已切換到「${b.name}」`);}
+}
+
+/* =====================================================================
+   記帳提醒：時間到了還沒記帳，就一直煩，越久沒記越煩
+   - 溫和：首頁提醒卡片＋App 圖示紅色數字
+   - 囉嗦：再加上打開 App 就跳出來問、每 3 分鐘念一次、＋號一直跳
+   - 地獄：整個畫面擋住，只能記帳或「按住」今天沒花錢；要再拖得按越來越久，一天最多 3 次
+   App 關著的時候網頁沒辦法自己響，所以另外產生行事曆檔，讓 iPhone 的行事曆每天照時間響。
+   ===================================================================== */
+const NAG_LV={
+  gentle:{n:'溫和',d:'首頁最上面出現提醒卡片，App 圖示上顯示還沒記的天數。'},
+  nag:{n:'囉嗦',d:'溫和的全部，再加上：一打開 App 就跳出來問，每 3 分鐘再念一次，＋號按鈕會一直跳。'},
+  hell:{n:'地獄',d:'囉嗦的全部，再加上：整個畫面被擋住，只能記一筆，或按住 2 秒說「今天沒花錢」。想再拖 10 分鐘要按住越來越久，一天最多拖 3 次。'}
+};
+const NAG_MSG=[
+  ['今天的帳還沒記，花 10 秒就好。','今天花了什麼？趁還記得快記下來。','記帳時間到了，來吧。'],
+  ['還沒記？錢不會自己告訴你它去了哪裡。','我又來了。今天的帳呢？','再拖下去，就想不起來午餐花了多少了。'],
+  ['昨天沒記，今天也還沒。要我一直問下去嗎？','已經一天沒記帳了，你的錢包很想念你。','今天不記，明天就要補兩天份。'],
+  ['{d} 天沒記帳了。我會越來越煩，你知道的。','{d} 天了，你的帳本開始長灰塵了。','連續 {d} 天沒記。記一筆，我就閉嘴。'],
+  ['{d} 天沒記帳。我不會放棄的。','{d} 天了，我還在這裡，而且會一直在。','記一筆，我就消失。不記，我就天天來。']
+];
+let _nagPrev=false,_nagPrevT=0,_nagPopAt=0,_nagToastAt=0;
+function nagCfg(){const c=Object.assign({on:false,level:'nag',time:'21:00',since:today(),snoozeUntil:0,snoozes:null},settings.nag||{});
+  if(!NAG_LV[c.level])c.level='nag';if(!/^\d\d:\d\d$/.test(c.time))c.time='21:00';return c;}
+function nagLabel(){const c=nagCfg();return c.on?`${NAG_LV[c.level].n}・${c.time}`:'關閉';}
+function nagState(){
+  const c=nagCfg(),now=new Date(),t=ymd(now);
+  if(_nagPrev)return {c:Object.assign(c,{level:_nagPrev}),logged:false,missed:3,overMin:95,due:true,tier:3,snoozed:false,last:ymd(addDays(now,-4)),any:true};
+  let last=ymd(addDays(parseD(c.since),-1)),any=false;
+  for(const id in DB){const b=DB[id];if(!b||!b.tx)continue;
+    for(const r of b.tx){any=true;if(r.date<=t&&r.date>last)last=r.date;
+      if(r.createdAt){const cd=ymd(new Date(r.createdAt));if(cd<=t&&cd>last)last=cd;}}}
+  (settings.nsDays||[]).forEach(d=>{if(d<=t&&d>last)last=d;});
+  const logged=last===t,missed=logged?0:Math.max(0,Math.round((parseD(t)-parseD(last))/86400000)-1);
+  const [hh,mm]=c.time.split(':').map(Number),overMin=now.getHours()*60+now.getMinutes()-(hh*60+mm);
+  const due=c.on&&!logged&&(missed>=1||overMin>=0);
+  const tier=missed>=4?4:missed>=2?3:missed===1?2:overMin>=60?1:0;
+  return {c,logged,missed,overMin,due,tier,snoozed:Date.now()<c.snoozeUntil,last,any};
+}
+function nagMsg(st,salt){const a=NAG_MSG[st.tier];return a[Math.abs(Math.floor(salt||0))%a.length].replace('{d}',st.missed+1);}
+function nagCounter(st){
+  if(st.missed>=1)return st.any?`上次記帳是 ${+st.last.slice(5,7)}/${+st.last.slice(8,10)}，已經 ${st.missed+1} 天沒記了`:`開啟提醒後，已經 ${st.missed+1} 天沒記帳了`;
+  if(st.overMin>=60)return `已經超過提醒時間 ${Math.floor(st.overMin/60)} 小時 ${st.overMin%60} 分`;
+  if(st.overMin>=0)return `已經超過提醒時間 ${st.overMin} 分鐘`;
+  return '';
+}
+function nagSnoozeInfo(){const c=nagCfg(),t=today(),n=c.snoozes&&c.snoozes.d===t?c.snoozes.n:0;return {n,left:Math.max(0,3-n),ms:[3000,6000,10000][Math.min(n,2)]};}
+function nagRender(){
+  const st=nagState(),lv=st.c.level,active=st.due,de=document.documentElement;
+  if(active&&lv!=='gentle')de.setAttribute('data-nag',lv);else if(active)de.setAttribute('data-nag','gentle');else de.removeAttribute('data-nag');
+  const hb=$('homeBody');
+  if(hb){let bn=$('nagBanner');
+    if(active){
+      if(!bn||bn.parentNode!==hb){bn=document.createElement('div');bn.id='nagBanner';hb.prepend(bn);}
+      bn.className='card nagcard t'+st.tier;
+      const h=`<div class="nagtop"><span class="nagic">${ICON.clock}</span><div><b>${esc(nagMsg(st,Date.now()/60000))}</b><small>${esc(nagCounter(st))}</small></div></div>
+        <div class="nagbtns"><button class="pbtn" data-nag="add">記一筆</button><button class="ghost" data-nag="none">今天沒花錢</button></div>`;
+      if(bn._h!==h){bn.innerHTML=h;bn._h=h;}
+    }else if(bn)bn.remove();}
+  nagWall(st,lv==='hell'&&st.due&&!st.snoozed);
+  nagBadge(st,false);
+  pushSync(st);
+}
+function nagWall(st,show){
+  let w=$('nagwall');
+  if(!show){if(w)w.classList.remove('on','away');return;}
+  if(!w){w=document.createElement('div');w.className='nagwall';w.id='nagwall';w.setAttribute('role','alertdialog');w.setAttribute('aria-modal','true');w.setAttribute('aria-labelledby','nagwT');document.body.appendChild(w);}
+  const sn=nagSnoozeInfo(),big=st.missed>=1?`${st.missed+1}<small>天沒記帳</small>`:ICON.clock;
+  const h=`<div class="nwin"><div class="nwbig">${big}</div><h2 id="nagwT">${esc(nagMsg(st,Date.now()/60000))}</h2><p>${esc(nagCounter(st))}</p>
+    <button class="pbtn" data-nag="add">記一筆</button>
+    <button class="nwhold" data-hold="none" style="--hold:2000ms"><span>按住 2 秒：今天沒花錢</span></button>
+    ${sn.left>0?`<button class="nwhold ghost" data-hold="snooze" style="--hold:${sn.ms}ms"><span>按住 ${sn.ms/1000} 秒：再拖 10 分鐘（今天還能拖 ${sn.left} 次）</span></button>`
+      :`<p style="margin:4px 0 0;font-size:.8rem;opacity:.65">今天已經拖了 3 次，不能再拖了</p>`}
+    ${_nagPrev?'<button class="nwx" data-nag="endprev">結束預覽</button>':''}</div>`;
+  if(w._h!==h&&!qs('.holding',w)){w.innerHTML=h;w._h=h;}
+  if(!w.classList.contains('on')){w.classList.add('on');haptic('error');}
+}
+function nagBadge(st,hiding){
+  if(PREVIEW||_nagPrev||!('setAppBadge' in navigator))return;
+  const n=st.c.on&&!st.logged?st.missed+(st.due||hiding?1:0):0;
+  try{(n?navigator.setAppBadge(n):navigator.clearAppBadge()).catch(()=>{});}catch(e){}
+}
+function nagNoSpend(){
+  const t=today(),cut=ymd(addDays(new Date(),-60));
+  settings.nsDays=(settings.nsDays||[]).filter(d=>d>=cut);if(!settings.nsDays.includes(t))settings.nsDays.push(t);
+  saveSettings();haptic('success');toast('好，今天放過你');nagRender();
+}
+function nagSnooze(){
+  const c=nagCfg(),sn=nagSnoozeInfo();if(sn.left<=0)return;
+  c.snoozeUntil=Date.now()+10*60000;c.snoozes={d:today(),n:sn.n+1};settings.nag=c;saveSettings();
+  toast(sn.n+1>=3?'給你 10 分鐘，這是今天最後一次':'給你 10 分鐘，待會見');nagRender();
+}
+function nagPopup(force){
+  const st=nagState();
+  if(!force&&(st.c.level!=='nag'||!st.due||st.snoozed||Date.now()-_nagPopAt<20*60000))return;
+  if(passMode||sheetStack.length||qs('.asheet,.alert'))return;
+  _nagPopAt=_nagToastAt=Date.now();haptic('error');
+  actionSheet({title:nagMsg(st,_nagPopAt/60000),message:nagCounter(st),actions:[{label:'記一筆'},{label:'今天沒花錢'}],cancel:'等一下再說'})
+    .then(i=>{if(i===0)openTxSheet(null);else if(i===1){if(_nagPrev)nagEndPreview();else nagNoSpend();}else if(!_nagPrev)toast('好，3 分鐘後再來問你',{ms:2600});});
+}
+function nagTick(){
+  if(document.hidden)return;
+  nagRender();
+  const st=nagState();if(!st.due||st.snoozed||st.c.level==='gentle'||_nagPrev)return;
+  if(st.c.level==='nag')nagPopup(false);
+  const w=$('nagwall');
+  if(Date.now()-_nagToastAt>180000&&!sheetStack.length&&!passMode&&!(w&&w.classList.contains('on'))&&!qs('.asheet,.alert')){
+    _nagToastAt=Date.now();toast(nagMsg(st,_nagToastAt/60000),{tone:'error',ms:4000});haptic('error');}
+}
+setInterval(nagTick,20000);
+document.addEventListener('visibilitychange',()=>{
+  if(document.hidden){nagBadge(nagState(),true);return;}
+  setTimeout(nagTick,700);
+});
+function nagPreview(){
+  const lv=nagCfg().level;_nagPrev=lv;clearTimeout(_nagPrevT);
+  switchTab('home');nagRender();
+  if(lv==='nag')setTimeout(()=>nagPopup(true),600);
+  if(lv==='hell')nagWall(nagState(),true);
+  else{toast('這是預覽，10 秒後結束',{ms:2600});_nagPrevT=setTimeout(nagEndPreview,10000);}
+}
+function nagEndPreview(){if(!_nagPrev)return;_nagPrev=false;clearTimeout(_nagPrevT);nagRender();toast('預覽結束');}
+document.addEventListener('click',e=>{
+  const el=e.target.closest&&e.target.closest('[data-nag]');if(!el)return;
+  const a=el.dataset.nag;
+  if(a==='add'){const w=$('nagwall');if(w&&w.classList.contains('on'))w.classList.add('away');if(_nagPrev){_nagPrev=false;clearTimeout(_nagPrevT);}openTxSheet(null);}
+  else if(a==='none'){if(_nagPrev)nagEndPreview();else nagNoSpend();}
+  else if(a==='endprev')nagEndPreview();
+});
+/* 按住才算數 */
+let _hold=null;
+document.addEventListener('pointerdown',e=>{
+  const el=e.target.closest&&e.target.closest('[data-hold]');if(!el)return;
+  const ms=parseInt(getComputedStyle(el).getPropertyValue('--hold'),10)||2000;
+  el.classList.add('holding');
+  _hold={el,at:Date.now(),t:setTimeout(()=>{el.classList.remove('holding');_hold=null;haptic('success');
+    const k=el.dataset.hold;if(_nagPrev){nagEndPreview();return;}if(k==='none')nagNoSpend();else if(k==='snooze')nagSnooze();},ms)};
+},true);
+function _holdEnd(){if(!_hold)return;clearTimeout(_hold.t);_hold.el.classList.remove('holding');if(Date.now()-_hold.at<600)toast('要按住不放喔',{ms:1600});_hold=null;}
+document.addEventListener('pointerup',_holdEnd,true);
+document.addEventListener('pointercancel',_holdEnd,true);
+/* 設定頁 */
+function renderNagPage(box){
+  const c=nagCfg(),lvBtns=Object.keys(NAG_LV).map(k=>`<button data-naglv="${k}" class="${c.level===k?'on':''}">${NAG_LV[k].n}</button>`).join('');
+  const N={gentle:1,nag:3,hell:8}[c.level];
+  let badge='';
+  if('setAppBadge' in navigator){const p=('Notification' in window)?Notification.permission:'denied';
+    badge=rowBtn('nagBadge','info','red','App 圖示顯示沒記的天數',p==='granted'?'已開啟':p==='denied'?'被拒絕了，可以到 iPhone「設定 › 通知」打開':'點一下，iPhone 會問要不要允許通知（只用來顯示紅色數字）');}
+  box.innerHTML=`<div class="sec"><div class="group">
+    ${rowToggle('nag','clock','orange','記帳提醒',c.on)}
+    <div class="row" style="--inset:58px">${sic('clock','orange')}<div class="rt"><div class="t">每天幾點開始煩</div></div><input type="time" class="ntime" data-nagtime value="${c.time}" aria-label="提醒時間"></div>
+  </div><div class="sec-f">每天到了這個時間還沒記帳就開始提醒；只要記一筆，或按「今天沒花錢」，當天就不會再吵。幾天沒記，就會越來越煩。</div></div>
+  <div class="sec"><div class="sec-h">煩人程度</div><div class="group">
+    <div class="srow" style="padding:12px 16px"><div class="seg" data-segkey="naglv" style="width:100%">${lvBtns}</div></div>
+    <div class="row"><div class="rt"><div class="t nagdesc" id="nagDesc">${NAG_LV[c.level].d}</div></div></div>
+  </div></div>
+  ${pushSectionHTML()}
+  <div class="sec"><div class="sec-h">${pushReady()?'其他方式':'App 關著的時候'}</div><div class="group">
+    ${rowBtn('nagCal','clock','red','加入 iPhone 行事曆鬧鐘',`照「${NAG_LV[c.level].n}」每天響 ${N} 次`)}
+    ${badge}
+  </div><div class="sec-f">網頁 App 關著的時候沒辦法自己響，所以改用 iPhone 的行事曆：每天到時間就跳通知。行事曆不知道你記了沒，記完也會照響。改了時間或等級，先到「行事曆」刪掉舊的「記帳提醒」，再重新加入。</div></div>
+  <div class="sec"><div class="group">${rowBtn('nagTest','wave','purple','現在試試看','預覽目前等級的提醒，不會影響資料')}</div></div>`;
+  syncSegs(box);pushCheck();
+}
+document.addEventListener('click',e=>{
+  const b=e.target.closest&&e.target.closest('[data-naglv]');if(!b)return;
+  const c=nagCfg();c.level=b.dataset.naglv;settings.nag=c;saveSettings();haptic();
+  const seg=b.closest('.seg');qsa('button[data-naglv]',seg).forEach(x=>x.classList.toggle('on',x===b));syncSegs(seg.parentNode);
+  const d=$('nagDesc');if(d)d.textContent=NAG_LV[c.level].d;
+  setTimeout(()=>{refreshSettingsTop();nagRender();},260);
+});
+document.addEventListener('change',e=>{
+  const el=e.target.closest&&e.target.closest('[data-nagtime]');if(!el||!/^\d\d:\d\d$/.test(el.value))return;
+  const c=nagCfg();c.time=el.value;settings.nag=c;saveSettings();nagRender();toast(`改成每天 ${c.time} 開始提醒`);
+});
+async function nagAskBadge(){
+  if(!('Notification' in window)){toast('這個瀏覽器不支援');return;}
+  if(Notification.permission==='denied'){alertMsg('通知被關掉了','到 iPhone「設定 › 通知 › 我的記帳本」打開「允許通知」和「標記」，App 圖示就會顯示紅色數字。');return;}
+  try{await Notification.requestPermission();}catch(e){}
+  nagRender();refreshSettingsTop();
+  if(Notification.permission==='granted')toast('已開啟圖示紅色數字');
+}
+function nagICS(){
+  const c=nagCfg(),[hh,mm]=c.time.split(':').map(Number);
+  const plan={gentle:[0],nag:[0,30,60],hell:[0,15,30,45,60,90,120]}[c.level];
+  const T={gentle:['記帳時間到了，花 10 秒記一下'],
+    nag:['記帳時間到了','還沒記帳？','再不記就要忘了'],
+    hell:['記帳時間到了','還沒記帳？','我還在等你記帳','再不記就要忘了','記一筆，我就閉嘴','記帳！記帳！記帳！','最後通牒：今天的帳']}[c.level];
+  const base=new Date();base.setHours(hh,mm,0,0);
+  const f=d=>d.getFullYear()+pad2(d.getMonth()+1)+pad2(d.getDate())+'T'+pad2(d.getHours())+pad2(d.getMinutes())+'00';
+  const stamp=new Date().toISOString().replace(/[-:]/g,'').replace(/\.\d+/,'');
+  const url=location.origin+location.pathname.replace(/[^/]*$/,'');
+  const L=['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//my-ledger//nag//ZH-TW','CALSCALE:GREGORIAN','METHOD:PUBLISH','X-WR-CALNAME:記帳提醒'];
+  const ev=(i,st,title)=>{L.push('BEGIN:VEVENT',`UID:my-ledger-nag-${i}@${location.host||'local'}`,'DTSTAMP:'+stamp,'DTSTART:'+f(st),'DTEND:'+f(new Date(st.getTime()+5*60000)),
+    'RRULE:FREQ=DAILY','SUMMARY:'+title,'DESCRIPTION:記帳提醒：打開記帳本記一筆 '+url,'URL:'+url,'TRANSP:TRANSPARENT',
+    'BEGIN:VALARM','ACTION:DISPLAY','DESCRIPTION:'+title,'TRIGGER:PT0S','END:VALARM','END:VEVENT');};
+  plan.forEach((m,i)=>ev(i,new Date(base.getTime()+m*60000),T[i]));
+  if(c.level==='hell'){const mo=new Date();mo.setHours(8,30,0,0);ev(9,mo,'昨天的帳記好了嗎？');}
+  L.push('END:VCALENDAR');
+  return L.join('\r\n')+'\r\n';
+}
+async function nagCalendar(){
+  const ok=await shareOrDownload('記帳提醒.ics',nagICS(),'text/calendar',false);
+  if(ok)alertMsg('加入行事曆','如果出現分享面板：選「儲存到檔案」，再打開「檔案」App 點這個檔案，按「全部加入」。\n如果直接出現行事曆畫面：按「全部加入」就好。');
 }
 
 /* =====================================================================
@@ -2332,6 +3402,7 @@ async function chooseBook(){
   saveSettings();
   qsa('#rangeSeg button').forEach(b=>b.classList.toggle('on',b.dataset.v===stRange));
   switchTab('home',true);
+  setTimeout(nagTick,1500);
   requestAnimationFrame(()=>{movePill(false);syncSegs();});
   if(document.fonts&&document.fonts.ready)document.fonts.ready.then(()=>{movePill(false);syncSegs();});
   if(settings.pass){passFlow('unlock');if(settings.bio&&settings.bioCred&&bioSupported())setTimeout(()=>doBioUnlock(true),350);}
