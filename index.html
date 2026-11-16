@@ -1195,12 +1195,16 @@ function sortArr(kind){const d=D();return kind==='accts'?d.accounts:(catMgrType=
 function addCatTo(arr,full){const i=arr.length-1;if(i>=0&&catName(arr[i])==='其他'&&catName(full)!=='其他')arr.splice(i,0,full);else arr.push(full);}
 let dbVer=0;
 function saveDB(){dbVer++;return LS.set('ll_db',DB);}
-/* 信用卡：刷卡先記在卡上（待繳），不算支出；繳卡費那天才算一筆支出（分類「卡費」） */
+/* 信用卡兩種算法（設定 › 帳戶 › 信用卡）：
+   預設「刷卡就算支出」：刷卡當下算支出，繳卡費是戶頭轉到卡上（不算支出）。
+   開啟「繳卡費才算支出」：刷卡先記在卡上（待繳），繳卡費那天才算一筆「卡費」支出。 */
 const CARD_PAY_CAT='💳 卡費';
+const cardPayMode=()=>!!(settings&&settings.cardPayMode);
 const isCardAcct=(d,id)=>{if(!id)return false;const a=d.accounts.find(x=>x.id===id);return !!a&&acctKind(a)==='credit';};
-const isPendingTx=(d,r)=>isCardAcct(d,r.account);
+const isPendingTx=(d,r)=>cardPayMode()&&isCardAcct(d,r.account);
 let _ledger={d:null,v:-1,sig:'',rows:null};
 function ledgerTx(d){d=d||D();
+  if(!cardPayMode())return d.tx;
   const sig=d.tx.length+'|'+d.accounts.map(a=>a.id+(a.kind||'')+((a.payments||[]).length)).join(',');
   if(_ledger.d===d&&_ledger.v===dbVer&&_ledger.sig===sig)return _ledger.rows;
   const rows=d.tx.filter(r=>!isCardAcct(d,r.account));
@@ -2129,7 +2133,7 @@ function txRowHTML(r,opts){
   opts=opts||{};
   if(r.synthetic){const src=D().accounts.find(x=>x.id===r.account);
     return `<div class="row tap" data-card-view="${esc(r.payOf)}" style="--inset:66px" role="button" tabindex="0">${catIcon(r.category)}<div class="rt"><div class="t">${esc(r.name)}</div><div class="s">${esc([opts.showDate?shortDate(r.date):null,'卡費',src?'從'+src.name:null,r.note||null].filter(Boolean).join(' · '))}</div></div><div class="amt num expense">${money(r.amount)}</div></div>`;}
-  const a=D().accounts.find(x=>x.id===r.account),pend=a&&acctKind(a)==='credit';
+  const a=D().accounts.find(x=>x.id===r.account),pend=cardPayMode()&&a&&acctKind(a)==='credit';
   const sub=[opts.showDate?shortDate(r.date):null,catName(r.category),a?a.name:null,pend?(r.type==='income'?'退款到卡上':'待繳'):null,r.inst>1?`分 ${r.inst} 期`:null,r.note||null].filter(Boolean).join(' · ');
   return `<div class="swipe" data-id="${esc(r.id)}"><div class="swipe-act"><button class="sa-del" data-del="${esc(r.id)}" data-full>刪除</button></div>
     <div class="row tap swipe-main${r.id===flashId?' flash':''}" data-edit="${esc(r.id)}" style="--inset:66px" role="button" tabindex="0" aria-label="${esc(r.name)} ${r.type==='income'?'收入':'支出'} ${money(r.amount)}">
@@ -2513,7 +2517,7 @@ function deleteTx(id){
    設定
    ===================================================================== */
 const setPages=[];
-const sic=(icon,color)=>`<span class="sic" style="--cc:var(--c-${color==='warn'?'red':color})">${ICON[icon]}</span>`;
+const sic=(icon,color)=>`<span class="sic" style="--cc:var(--c-${color==='warn'?'red':color})">${ICON[icon]||glyph(icon)}</span>`;
 const rowNav=(act,icon,color,title,value)=>`<button class="row tap" data-act="${act}" style="--inset:58px">${sic(icon,color)}<div class="rt"><div class="t">${title}</div></div><span class="v">${value||''}</span>${ICON.chev}</button>`;
 const rowBtn=(act,icon,color,title,sub)=>`<button class="row tap" data-act="${act}" style="--inset:58px">${sic(icon,color)}<div class="rt"><div class="t">${title}</div>${sub?`<div class="s">${sub}</div>`:''}</div></button>`;
 const rowToggle=(key,icon,color,title,on,disabled)=>`<div class="row" style="--inset:58px">${sic(icon,color)}<div class="rt"><div class="t">${title}</div></div><label class="switch"><input type="checkbox" switch role="switch" data-toggle="${key}" ${on?'checked':''} ${disabled?'disabled':''} aria-label="${title}"><span></span></label></div>`;
@@ -2637,8 +2641,8 @@ function renderAccountsPage(box){
       <div class="rt"><div class="t">${esc(a.name)}</div><div class="s">${ACCT_KINDS[acctKind(a)].n}${acctSub(d,a)?'・'+esc(acctSub(d,a)):''}</div></div><span class="amt num">${money(acctBalance(d,a))}</span>${ICON.chev}</button></div>`).join('')}</div>
     <div class="sec-f">點一下設定類型、名稱，信用卡的結帳日和繳款日、簽帳卡的扣款戶頭也在這裡；往左滑刪除（已有記錄的帳戶不能刪除）。</div></div>
     <div class="sec"><div class="group"><button class="row action left tap" data-act="addAcct">新增帳戶…</button></div></div>
-    <div class="sec"><div class="sec-h">信用卡</div><div class="group"><div class="frow"><span class="lb">「將要支付」顯示在</span><select data-paydue aria-label="將要支付顯示在">${[['home','首頁'],['stats','統計'],['both','首頁和統計'],['off','不顯示']].map(([v,l])=>`<option value="${v}" ${payDueAt()===v?'selected':''}>${l}</option>`).join('')}</select></div></div>
-    <div class="sec-f">用信用卡刷的錢會先記在卡上、列為「將要支付」，不算進支出；記錄繳卡費（或設定自動扣繳）那天，才會算一筆「卡費」支出，這樣同一筆錢不會算兩次。</div></div>`;
+    <div class="sec"><div class="sec-h">信用卡</div><div class="group">${rowToggle('cardPayMode','card','indigo','繳卡費才算支出',cardPayMode())}<div class="frow"><span class="lb">「將要支付」顯示在</span><select data-paydue aria-label="將要支付顯示在">${[['home','首頁'],['stats','統計'],['both','首頁和統計'],['off','不顯示']].map(([v,l])=>`<option value="${v}" ${payDueAt()===v?'selected':''}>${l}</option>`).join('')}</select></div></div>
+    <div class="sec-f">${cardPayMode()?'現在：刷卡先記在卡上、列為「將要支付」，不算支出；繳卡費（或自動扣繳）那天才算一筆「卡費」支出。支出會跟戶頭實際流出的錢一致，但統計只看得到「卡費」，看不出買了什麼。':'現在：刷卡當下就算支出，分類和預算馬上反映；繳卡費是從戶頭轉到卡上，不算支出，同一筆錢不會算兩次。想讓支出跟戶頭實際流出的錢一致，可以打開「繳卡費才算支出」。'}</div></div>`;
 }
 let catMgrType='expense';
 function renderCatsPage(box){
@@ -2727,6 +2731,7 @@ async function settingsAction(act){
 async function toggleSetting(key,on,input){
   if(key==='nag'){const c=nagCfg();c.on=on;if(on)c.since=today();settings.nag=c;saveSettings();nagRender();
     if(on)toast(`已開啟，每天 ${c.time} 開始提醒`);setTimeout(refreshSettingsTop,360);return;}
+  if(key==='cardPayMode'){settings.cardPayMode=on;saveSettings();haptic('success');toast(on?'改成繳卡費才算支出':'改回刷卡就算支出');renderAll();setTimeout(refreshSettingsTop,320);return;}
   if(key==='haptic'){settings.haptic=on;saveSettings();applyHapticSetting();if(on)haptic();return;}
   // 等開關滑完（約 .3 秒）再換外觀，畫面用淡入淡出銜接
   if(key==='darkFrost'){settings.darkFrost=on;saveSettings();lookTransition(()=>{applyLook();syncLookUI();},reduceMotion()?0:300);return;}
