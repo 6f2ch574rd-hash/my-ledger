@@ -724,18 +724,38 @@ html[data-nag] .tab[data-tab="home"]::after{content:'';position:absolute;top:7px
 .wprev.empty b{font-size:.8rem;font-weight:600;}
 html[data-look="glass"] .wtile{background:var(--glass-card);-webkit-backdrop-filter:blur(24px);backdrop-filter:blur(24px);}
 
-/* ============ 主題色票 ============ */
-.swatches{display:grid;grid-template-columns:repeat(5,1fr);gap:14px 6px;padding:16px 10px;}
-.sw{display:flex;flex-direction:column;align-items:center;gap:7px;font-size:.706rem;color:var(--label2);}
-.sw .dot2{width:44px;height:44px;border-radius:50%;display:grid;place-items:center;color:#fff;
-  background:radial-gradient(80% 70% at 30% 22%,rgba(255,255,255,.32),transparent 60%),var(--sc);box-shadow:inset 0 0 0 .5px rgba(255,255,255,.18),0 3px 8px color-mix(in srgb,var(--sc) 30%,transparent);
-  transition:transform .35s var(--spring),box-shadow .25s;}
-.sw .dot2 .ico{width:20px;height:20px;stroke-width:3;opacity:0;transform:scale(.4);transition:opacity .2s,transform .35s var(--spring);}
-.sw.on{color:var(--label);font-weight:600;}
-.sw.on .dot2{box-shadow:0 0 0 2.5px var(--cell),0 0 0 4px var(--label);}
+/* ============ 主題色票（預覽卡＋3×3 色票） ============ */
+.thprev{display:flex;flex-direction:column;gap:14px;padding:16px;}
+.thprev .top{display:flex;align-items:center;gap:12px;}
+.thprev .orb{flex:none;width:40px;height:40px;border-radius:12px;background:linear-gradient(145deg,color-mix(in srgb,var(--sc) 70%,#fff),var(--sc) 55%,color-mix(in srgb,var(--sc) 82%,#000));
+  box-shadow:inset 0 0 0 .5px rgba(255,255,255,.28),0 6px 16px color-mix(in srgb,var(--sc) 35%,transparent);}
+.thprev .nm{min-width:0;flex:1;}
+.thprev .nm b{display:block;font-size:1.06rem;font-weight:700;letter-spacing:-.01em;}
+.thprev .nm span{font-size:.765rem;color:var(--label2);}
+.thprev .demo{display:flex;align-items:flex-end;gap:12px;}
+.thprev .bars{flex:1;display:flex;align-items:flex-end;gap:6px;height:46px;}
+.thprev .bars i{flex:1;border-radius:5px;background:var(--sc);}
+.thprev .thpill{flex:none;display:inline-flex;align-items:center;gap:4px;padding:8px 14px;border-radius:999px;background:var(--sc);color:#fff;font-size:.8rem;font-weight:600;box-shadow:0 4px 12px color-mix(in srgb,var(--sc) 35%,transparent);}
+.thprev .thpill.mono{color:#fff;background:var(--label);box-shadow:0 4px 12px rgba(0,0,0,.18);}
+@media (prefers-color-scheme:dark){.thprev .thpill.mono{color:#000;}}
+.swatches{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:10px;}
+.sw{position:relative;display:flex;align-items:center;gap:10px;padding:10px 10px 10px 10px;border-radius:14px;font-size:.82rem;color:var(--label);text-align:left;
+  background:color-mix(in srgb,var(--label) 4%,transparent);transition:background .25s,box-shadow .25s,transform .3s var(--spring);}
+.sw .dot2{flex:none;width:26px;height:26px;border-radius:50%;display:grid;place-items:center;color:#fff;
+  background:linear-gradient(145deg,color-mix(in srgb,var(--sc) 72%,#fff),var(--sc) 55%,color-mix(in srgb,var(--sc) 85%,#000));
+  box-shadow:inset 0 0 0 .5px rgba(255,255,255,.3),0 2px 6px color-mix(in srgb,var(--sc) 30%,transparent);}
+.sw .dot2 .ico{width:14px;height:14px;stroke-width:3.2;opacity:0;transform:scale(.3);transition:opacity .2s,transform .35s var(--spring);}
+.sw span:last-child{min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.sw.on{background:color-mix(in srgb,var(--sc) 13%,transparent);box-shadow:inset 0 0 0 1.5px color-mix(in srgb,var(--sc) 75%,var(--label) 25%);font-weight:600;}
 .sw.on .dot2 .ico{opacity:1;transform:none;}
-.sw:active .dot2{transform:scale(.9);}
-html[data-look="glass"] .sw.on .dot2{box-shadow:0 0 0 2.5px rgba(255,255,255,.7),0 0 0 4px var(--label);}
+.sw:active{transform:scale(.96);}
+@media (max-width:360px){.swatches{grid-template-columns:repeat(2,1fr);}}
+.bkcard{display:flex;align-items:center;gap:12px;padding:14px 16px;}
+.bkcard .rt{flex:1;min-width:0;}
+.bkcard .t{font-weight:600;}
+.bkcard .s{font-size:.765rem;color:var(--label2);margin-top:2px;line-height:1.4;white-space:normal;overflow:visible;text-overflow:clip;}
+.bkcard .s.warn{color:var(--red);}
+.bkcard .pbtn{flex:none;}
 .iconprev{display:flex;align-items:center;gap:16px;}
 .hicons{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;padding:16px 10px 14px;}
 .hic{display:flex;flex-direction:column;align-items:center;gap:8px;font-size:.706rem;color:var(--label2);text-align:center;line-height:1.3;}
@@ -2467,10 +2487,15 @@ function renderCatsPage(box){
 }
 function renderThemePage(box){
   const cur=currentPresetKey();
-  box.innerHTML=`<div class="sec"><div class="sec-h">主題色</div><div class="card swatches" style="margin:0;width:100%">${PRESETS.map(p=>`<button class="sw${cur===p.k?' on':''}" data-preset="${p.k}" style="--sc:${p.c}" aria-label="${p.n}" aria-pressed="${cur===p.k}"><span class="dot2">${ICON.check.replace('class="ico check"','class="ico"')}</span><span>${p.n}</span></button>`).join('')}</div>
+  const mono=cur==='wine',sc=mono?'var(--label)':accentHex();
+  box.innerHTML=`<div class="sec"><div class="sec-h">主題色</div><div class="card" style="margin:0;width:100%;padding:0">
+      <div class="thprev" style="--sc:${sc}"><div class="top"><span class="orb"></span><div class="nm"><b>${esc(themeName())}</b><span>按鈕、圖表與重點顏色會換成這個色調</span></div></div>
+        <div class="demo"><div class="bars">${[38,62,46,80,54,100,70].map((h,i)=>`<i style="height:${h}%;opacity:${i===5?1:.28+.08*i}"></i>`).join('')}</div><span class="thpill${mono?' mono':''}">＋ 記一筆</span></div></div>
+      <div class="swatches" style="border-top:.5px solid var(--sep,rgba(127,127,127,.2))">${PRESETS.map(p=>`<button class="sw${cur===p.k?' on':''}" data-preset="${p.k}" style="--sc:${p.c}" aria-label="${p.n}" aria-pressed="${cur===p.k}"><span class="dot2">${ICON.check.replace('class="ico check"','class="ico"')}</span><span>${p.n}</span></button>`).join('')}</div></div>
     ${cur?'':`<div class="sec-f">目前使用兌換碼主題「${esc(themeName())}」。</div>`}</div>
     <div class="sec"><div class="sec-h">主畫面圖示</div><div class="card hicons" style="margin:0;width:100%">${HOME_ICONS.map(x=>`<button class="hic${homeIconKey()===x.k?' on':''}" data-homeicon="${x.k}" aria-pressed="${homeIconKey()===x.k}"><span class="appicon">${x.svg()}</span><span>${x.n}${x.k==='light'?'（預設）':x.k==='gray'?'（深淺通用）':''}</span></button>`).join('')}</div>
       <div class="sec-f">iPhone 不會讓網頁 App 的圖示跟著深色模式自動變色，圖示是在「加入主畫面」那一刻決定的。想在深色主畫面也好看，可以選灰色。</div></div>
+    <div class="sec"><div class="sec-h">換圖示前先備份</div><div class="card bkcard" style="margin:0;width:100%">${sic('share',backupInfo().warn||!backupFresh()?'red':'blue')}<div class="rt"><div class="t">完整備份</div><div class="s${backupInfo().warn?' warn':''}">上次匯出：${backupInfo().text}。移除主畫面圖示會刪掉裡面的記錄，加回來後要用這份備份還原。</div></div><button class="pbtn sm" data-act="backupJSON">匯出</button></div></div>
     <div class="sec"><div class="sec-h">怎麼換成這個圖示</div><div class="group">${isStandaloneApp()?`<div class="row"><span class="cic" style="--cc:var(--c-blue)">1</span><div class="rt"><div class="t" style="white-space:normal;line-height:1.4">選好上面的顏色</div></div></div><div class="row" style="--inset:66px"><span class="cic" style="--cc:var(--c-blue)">2</span><div class="rt"><div class="t" style="white-space:normal;line-height:1.4">匯出完整備份</div></div><button class="tlink" data-act="backupJSON">現在匯出</button></div><div class="row" style="--inset:66px"><span class="cic" style="--cc:var(--c-blue)">3</span><div class="rt"><div class="t" style="white-space:normal;line-height:1.4">拷貝加入用網址</div></div><button class="tlink" data-act="copyIconURL">拷貝</button></div><div class="row" style="--inset:66px"><span class="cic" style="--cc:var(--c-blue)">4</span><div class="rt"><div class="t" style="white-space:normal;line-height:1.4">長按主畫面的記帳本圖示，選「移除 App」→「從主畫面移除」</div></div></div><div class="row" style="--inset:66px"><span class="cic" style="--cc:var(--c-blue)">5</span><div class="rt"><div class="t" style="white-space:normal;line-height:1.4">打開 Safari，貼上網址前往</div></div></div><div class="row" style="--inset:66px"><span class="cic" style="--cc:var(--c-blue)">6</span><div class="rt"><div class="t" style="white-space:normal;line-height:1.4">點下方「分享」→「加入主畫面」→「加入」</div></div></div><div class="row" style="--inset:66px"><span class="cic" style="--cc:var(--c-blue)">7</span><div class="rt"><div class="t" style="white-space:normal;line-height:1.4">打開新的圖示，到「設定」→「從完整備份還原」</div></div></div>`:`<div class="row"><span class="cic" style="--cc:var(--c-blue)">1</span><div class="rt"><div class="t" style="white-space:normal;line-height:1.4">選好上面的顏色</div></div></div><div class="row" style="--inset:66px"><span class="cic" style="--cc:var(--c-blue)">2</span><div class="rt"><div class="t" style="white-space:normal;line-height:1.4">點 Safari 下方的「分享」</div></div></div><div class="row" style="--inset:66px"><span class="cic" style="--cc:var(--c-blue)">3</span><div class="rt"><div class="t" style="white-space:normal;line-height:1.4">選「加入主畫面」→「加入」</div></div></div>`}</div>
       <div class="sec-f">${isStandaloneApp()?'<b style="color:var(--red)">移除主畫面圖示會刪掉這個 App 裡的所有記錄</b>，第 2 步一定要先做，加回來後再還原。':'如果主畫面上已經有記帳本，要先在那個 App 裡匯出完整備份，再把它從主畫面移除，加入新的之後再還原。<b style="color:var(--red)">移除圖示會刪掉它裡面的記錄。</b>'}</div></div>
     <div class="sec"><div class="sec-h">兌換主題</div><div class="group"><div class="frow"><input class="left" id="themeCode" placeholder="輸入主題兌換碼" autocomplete="off" autocapitalize="characters"></div></div>
@@ -2614,8 +2639,16 @@ function applyTheme(th){const r=document.documentElement.style,c=th.c;
   applyIcon(th);syncMono();applyWall();}
 function readIconParam(){try{const q=new URLSearchParams(location.search).get('icon');if(q&&HOME_ICONS.some(x=>x.k===q)){settings.homeIcon=q;saveSettings();}}catch(e){}}
 function homeIconURL(k){return location.origin+location.pathname+'?icon='+(k||homeIconKey());}
-function setHomeIcon(k){if(!homeIcon(k)||homeIconKey()===k)return;settings.homeIcon=k;saveSettings();applyIcon();haptic('success');refreshSettingsTop();}
-async function copyIconURL(){const u=homeIconURL();
+const backupFresh=()=>nowTs()-LS.get('ll_lastBackup',0)<3600000;
+async function remindBackup(){
+  if(backupFresh())return true;
+  const i=await actionSheet({title:'先匯出完整備份',message:'換主畫面圖示要先把舊的圖示移除，移除時裡面的記錄會一起刪掉。請先匯出一份完整備份（可存到「檔案」或 iCloud），加回來後再還原。',actions:[{label:'匯出完整備份'},{label:'我已經備份好了'}],cancel:'稍後'});
+  if(i===0){await exportJSON();return backupFresh();}
+  return i===1;
+}
+function setHomeIcon(k){if(!homeIcon(k)||homeIconKey()===k)return;settings.homeIcon=k;saveSettings();applyIcon();haptic('success');refreshSettingsTop();
+  if(isStandaloneApp())setTimeout(remindBackup,350);}
+async function copyIconURL(){const u=homeIconURL();if(isStandaloneApp()&&!(await remindBackup()))return;
   try{await navigator.clipboard.writeText(u);haptic('success');toast('已拷貝加入用網址');}
   catch(e){alertMsg('加入用網址','請手動拷貝這個網址：\n'+u);}}
 function initTheme(){readIconParam();syncMono();applyIcon();if(settings.theme){const th=parseTheme(settings.theme);if(th)applyTheme(th);}}
