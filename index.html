@@ -232,6 +232,12 @@ html[data-nohap] .hap-ov{display:none;}
 @keyframes avgIn{from{opacity:0;transform:translateY(4px) scale(.9)}to{opacity:1;transform:none}}
 .chart .bar{transition:opacity .2s;}
 .chart .bar.dim{opacity:.32;}
+.sortlist .sortrow{position:relative;transition:transform .22s var(--ease);}
+.sortlist .sortrow.dragging{transition:none;background:var(--cell);z-index:5;box-shadow:0 10px 28px rgba(0,0,0,.22);border-radius:12px;}
+.grip{flex:none;display:grid;place-items:center;width:44px;height:44px;margin:-10px -10px -10px 0;color:var(--label3);touch-action:none;cursor:grab;}
+.amt.pend{color:var(--label2);font-weight:500;}
+.paydue .rt .s{white-space:normal;line-height:1.4;}
+.paydue .s.warn{color:var(--c-red);}
 .chint{font-size:.7rem;color:var(--label3);text-align:center;margin:2px 0 -2px;}
 .chart .grid.zero{stroke:var(--label3);stroke-width:.9;}
 .chart .selband{fill:color-mix(in srgb,var(--label) 7%,transparent);}
@@ -1060,12 +1066,12 @@ const GLYPH={
   card:'<path d="M3 6h18v12H3zM3 10h18M6.5 14.5h4"/>',
   bolt:'<path d="M13 3 5.5 13.5H12L11 21l7.5-10.5H12z"/>'
 };
-const CAT_GLYPH=[['餐','food'],['食','food'],['早','food'],['午','food'],['晚','food'],['飲','cup'],['咖啡','cup'],['茶','cup'],
+const CAT_GLYPH=[['卡費','card'],['餐','food'],['食','food'],['早','food'],['午','food'],['晚','food'],['飲','cup'],['咖啡','cup'],['茶','cup'],
   ['交通','car'],['車','car'],['油','car'],['捷運','car'],['購物','bag'],['買','bag'],['衣','bag'],['居家','house'],['房','house'],['租','house'],
   ['水電','bolt'],['電費','bolt'],['娛樂','ticket'],['電影','ticket'],['醫','cross'],['藥','cross'],['學','book'],['書','book'],['旅','plane'],
   ['禮','gift'],['訂閱','repeat'],['電話','phone'],['手機','phone'],['薪','note'],['工資','note'],['紅包','envelope'],['投資','trend'],['股','trend'],['獎','star'],['其他','dots']];
 const glyph=k=>`<svg class="ico" viewBox="0 0 24 24" aria-hidden="true">${GLYPH[k]}</svg>`;
-const GLYPH_COLOR={food:'orange',cup:'brown',car:'blue',bag:'pink',house:'teal',bolt:'yellow',ticket:'purple',cross:'red',book:'indigo',
+const GLYPH_COLOR={card:'indigo',food:'orange',cup:'brown',car:'blue',bag:'pink',house:'teal',bolt:'yellow',ticket:'purple',cross:'red',book:'indigo',
   plane:'cyan',gift:'pink',repeat:'mint',phone:'blue',note:'green',envelope:'red',trend:'mint',star:'yellow',dots:'gray'};
 const CAT_POOL=['blue','orange','pink','mint','purple','yellow','teal','indigo','brown','cyan','green','red'];
 function catInfo(cat){const n=catName(cat);
@@ -1160,7 +1166,47 @@ if(settings.bio===undefined)settings.bio=false;
 if(settings.bioCred===undefined)settings.bioCred=null;
 if(settings.haptic===undefined)settings.haptic=true;
 function saveSettings(){return LS.set('ll_settings',settings);}
-function saveDB(){return LS.set('ll_db',DB);}
+let sortMode=null;
+const GRIP='<svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M5 8h14M5 12h14M5 16h14" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>';
+function sortArr(kind){const d=D();return kind==='accts'?d.accounts:(catMgrType==='expense'?d.catsExp:d.catsInc);}
+(function setupSort(){
+  let S=null;
+  document.addEventListener('pointerdown',e=>{
+    const g=e.target.closest('[data-grip]');if(!g)return;const row=g.closest('.sortrow'),list=row&&row.closest('.sortlist');if(!list)return;
+    e.preventDefault();
+    const rows=[...list.querySelectorAll('.sortrow')],from=rows.indexOf(row),h=row.getBoundingClientRect().height;
+    S={list,rows,row,from,to:from,h,y0:e.clientY,id:e.pointerId};row.classList.add('dragging');haptic();
+    try{g.setPointerCapture(e.pointerId);}catch(_){}
+  });
+  document.addEventListener('pointermove',e=>{
+    if(!S||e.pointerId!==S.id)return;e.preventDefault();
+    const dy=e.clientY-S.y0;S.row.style.transform=`translateY(${dy}px)`;
+    const to=Math.max(0,Math.min(S.rows.length-1,S.from+Math.round(dy/S.h)));
+    if(to!==S.to){S.to=to;haptic();}
+    S.rows.forEach((r,i)=>{if(r===S.row)return;let off=0;if(S.from<S.to&&i>S.from&&i<=S.to)off=-S.h;if(S.from>S.to&&i<S.from&&i>=S.to)off=S.h;r.style.transform=off?`translateY(${off}px)`:'';});
+  },{passive:false});
+  const end=e=>{if(!S||e.pointerId!==S.id)return;const {from,to,list}=S,kind=list.dataset.sortlist;
+    S.rows.forEach(r=>{r.style.transform='';r.classList.remove('dragging');});S=null;
+    if(from!==to){const arr=sortArr(kind);const [x]=arr.splice(from,1);arr.splice(to,0,x);saveDB();haptic('success');}
+    refreshSettingsTop();};
+  document.addEventListener('pointerup',end);document.addEventListener('pointercancel',end);
+})();
+/* 新分類放在「其他」前面（「其他」在最後時），讓「其他」一直留在最後 */
+function addCatTo(arr,full){const i=arr.length-1;if(i>=0&&catName(arr[i])==='其他'&&catName(full)!=='其他')arr.splice(i,0,full);else arr.push(full);}
+let dbVer=0;
+function saveDB(){dbVer++;return LS.set('ll_db',DB);}
+/* 信用卡：刷卡先記在卡上（待繳），不算支出；繳卡費那天才算一筆支出（分類「卡費」） */
+const CARD_PAY_CAT='💳 卡費';
+const isCardAcct=(d,id)=>{if(!id)return false;const a=d.accounts.find(x=>x.id===id);return !!a&&acctKind(a)==='credit';};
+const isPendingTx=(d,r)=>isCardAcct(d,r.account);
+let _ledger={d:null,v:-1,sig:'',rows:null};
+function ledgerTx(d){d=d||D();
+  const sig=d.tx.length+'|'+d.accounts.map(a=>a.id+(a.kind||'')+((a.payments||[]).length)).join(',');
+  if(_ledger.d===d&&_ledger.v===dbVer&&_ledger.sig===sig)return _ledger.rows;
+  const rows=d.tx.filter(r=>!isCardAcct(d,r.account));
+  d.accounts.forEach(a=>{if(acctKind(a)!=='credit')return;(a.payments||[]).forEach(p=>rows.push({id:'pay:'+a.id+':'+p.id,date:p.date,name:`繳「${a.name}」卡費`,
+    category:CARD_PAY_CAT,amount:Number(p.amount)||0,type:'expense',account:p.from||'',note:p.auto?'自動扣繳':'',payOf:a.id,synthetic:true}));});
+  _ledger={d,v:dbVer,sig,rows};return rows;}
 function saveBooks(){LS.set('ll_books',books);LS.set('ll_active',activeId);}
 const book=()=>books.find(b=>b.id===activeId);
 const D=()=>DB[activeId];
@@ -1568,13 +1614,13 @@ function renderHome(){
       <button class="pbtn" data-new>記第一筆</button></div></div>`+accountsSection(d);
     return;
   }
-  const monthRows=d.tx.filter(r=>r.date.startsWith(mStr));
+  const L=ledgerTx(d),monthRows=L.filter(r=>r.date.startsWith(mStr));
   let exp=0,inc=0;const cat={};
   monthRows.forEach(r=>{if(r.type==='expense'){exp+=r.amount;cat[r.category]=(cat[r.category]||0)+r.amount;}else inc+=r.amount;});
   const lm=new Date(now.getFullYear(),now.getMonth()-1,1),lmStr=ym(lm);
   const lmLast=new Date(now.getFullYear(),now.getMonth(),0).getDate();
   const lmCut=lmStr+'-'+pad2(Math.min(now.getDate(),lmLast));
-  const lmExp=d.tx.filter(r=>r.type==='expense'&&r.date.startsWith(lmStr)&&r.date<=lmCut).reduce((s,r)=>s+r.amount,0);
+  const lmExp=L.filter(r=>r.type==='expense'&&r.date.startsWith(lmStr)&&r.date<=lmCut).reduce((s,r)=>s+r.amount,0);
   let cmp='';
   if(lmExp>0){const diff=exp-lmExp,pct=Math.round(Math.abs(diff)/lmExp*100);
     cmp=Math.abs(diff)<1?'和上個月同期差不多':`比上個月同期${diff<0?'少':'多'} ${money(Math.abs(diff))}（${pct}%）`;}
@@ -1602,11 +1648,12 @@ function renderHome(){
   }
   // 本週
   const ws=weekStart(now),vals=[],labels=[],future=[];
-  for(let i=0;i<7;i++){const dd=ymd(addDays(ws,i));vals.push(d.tx.filter(r=>r.type==='expense'&&r.date===dd).reduce((s,r)=>s+r.amount,0));labels.push(WD[addDays(ws,i).getDay()]);future.push(dd>t);}
+  for(let i=0;i<7;i++){const dd=ymd(addDays(ws,i));vals.push(L.filter(r=>r.type==='expense'&&r.date===dd).reduce((s,r)=>s+r.amount,0));labels.push(WD[addDays(ws,i).getDay()]);future.push(dd>t);}
   const wTotal=vals.reduce((a,b)=>a+b,0);
   const selTxt=homeSel!=null?`星期${labels[homeSel]}　<b class="num">${money(vals[homeSel])}</b>`:`共 <b class="num">${money(wTotal)}</b>`;
   h+=`<div class="card"><div class="cap"><span>本週支出</span><span style="font-weight:400" id="weekSel">${selTxt}</span></div>
     <div style="margin-top:8px" id="weekChart">${barChart({id:'week',vals,labels,showLabel:()=>true,sel:homeSel,color:'var(--accent)',future,h:150,anim:ANIM})}</div></div>`;
+  if(payDueOn('home'))h+=payDueHTML(d);
   h+=accountsSection(d);
   // 最近交易
   const recent=[...d.tx].sort(byDateDesc).slice(0,5);
@@ -1727,6 +1774,27 @@ function cardBanners(){
       <div class="nagbtns">${o.t==='new'?`<button class="pbtn" data-bill-enter="${esc(o.a.id)}|${o.key}">輸入帳單金額</button><button class="ghost" data-bill-seen="${esc(o.a.id)}|${o.key}">金額沒問題</button>`
         :`<button class="pbtn" data-card-pay="${esc(o.a.id)}|${o.key}">記錄繳款</button><button class="ghost" data-card-view="${esc(o.a.id)}">查看卡片</button>`}</div>`;
     hb.insertBefore(el,ref);});
+}
+/* ---------- 將要支付（信用卡待繳總結） ---------- */
+const payDueAt=()=>['home','stats','both','off'].includes(settings.payDueAt)?settings.payDueAt:'home';
+const payDueOn=w=>{const v=payDueAt();return v==='both'||v===w;};
+function payDueList(d){
+  const out=[];
+  d.accounts.forEach(a=>{if(acctKind(a)!=='credit')return;const owed=Math.max(0,-acctBalance(d,a));if(owed<1)return;
+    let next=null;if(cardReady(a)){const S=cardSummary(d,a);const due=S.list.slice().reverse().find(x=>x.st==='open'||x.st==='late'||x.st==='min');
+      if(due&&due.left>0)next={amt:Math.min(due.left,owed),due:due.due,late:daysTo(due.due)<0,est:!due.real};}
+    out.push({a,owed,next});});
+  return out;
+}
+function payDueHTML(d){
+  const L=payDueList(d);if(!L.length)return '';
+  const total=L.reduce((s,x)=>s+x.owed,0);
+  return `<div class="sec paydue"><div class="sec-h big"><span>將要支付</span><span class="num" style="font-weight:600">${money(total)}</span></div><div class="group">${L.map(x=>{
+    const n=x.next?daysTo(x.next.due):null;
+    const sub=x.next?(x.next.late?`逾期 ${-n} 天・這期還沒繳 ${money(x.next.amt)}`:`${md(x.next.due)} 前要繳 ${money(x.next.amt)}${x.next.est?'（預估）':''}${n<=7?`・還有 ${n} 天`:''}`)+(x.owed-x.next.amt>=1?`・下期累積 ${money(x.owed-x.next.amt)}`:'')
+      :'刷卡累積，還沒設定結帳日和繳款日';
+    return `<button class="row tap" data-card-view="${esc(x.a.id)}" style="--inset:58px">${acctGlyph(x.a)}<div class="rt"><div class="t">${esc(x.a.name)}</div><div class="s${x.next&&x.next.late?' warn':''}">${esc(sub)}</div></div><span class="amt num">${money(x.owed)}</span>${ICON.chev}</button>`;}).join('')}</div>
+    <div class="sec-f">刷卡的錢先列在這裡，不算支出；繳卡費那天才會算進支出。</div></div>`;
 }
 /* ---------- 卡片頁（sheet） ---------- */
 let cardId=null;
@@ -2059,12 +2127,14 @@ function updateAcctHint(){
 }
 function txRowHTML(r,opts){
   opts=opts||{};
-  const a=D().accounts.find(x=>x.id===r.account);
-  const sub=[opts.showDate?shortDate(r.date):null,catName(r.category),a?a.name:null,r.inst>1?`分 ${r.inst} 期`:null,r.note||null].filter(Boolean).join(' · ');
+  if(r.synthetic){const src=D().accounts.find(x=>x.id===r.account);
+    return `<div class="row tap" data-card-view="${esc(r.payOf)}" style="--inset:66px" role="button" tabindex="0">${catIcon(r.category)}<div class="rt"><div class="t">${esc(r.name)}</div><div class="s">${esc([opts.showDate?shortDate(r.date):null,'卡費',src?'從'+src.name:null,r.note||null].filter(Boolean).join(' · '))}</div></div><div class="amt num expense">${money(r.amount)}</div></div>`;}
+  const a=D().accounts.find(x=>x.id===r.account),pend=a&&acctKind(a)==='credit';
+  const sub=[opts.showDate?shortDate(r.date):null,catName(r.category),a?a.name:null,pend?(r.type==='income'?'退款到卡上':'待繳'):null,r.inst>1?`分 ${r.inst} 期`:null,r.note||null].filter(Boolean).join(' · ');
   return `<div class="swipe" data-id="${esc(r.id)}"><div class="swipe-act"><button class="sa-del" data-del="${esc(r.id)}" data-full>刪除</button></div>
     <div class="row tap swipe-main${r.id===flashId?' flash':''}" data-edit="${esc(r.id)}" style="--inset:66px" role="button" tabindex="0" aria-label="${esc(r.name)} ${r.type==='income'?'收入':'支出'} ${money(r.amount)}">
     ${catIcon(r.category)}<div class="rt"><div class="t">${esc(r.name)}</div><div class="s">${esc(sub)}</div></div>
-    <div class="amt num ${r.type}">${r.type==='income'?'+':''}${money(r.amount)}</div></div></div>`;
+    <div class="amt num ${r.type}${pend?' pend':''}">${r.type==='income'?'+':''}${money(r.amount)}</div></div></div>`;
 }
 
 /* ---------- 長條圖（可點、可拖曳看數值） ---------- */
@@ -2163,14 +2233,16 @@ function renderList(){
 function renderListBody(){
   const d=D(),q=listQuery.trim().toLowerCase();
   $('searchBox').classList.toggle('has',!!q);
-  let rows=q?d.tx.slice():d.tx.filter(r=>r.date.startsWith(listMonth));
+  const all=d.tx.concat(ledgerTx(d).filter(r=>r.synthetic));
+  let rows=q?all.slice():all.filter(r=>r.date.startsWith(listMonth));
   if(listType!=='all')rows=rows.filter(r=>r.type===listType);
-  if(listAccount)rows=rows.filter(r=>r.account===listAccount);
+  if(listAccount)rows=rows.filter(r=>r.account===listAccount||r.payOf===listAccount);
   if(q)rows=rows.filter(r=>(r.name+' '+catName(r.category)+' '+(r.note||'')+' '+r.amount).toLowerCase().includes(q));
   rows.sort(byDateDesc);
-  const exp=rows.filter(r=>r.type==='expense').reduce((s,r)=>s+r.amount,0),inc=rows.filter(r=>r.type==='income').reduce((s,r)=>s+r.amount,0);
+  const cnt=rows.filter(r=>!isPendingTx(d,r)),exp=cnt.filter(r=>r.type==='expense').reduce((s,r)=>s+r.amount,0),inc=cnt.filter(r=>r.type==='income').reduce((s,r)=>s+r.amount,0);
+  const swiped=rows.filter(r=>isPendingTx(d,r)&&r.type==='expense').reduce((s,r)=>s+r.amount,0);
   $('mTitle').textContent=q?'搜尋結果':monthTitle(listMonth);
-  $('mSum').textContent=(q?`${rows.length} 筆 · `:'')+`支出 ${money(exp)}　收入 ${money(inc)}`;
+  $('mSum').textContent=(q?`${rows.length} 筆 · `:'')+`支出 ${money(exp)}　收入 ${money(inc)}`+(swiped?`　刷卡 ${money(swiped)}`:'');
   $('mPrev').style.visibility=$('mNext').style.visibility=q?'hidden':'visible';
   $('mNext').disabled=listMonth>=ym(new Date());
   if(!rows.length){
@@ -2182,7 +2254,7 @@ function renderListBody(){
   const groups=new Map();rows.forEach(r=>{if(!groups.has(r.date))groups.set(r.date,[]);groups.get(r.date).push(r);});
   let html='';
   groups.forEach((list,date)=>{
-    const de=list.filter(r=>r.type==='expense').reduce((s,r)=>s+r.amount,0),di=list.filter(r=>r.type==='income').reduce((s,r)=>s+r.amount,0);
+    const lc=list.filter(r=>!isPendingTx(d,r)),de=lc.filter(r=>r.type==='expense').reduce((s,r)=>s+r.amount,0),di=lc.filter(r=>r.type==='income').reduce((s,r)=>s+r.amount,0);
     html+=`<div class="sec"><div class="sec-h"><span>${esc(dayTitle(date))}</span><span class="num">${[de?'支出 '+money(de):'',di?'收入 '+money(di):''].filter(Boolean).join('　')}</span></div>
       <div class="group">${list.map(r=>txRowHTML(r)).join('')}</div></div>`;
   });
@@ -2209,7 +2281,7 @@ function stPeriod(){
       show:i=>[0,7,14,21,28].includes(i)};
   }
   if(stRange==='all'){
-    const ys=D().tx.map(r=>Number(r.date.slice(0,4))).filter(Boolean),cy=now.getFullYear(),y0=ys.length?Math.min(cy,...ys):cy,bk=[];
+    const ys=ledgerTx().map(r=>Number(r.date.slice(0,4))).filter(Boolean),cy=now.getFullYear(),y0=ys.length?Math.min(cy,...ys):cy,bk=[];
     for(let y=y0;y<=cy;y++)bk.push({from:`${y}-01-01`,to:`${y}-12-31`,label:cy-y0>5?`'${String(y).slice(2)}`:String(y),full:`${y}年`,future:false});
     return {from:`${y0}-01-01`,to:`${cy}-12-31`,title:y0===cy?`${cy}年（全部）`:`${y0} – ${cy}年`,bk,prevFrom:null,prevTo:null,cmpWord:'',avgUnit:'年',show:()=>true,all:true};
   }
@@ -2218,8 +2290,8 @@ function stPeriod(){
   return {from:`${y}-01-01`,to:`${y}-12-31`,title:`${y}年`,bk,prevFrom:`${y-1}-01-01`,prevTo:`${y-1}-12-31`,cmpWord:'去年',avgUnit:'月',show:()=>true};
 }
 function sumRange(type,from,to){
-  if(type==='net')return D().tx.reduce((s,r)=>r.date>=from&&r.date<=to?s+(r.type==='income'?r.amount:-r.amount):s,0);
-  return D().tx.reduce((s,r)=>r.type===type&&r.date>=from&&r.date<=to?s+r.amount:s,0);}
+  if(type==='net')return ledgerTx().reduce((s,r)=>r.date>=from&&r.date<=to?s+(r.type==='income'?r.amount:-r.amount):s,0);
+  return ledgerTx().reduce((s,r)=>r.type===type&&r.date>=from&&r.date<=to?s+r.amount:s,0);}
 /* 目前選取（單根或一段）對應的日期範圍；沒選就是整段期間 */
 function stSpan(P){
   if(stSel==null)return {from:P.from,to:P.to,sel:false};
@@ -2250,7 +2322,7 @@ function renderStatsTop(){
       if(stRange==='year'){prevTo=`${Number(P.prevFrom.slice(0,4))}-${t.slice(5)}`;}
       else prevTo=ymd(addDays(parseD(P.prevFrom),elapsed-1));}
     const prev=sumRange(stType,P.prevFrom,prevTo<P.prevTo?prevTo:P.prevTo);
-    if(net){const anyPrev=D().tx.some(r=>r.date>=P.prevFrom&&r.date<=P.prevTo);if(anyPrev&&Math.round(total-prev)){const diff=total-prev;cmpTxt=`比${P.cmpWord}${isCur?'同期':''}${diff>0?'多存':'少存'} ${money(Math.abs(Math.round(diff)))}`;}}
+    if(net){const anyPrev=ledgerTx().some(r=>r.date>=P.prevFrom&&r.date<=P.prevTo);if(anyPrev&&Math.round(total-prev)){const diff=total-prev;cmpTxt=`比${P.cmpWord}${isCur?'同期':''}${diff>0?'多存':'少存'} ${money(Math.abs(Math.round(diff)))}`;}}
     else if(prev>0&&total>0){const diff=total-prev,pct=Math.round(Math.abs(diff)/prev*100);cmpTxt=`比${P.cmpWord}${isCur?'同期':''}${diff<0?'少':'多'} ${pct}%`;}
   }
   const word=net?'結餘':stType==='expense'?'支出':'收入';
@@ -2283,6 +2355,10 @@ function renderStatsTop(){
 }
 function renderStatsCats(){
   const box=$('statsCats');if(!box)return;
+  renderStatsCatsInner(box);
+  if(payDueOn('stats')){const h=payDueHTML(D());if(h)box.insertAdjacentHTML('afterbegin',h);}
+}
+function renderStatsCatsInner(box){
   const P=stPeriod(),SP=stSpan(P),spanTxt=SP.sel?esc(SP.label):'';
   if(stType==='net'){
     const inc=sumRange('income',SP.from,SP.to),exp=sumRange('expense',SP.from,SP.to),net=inc-exp,mx=Math.max(inc,exp,1);
@@ -2297,7 +2373,7 @@ function renderStatsCats(){
       </div></div></div>`;
     return;
   }
-  const rows=D().tx.filter(r=>r.type===stType&&r.date>=SP.from&&r.date<=SP.to);
+  const rows=ledgerTx().filter(r=>r.type===stType&&r.date>=SP.from&&r.date<=SP.to);
   const m={},cnt={};rows.forEach(r=>{m[r.category]=(m[r.category]||0)+r.amount;cnt[r.category]=(cnt[r.category]||0)+1;});
   const entries=Object.entries(m).sort((a,b)=>b[1]-a[1]),total=entries.reduce((s,x)=>s+x[1],0);
   if(!entries.length){box.innerHTML=`<div class="empty" style="padding-top:20px">${ICON.chart.replace('class="ico"','class="ico ei"')}<h3>沒有資料</h3><p>${SP.sel?'選取的這段':'這段期間'}沒有${stType==='expense'?'支出':'收入'}記錄。</p></div>`;return;}
@@ -2309,7 +2385,7 @@ function renderStatsCats(){
       <span class="amt num">${money(v)}</span>${ICON.chev}</button>`).join('')}</div></div>`;
 }
 function openCatSheet(cat){
-  const P=stPeriod(),SP=stSpan(P),rows=D().tx.filter(r=>r.type===stType&&r.category===cat&&r.date>=SP.from&&r.date<=SP.to).sort(byDateDesc);
+  const P=stPeriod(),SP=stSpan(P),rows=ledgerTx().filter(r=>r.type===stType&&r.category===cat&&r.date>=SP.from&&r.date<=SP.to).sort(byDateDesc);
   $('catTitle').textContent=catName(cat);
   const total=rows.reduce((s,r)=>s+r.amount,0);
   $('catBody').innerHTML=`<div class="sumline">${esc(SP.sel?SP.label:P.title)} · ${rows.length} 筆<b class="num">${money(total)}</b></div>
@@ -2519,7 +2595,7 @@ function pushPage(key){
   void el.offsetWidth;el.classList.add('in');prevEl.classList.add('under');haptic();
 }
 function popPage(){
-  const top=setPages.pop();if(!top)return;
+  const top=setPages.pop();if(!top)return;sortMode=null;
   const prev=topScreen('settings');prev.classList.remove('under');top.el.classList.remove('in');
   setTimeout(()=>top.el.remove(),420);refreshSettingsTop();haptic();
 }
@@ -2554,19 +2630,26 @@ function renderBooksPage(box){
 }
 function renderAccountsPage(box){
   const d=D();
-  box.innerHTML=`<div class="sec"><div class="sec-h">${esc(book().name)}</div><div class="group">${d.accounts.map((a,i)=>`<div class="swipe" data-id="${esc(a.id)}"><div class="swipe-act"><button class="sa-del" data-acct-del="${i}" data-full>刪除</button></div>
+  if(sortMode==='accts'){box.innerHTML=`<div class="sec"><div class="sec-h"><span>按住右邊的 ≡ 上下拖曳</span><button class="link" data-sort-done>完成</button></div><div class="group sortlist" data-sortlist="accts">${d.accounts.map((a,i)=>`<div class="row sortrow" data-si="${i}" style="--inset:66px">${acctGlyph(a)}<div class="rt"><div class="t">${esc(a.name)}</div><div class="s">${ACCT_KINDS[acctKind(a)].n}</div></div><span class="grip" data-grip aria-label="拖曳排序">${GRIP}</span></div>`).join('')}</div>
+    <div class="sec-f">首頁、記帳時選帳戶都照這個順序排。</div></div>`;return;}
+  box.innerHTML=`<div class="sec"><div class="sec-h"><span>${esc(book().name)}</span>${d.accounts.length>1?'<button class="link" data-sort="accts">排序</button>':''}</div><div class="group">${d.accounts.map((a,i)=>`<div class="swipe" data-id="${esc(a.id)}"><div class="swipe-act"><button class="sa-del" data-acct-del="${i}" data-full>刪除</button></div>
       <button class="row tap swipe-main" data-acct-edit="${i}" style="--inset:66px">${acctGlyph(a)}
       <div class="rt"><div class="t">${esc(a.name)}</div><div class="s">${ACCT_KINDS[acctKind(a)].n}${acctSub(d,a)?'・'+esc(acctSub(d,a)):''}</div></div><span class="amt num">${money(acctBalance(d,a))}</span>${ICON.chev}</button></div>`).join('')}</div>
     <div class="sec-f">點一下設定類型、名稱，信用卡的結帳日和繳款日、簽帳卡的扣款戶頭也在這裡；往左滑刪除（已有記錄的帳戶不能刪除）。</div></div>
-    <div class="sec"><div class="group"><button class="row action left tap" data-act="addAcct">新增帳戶…</button></div></div>`;
+    <div class="sec"><div class="group"><button class="row action left tap" data-act="addAcct">新增帳戶…</button></div></div>
+    <div class="sec"><div class="sec-h">信用卡</div><div class="group"><div class="frow"><span class="lb">「將要支付」顯示在</span><select data-paydue aria-label="將要支付顯示在">${[['home','首頁'],['stats','統計'],['both','首頁和統計'],['off','不顯示']].map(([v,l])=>`<option value="${v}" ${payDueAt()===v?'selected':''}>${l}</option>`).join('')}</select></div></div>
+    <div class="sec-f">用信用卡刷的錢會先記在卡上、列為「將要支付」，不算進支出；記錄繳卡費（或設定自動扣繳）那天，才會算一筆「卡費」支出，這樣同一筆錢不會算兩次。</div></div>`;
 }
 let catMgrType='expense';
 function renderCatsPage(box){
   const d=D(),list=catMgrType==='expense'?d.catsExp:d.catsInc;
+  if(sortMode==='cats'){box.innerHTML=`<div class="seg-wrap"><div class="seg" data-segkey="catmgr"><button data-catmgr="expense" class="${catMgrType==='expense'?'on':''}">支出分類</button><button data-catmgr="income" class="${catMgrType==='income'?'on':''}">收入分類</button></div></div>
+    <div class="sec"><div class="sec-h"><span>按住右邊的 ≡ 上下拖曳</span><button class="link" data-sort-done>完成</button></div><div class="group sortlist" data-sortlist="cats">${list.map((c,i)=>`<div class="row sortrow" data-si="${i}" style="--inset:66px">${catIcon(c)}<div class="rt"><div class="t">${esc(catName(c))}</div></div><span class="grip" data-grip aria-label="拖曳排序">${GRIP}</span></div>`).join('')}</div>
+    <div class="sec-f">記帳時分類就照這個順序排。新增的分類會自動放在「其他」前面。</div></div>`;return;}
   box.innerHTML=`<div class="seg-wrap"><div class="seg" data-segkey="catmgr"><button data-catmgr="expense" class="${catMgrType==='expense'?'on':''}">支出分類</button><button data-catmgr="income" class="${catMgrType==='income'?'on':''}">收入分類</button></div></div>
-    <div class="sec"><div class="group">${list.map((c,i)=>`<div class="swipe" data-id="c${i}"><div class="swipe-act"><button class="sa-del" data-cat-del="${i}" data-full>刪除</button></div>
+    <div class="sec"><div class="sec-h"><span></span><button class="link" data-sort="cats">排序</button></div><div class="group">${list.map((c,i)=>`<div class="swipe" data-id="c${i}"><div class="swipe-act"><button class="sa-del" data-cat-del="${i}" data-full>刪除</button></div>
       <button class="row tap swipe-main" data-cat-edit="${i}" style="--inset:66px">${catIcon(c)}<div class="rt"><div class="t">${esc(catName(c))}</div><div class="s">${d.tx.filter(r=>r.category===c).length} 筆記錄</div></div>${ICON.chev}</button></div>`).join('')}</div>
-    <div class="sec-f">點一下可以改名（舊記錄會一起更新）；往左滑刪除（舊記錄保留原本的分類名稱）。</div></div>
+    <div class="sec-f">點一下可以改名（舊記錄會一起更新）；往左滑刪除（舊記錄保留原本的分類名稱）；點「排序」可以調整順序。</div></div>
     <div class="sec"><div class="group"><button class="row action left tap" data-act="addCat">新增分類…</button></div></div>`;
 }
 function renderThemePage(box){
@@ -2630,7 +2713,7 @@ async function settingsAction(act){
       if(!v)return;if(!v.n){toast('請輸入分類名稱');return;}
       const full=(v.e?v.e+' ':'🏷️ ')+v.n.replace(/\s+/g,''),arr=catMgrType==='expense'?d.catsExp:d.catsInc;
       if(arr.some(c=>catName(c)===catName(full))){toast('已經有這個分類');return;}
-      arr.push(full);saveDB();toast('已新增分類');refreshSettingsTop();break;}
+      addCatTo(arr,full);saveDB();toast('已新增分類');refreshSettingsTop();break;}
     case 'redeem':redeemTheme();break;
     case 'resetTheme':resetTheme();break;
     case 'backupJSON':exportJSON();break;
@@ -3175,6 +3258,7 @@ function renderImport(){
     ${IMP.rows.length>150?`<div class="row"><div class="rt"><div class="s">還有 ${IMP.rows.length-150} 筆沒列出來，會一起匯入</div></div></div>`:''}</div></div>`;
   $('impBody').innerHTML=h;$('impGo').disabled=!use.length;$('impGo').textContent=use.length?`匯入 ${use.length} 筆`:'匯入';
 }
+document.addEventListener('change',e=>{const t=e.target;if(t&&t.matches&&t.matches('[data-paydue]')){settings.payDueAt=t.value;saveSettings();haptic('success');renderAll();}});
 document.addEventListener('change',async e=>{
   const t=e.target;if(!IMP||!t.closest||!t.closest('#importSheet'))return;
   if(t.id==='impTarget'){
@@ -3201,7 +3285,7 @@ $('impGo').addEventListener('click',()=>{
     if(x.kind==='pay'){const a=d.accounts.find(y=>y.id===aid);if(!a)return;
       const stmt=cardReady(a)?ymd(prevClose(a,closeFor(a,x.date))):'';
       (a.payments=a.payments||[]).push({id:uid(),date:x.date,amount:x.amt,from:'',stmt,imported:true});p++;return;}
-    const list=x.type==='income'?d.catsInc:d.catsExp;if(x.cat&&!list.includes(x.cat))list.push(x.cat);
+    const list=x.type==='income'?d.catsInc:d.catsExp;if(x.cat&&!list.includes(x.cat))addCatTo(list,x.cat);
     const rec={id:uid(),date:x.date,name:x.name,category:x.cat,amount:x.amt,type:x.type,account:aid,note:x.note,createdAt:nowTs()+n};
     if(x.post)rec.post=x.post;d.tx.push(rec);n++;});
   (IMP.newIds||[]).forEach(id=>{const a=d.accounts.find(y=>y.id===id);if(a&&acctKind(a)==='credit'&&!cardReady(a))newCards.push(a);});
@@ -3278,6 +3362,8 @@ document.addEventListener('click',e=>{
   if((el=t.closest('[data-acct-del]'))){acctAction('del',Number(el.dataset.acctDel));return;}
   if((el=t.closest('[data-cat-edit]'))){catAction('edit',Number(el.dataset.catEdit));return;}
   if((el=t.closest('[data-cat-del]'))){catAction('del',Number(el.dataset.catDel));return;}
+  if((el=t.closest('[data-sort]'))){sortMode=el.dataset.sort;closeSwipe();haptic();refreshSettingsTop();return;}
+  if((el=t.closest('[data-sort-done]'))){sortMode=null;haptic();refreshSettingsTop();renderAll();return;}
   if((el=t.closest('[data-catmgr]'))){catMgrType=el.dataset.catmgr;haptic();refreshSettingsTop();return;}
   if((el=t.closest('[data-cat-open]'))){openCatSheet(decodeURIComponent(el.dataset.catOpen));return;}
   if((el=t.closest('[data-st-shift]'))){if(el.disabled)return;const dir=Number(el.dataset.stShift);stOffset+=dir;if(stOffset>0)stOffset=0;stSel=null;haptic();ANIM=true;renderStats();ANIM=false;slideIn($('stMain'),dir);return;}
