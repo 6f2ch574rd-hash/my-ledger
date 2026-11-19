@@ -269,6 +269,9 @@ html[data-nohap] .hap-ov{display:none;}
 .cautorow .ck{flex:none;width:22px;height:22px;color:var(--c-blue);opacity:0;transform:scale(.4);transition:opacity .2s,transform .35s var(--spring);}
 .cautorow.on .ck{opacity:1;transform:none;}
 .cautorow .ck .ico{width:22px;height:22px;stroke-width:2.6;}
+.cgl{padding:14px 16px 0;font-size:.706rem;font-weight:600;letter-spacing:.06em;color:var(--label3);}
+.cgl+.cgrid{padding-top:10px;}
+.cpal button:last-child:nth-child(odd){grid-column:span 2;}
 .cgrid{display:grid;grid-template-columns:repeat(7,1fr);gap:14px 4px;padding:16px 10px 18px;justify-items:center;}
 .cgrid.g6{grid-template-columns:repeat(6,1fr);gap:10px 4px;}
 .cdot{position:relative;width:34px;height:34px;border-radius:50%;display:grid;place-items:center;color:#fff;
@@ -1151,7 +1154,14 @@ const CAT_POOL=['blue','orange','pink','mint','purple','yellow','teal','indigo',
 /* 分類外觀：自動（依名稱猜圖示和顏色）＋使用者在「設定 › 分類」單獨改過的（存在這本帳本的 catStyle）
    顏色走 --k-*（整組配色可以換），單獨挑過的顏色走 --c-*（系統色），換整組配色時不會變 */
 const CAT_COLORS=['red','orange','yellow','green','mint','teal','cyan','blue','indigo','purple','pink','brown','gray'];
-const CAT_COLOR_NAME={red:'紅',orange:'橘',yellow:'黃',green:'綠',mint:'薄荷',teal:'藍綠',cyan:'天藍',blue:'藍',indigo:'靛',purple:'紫',pink:'粉紅',brown:'棕',gray:'灰'};
+/* 典雅色：跟主題色同一組（墨黑、石墨灰、酒紅……），深色模式自動換成亮一點的版本 */
+const CAT_ELEGANT=[
+  {k:'ink',n:'墨黑',l:'#2C2C2E',d:'#C7C7CC'},{k:'graphite',n:'石墨灰',l:'#5B5F66',d:'#A3A7AE'},{k:'burgundy',n:'酒紅',l:'#8E1F3A',d:'#D0607A'},
+  {k:'ocean',n:'海洋藍',l:'#1F4FA8',d:'#7C9DE6'},{k:'emerald',n:'翡翠綠',l:'#0F7A55',d:'#4FC79B'},{k:'coral',n:'珊瑚橘',l:'#C4502A',d:'#EE8A64'},
+  {k:'violet',n:'紫羅蘭',l:'#5E3FC8',d:'#A88BEA'},{k:'rose',n:'玫瑰',l:'#B03566',d:'#E77AA2'},{k:'amber',n:'琥珀金',l:'#A8741E',d:'#E2AE55'}];
+const ELEG_KEYS=CAT_ELEGANT.map(x=>x.k);
+const colorVar=k=>ELEG_KEYS.includes(k)?`var(--e-${k})`:`var(--c-${k})`;
+const CAT_COLOR_NAME={ink:'墨黑',graphite:'石墨灰',burgundy:'酒紅',ocean:'海洋藍',emerald:'翡翠綠',coral:'珊瑚橘',violet:'紫羅蘭',rose:'玫瑰',amber:'琥珀金',red:'紅',orange:'橘',yellow:'黃',green:'綠',mint:'薄荷',teal:'藍綠',cyan:'天藍',blue:'藍',indigo:'靛',purple:'紫',pink:'粉紅',brown:'棕',gray:'灰'};
 const CAT_GLYPH_PICK=['food','cup','car','bag','shirt','house','bolt','phone','ticket','game','music','plane','book','cross','dumbbell','paw','heart','gift','leaf','repeat','card','bank','coin','note','envelope','trend','star','dots'];
 function catAuto(cat){const n=catName(cat);
   for(const [k,g] of CAT_GLYPH)if(n.includes(k))return {g,c:GLYPH_COLOR[g]};
@@ -1160,8 +1170,8 @@ function catAuto(cat){const n=catName(cat);
 function catStyleOf(cat){let d;try{d=D();}catch(e){return null;}const m=d&&d.catStyle;return m&&m[cat]||null;}
 function catInfo(cat){const n=catName(cat),a=catAuto(cat),o=catStyleOf(cat)||{};
   const gk=o.g&&o.g!=='text'&&GLYPH[o.g]?o.g:(o.g==='text'?null:a.g);
-  const ck=o.c&&CAT_COLORS.includes(o.c)?o.c:null;
-  return {g:gk?glyph(gk):esc([...n][0]||'？'),c:ck?`var(--c-${ck})`:`var(--k-${a.c})`,own:!!ck,ck:ck||a.c,gk};}
+  const ck=o.c&&(CAT_COLORS.includes(o.c)||ELEG_KEYS.includes(o.c))?o.c:null;
+  return {g:gk?glyph(gk):esc([...n][0]||'？'),c:ck?colorVar(ck):`var(--k-${a.c})`,own:!!ck,ck:ck||a.c,gk};}
 const catGlyph=cat=>catInfo(cat).g;
 const catColor=cat=>catInfo(cat).c;
 function acctInfo(a){const t=(a&&(a.name||''))+' '+(a&&a.icon||''),k=a&&a.kind;
@@ -1176,6 +1186,8 @@ const segColor=(c,i,n)=>settings.muted&&!catInfo(c).own?tone(i,n):catColor(c);
 /* 整組分類配色（設定 › 主題色與圖示）：繽紛＝系統色；柔和、大地、跟隨主題色 */
 const CAT_PALS={
   vivid:{n:'繽紛',d:'預設，顏色最好分辨'},
+  elegant:{n:'典雅',d:'酒紅、海洋藍、琥珀金，跟主題色同一組',light:{red:'#8E1F3A',orange:'#C4502A',yellow:'#A8741E',green:'#0F7A55',mint:'#3E7F6A',teal:'#1F6B74',cyan:'#3D6E8F',blue:'#1F4FA8',indigo:'#3F3F8F',purple:'#5E3FC8',pink:'#B03566',brown:'#8A6440',gray:'#5B5F66'},
+    dark:{red:'#D0607A',orange:'#EE8A64',yellow:'#E2AE55',green:'#4FC79B',mint:'#7FC2AC',teal:'#5FB3BD',cyan:'#7FAED0',blue:'#7C9DE6',indigo:'#8F8FDA',purple:'#A88BEA',pink:'#E77AA2',brown:'#CFA67A',gray:'#A3A7AE'}},
   soft:{n:'柔和',d:'低彩度的莫蘭迪色',light:{red:'#C27C7C',orange:'#C9926A',yellow:'#B39A55',green:'#7FA37F',mint:'#6FA39A',teal:'#6A9CA3',cyan:'#7A9EB8',blue:'#7F93BF',indigo:'#8A87B8',purple:'#9C86B0',pink:'#B985A0',brown:'#A08A76',gray:'#95938F'},
     dark:{red:'#D99A9A',orange:'#DDAE8A',yellow:'#D6BE7E',green:'#9DBF9D',mint:'#8EBFB6',teal:'#89B8BF',cyan:'#98BAD2',blue:'#9DAFD8',indigo:'#A8A5D2',purple:'#B8A3CB',pink:'#D3A3BC',brown:'#BCA592',gray:'#B0AEAA'}},
   earth:{n:'大地',d:'陶土、橄欖、芥末黃',light:{red:'#B5533C',orange:'#C77D3A',yellow:'#A88634',green:'#6B8A4E',mint:'#5E8C6A',teal:'#4F7F7A',cyan:'#5A7F8F',blue:'#4E6A8A',indigo:'#5F5A7E',purple:'#7A5A6E',pink:'#B0706A',brown:'#8A6A4A',gray:'#8C857A'},
@@ -1189,6 +1201,7 @@ function catPalColor(pal,name,dark){
     return i%2?`color-mix(in srgb,var(--accent) ${p}%,var(--label2))`:`color-mix(in srgb,var(--accent) ${p}%,var(--label3))`;}
   const P=CAT_PALS[pal];return (dark?P.dark:P.light)[name];}
 function applyCatPal(){const r=document.documentElement.style,pal=catPalKey(),dark=darkMQ.matches;
+  CAT_ELEGANT.forEach(x=>r.setProperty('--e-'+x.k,dark?x.d:x.l));
   CAT_COLORS.forEach(n=>{if(pal==='vivid')r.removeProperty('--k-'+n);else r.setProperty('--k-'+n,catPalColor(pal,n,dark));});}
 function setCatPal(k){if(!CAT_PALS[k]||catPalKey()===k)return;settings.catPal=k;saveSettings();haptic('success');
   lookTransition(()=>{applyCatPal();renderAll();},reduceMotion()?0:260);setTimeout(refreshSettingsTop,280);}
@@ -2830,6 +2843,7 @@ function renderCatsPage(box){
     <div class="sec"><div class="group"><button class="row action left tap" data-act="addCat">新增分類…</button></div></div>`;
 }
 let catEditKey=null,catEditPop=false;
+const cdotHTML=(k,o,others,check)=>`<button class="cdot${o.c===k?' on':''}" data-cstyle-c="${k}" style="--sc:${colorVar(k)}" aria-label="${CAT_COLOR_NAME[k]}${others.includes(k)?'（其他分類也在用）':''}" aria-pressed="${o.c===k}">${check}${others.includes(k)?'<i class="used"></i>':''}</button>`;
 function renderCatEditPage(box){
   const d=D(),arr=catMgrType==='expense'?d.catsExp:d.catsInc,c=catEditKey;
   if(c==null||!arr.includes(c)){box.innerHTML='<div class="empty"><p>這個分類已經不在了。</p></div>';return;}
@@ -2842,8 +2856,9 @@ function renderCatEditPage(box){
     <div class="sec"><div class="sec-h">名稱</div><div class="group"><div class="frow"><input class="left" id="catEditName" value="${esc(catName(c))}" maxlength="12" autocomplete="off" aria-label="分類名稱"></div></div>
       <div class="sec-f">改名後，這個分類的舊記錄也會一起更新。</div></div>
     <div class="sec"><div class="sec-h">顏色</div><div class="card" style="margin:0;width:100%;padding:0">
-      <button class="cautorow${o.c?'':' on'}" data-cstyle-c="auto" aria-pressed="${!o.c}"><span class="dotx" style="--sc:${autoCol}"></span><div class="rt"><div class="t">自動</div><div class="s">依名稱挑選，目前是${CAT_COLOR_NAME[auto.c]}色，會跟著「分類配色」一起變</div></div><span class="ck">${check}</span></button>
-      <div class="cgrid">${CAT_COLORS.map(k=>`<button class="cdot${o.c===k?' on':''}" data-cstyle-c="${k}" style="--sc:var(--c-${k})" aria-label="${CAT_COLOR_NAME[k]}${others.includes(k)?'（其他分類也在用）':''}" aria-pressed="${o.c===k}">${check}${others.includes(k)?'<i class="used"></i>':''}</button>`).join('')}</div></div>
+      <button class="cautorow${o.c?'':' on'}" data-cstyle-c="auto" aria-pressed="${!o.c}"><span class="dotx" style="--sc:${autoCol}"></span><div class="rt"><div class="t">自動</div><div class="s">依名稱挑選，目前是${CAT_COLOR_NAME[auto.c]}色系，會跟著「分類配色」一起變</div></div><span class="ck">${check}</span></button>
+      <div class="cgl">繽紛</div><div class="cgrid">${CAT_COLORS.map(k=>cdotHTML(k,o,others,check)).join('')}</div>
+      <div class="cgl">典雅</div><div class="cgrid">${ELEG_KEYS.map(k=>cdotHTML(k,o,others,check)).join('')}</div></div>
       <div class="sec-f">自己挑的顏色不會被「分類配色」改掉。下面有小點的顏色，這本帳本裡其他分類也在用，統計圖上會比較難分辨。</div></div>
     <div class="sec"><div class="sec-h">圖示</div><div class="card" style="margin:0;width:100%;padding:0;--cc:${I.c}">
       <button class="cautorow${o.g?'':' on'}" data-cstyle-g="auto" aria-pressed="${!o.g}"><span class="dotx g">${auto.g?glyph(auto.g):esc([...catName(c)][0]||'字')}</span><div class="rt"><div class="t">自動</div><div class="s">依名稱挑選圖示</div></div><span class="ck">${check}</span></button>
