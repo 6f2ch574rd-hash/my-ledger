@@ -243,6 +243,61 @@ html[data-nohap] .hap-ov{display:none;}
 .statshead{position:relative;}
 .statshead .peekbtn{position:absolute;top:0;right:0;}
 .statshead.peeking .hero{color:var(--c-indigo,var(--label));}
+:root{--k-red:var(--c-red);--k-orange:var(--c-orange);--k-yellow:var(--c-yellow);--k-green:var(--c-green);--k-mint:var(--c-mint);--k-teal:var(--c-teal);--k-cyan:var(--c-cyan);--k-blue:var(--c-blue);--k-indigo:var(--c-indigo);--k-purple:var(--c-purple);--k-pink:var(--c-pink);--k-brown:var(--c-brown);--k-gray:var(--c-gray);}
+.cprev{position:relative;overflow:hidden;display:flex;flex-direction:column;align-items:center;gap:8px;padding:26px 16px 20px;}
+.cprev::before{content:"";position:absolute;inset:-40% -10% auto;height:120%;background:radial-gradient(50% 50% at 50% 50%,color-mix(in srgb,var(--cc) 26%,transparent),transparent 70%);pointer-events:none;transition:background .35s;}
+.cprev>*{position:relative;}
+.cprev .orb2{width:84px;height:84px;border-radius:50%;display:grid;place-items:center;color:#fff;font-size:2rem;font-weight:700;
+  background:linear-gradient(145deg,color-mix(in srgb,var(--cc) 70%,#fff),var(--cc) 55%,color-mix(in srgb,var(--cc) 82%,#000));
+  box-shadow:inset 0 0 0 .5px rgba(255,255,255,.35),inset 0 1px 0 rgba(255,255,255,.35),0 12px 28px color-mix(in srgb,var(--cc) 38%,transparent);transition:transform .4s var(--spring);}
+.cprev .orb2 .ico{width:38px;height:38px;stroke-width:1.8;}
+.cprev .orb2.pop{animation:orbpop .45s var(--spring);}
+@keyframes orbpop{0%{transform:scale(.86)}100%{transform:none}}
+.cprev b{font-size:1.18rem;font-weight:700;letter-spacing:-.01em;margin-top:6px;}
+.cprev span.s{font-size:.765rem;color:var(--label2);}
+.cprev .mini{display:flex;align-items:center;gap:8px;margin-top:6px;padding:6px 12px 6px 6px;border-radius:999px;background:color-mix(in srgb,var(--label) 5%,transparent);font-size:.765rem;color:var(--label2);}
+.cprev .mini .cic{width:26px;height:26px;}
+.cprev .mini .cic .ico{width:14px;height:14px;}
+.cautorow{display:flex;align-items:center;gap:12px;padding:12px 14px;width:100%;text-align:left;border-bottom:.5px solid var(--sep,rgba(127,127,127,.2));}
+.cautorow .dotx{flex:none;width:30px;height:30px;border-radius:50%;display:grid;place-items:center;color:#fff;
+  background:linear-gradient(145deg,color-mix(in srgb,var(--sc) 72%,#fff),var(--sc) 55%,color-mix(in srgb,var(--sc) 85%,#000));box-shadow:inset 0 0 0 .5px rgba(255,255,255,.3);}
+.cautorow .dotx.g{background:color-mix(in srgb,var(--label) 7%,transparent);color:var(--label);}
+.cautorow .dotx .ico{width:16px;height:16px;stroke-width:1.9;}
+.cautorow .rt{flex:1;min-width:0;}
+.cautorow .t{font-size:.94rem;font-weight:500;}
+.cautorow .s{font-size:.735rem;color:var(--label2);margin-top:1px;white-space:normal;line-height:1.4;}
+.cautorow .ck{flex:none;width:22px;height:22px;color:var(--c-blue);opacity:0;transform:scale(.4);transition:opacity .2s,transform .35s var(--spring);}
+.cautorow.on .ck{opacity:1;transform:none;}
+.cautorow .ck .ico{width:22px;height:22px;stroke-width:2.6;}
+.cgrid{display:grid;grid-template-columns:repeat(7,1fr);gap:14px 4px;padding:16px 10px 18px;justify-items:center;}
+.cgrid.g6{grid-template-columns:repeat(6,1fr);gap:10px 4px;}
+.cdot{position:relative;width:34px;height:34px;border-radius:50%;display:grid;place-items:center;color:#fff;
+  background:linear-gradient(145deg,color-mix(in srgb,var(--sc) 70%,#fff),var(--sc) 55%,color-mix(in srgb,var(--sc) 84%,#000));
+  box-shadow:inset 0 0 0 .5px rgba(255,255,255,.3),0 3px 8px color-mix(in srgb,var(--sc) 28%,transparent);transition:transform .3s var(--spring),box-shadow .25s;}
+.cdot.on{box-shadow:inset 0 0 0 .5px rgba(255,255,255,.3),0 0 0 2.5px var(--cell),0 0 0 4.5px color-mix(in srgb,var(--sc) 80%,var(--label) 20%),0 6px 14px color-mix(in srgb,var(--sc) 35%,transparent);transform:scale(1.04);}
+.cdot .ico{width:15px;height:15px;stroke-width:3.2;opacity:0;transform:scale(.3);transition:opacity .2s,transform .35s var(--spring);}
+.cdot.on .ico{opacity:1;transform:none;}
+.cdot .used{position:absolute;bottom:-8px;left:50%;width:4px;height:4px;margin-left:-2px;border-radius:50%;background:var(--label3);}
+.cdot:active{transform:scale(.9);}
+.gpick{width:46px;height:46px;border-radius:14px;display:grid;place-items:center;color:var(--label2);background:color-mix(in srgb,var(--label) 5%,transparent);font-weight:700;font-size:.95rem;
+  transition:background .25s,color .25s,box-shadow .25s,transform .3s var(--spring);}
+.gpick .ico{width:22px;height:22px;stroke-width:1.8;}
+.gpick.on{color:#fff;background:linear-gradient(145deg,color-mix(in srgb,var(--cc) 70%,#fff),var(--cc) 55%,color-mix(in srgb,var(--cc) 84%,#000));
+  box-shadow:inset 0 0 0 .5px rgba(255,255,255,.3),0 6px 14px color-mix(in srgb,var(--cc) 32%,transparent);transform:scale(1.04);}
+.gpick:active{transform:scale(.9);}
+.cpal{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;padding:10px;}
+.cpal button{position:relative;display:flex;flex-direction:column;align-items:flex-start;gap:8px;padding:14px 12px 12px;border-radius:16px;text-align:left;
+  background:color-mix(in srgb,var(--label) 4%,transparent);transition:box-shadow .25s,background .25s,transform .3s var(--spring);}
+.cpal button.on{background:color-mix(in srgb,var(--label) 7%,transparent);box-shadow:inset 0 0 0 1.5px color-mix(in srgb,var(--label) 30%,transparent);}
+.cpal button:active{transform:scale(.97);}
+.cpal .pstack{display:flex;padding-left:6px;}
+.cpal .pstack i{display:block;flex:none;width:24px;height:24px;margin-left:-6px;border-radius:50%;box-shadow:0 0 0 2px var(--cell),inset 0 0 0 .5px rgba(255,255,255,.3);
+  background:linear-gradient(145deg,color-mix(in srgb,var(--sc) 70%,#fff),var(--sc) 55%,color-mix(in srgb,var(--sc) 84%,#000));}
+.cpal b{font-size:.9rem;font-weight:600;}
+.cpal span.d{font-size:.706rem;color:var(--label2);line-height:1.35;}
+.cpal .tick{position:absolute;top:10px;right:10px;width:20px;height:20px;border-radius:50%;display:grid;place-items:center;background:var(--label);color:var(--bg,#fff);opacity:0;transform:scale(.4);transition:opacity .2s,transform .35s var(--spring);}
+.cpal .tick .ico{width:12px;height:12px;stroke-width:3.4;}
+.cpal button.on .tick{opacity:1;transform:none;}
 .amt.pend{color:var(--label2);font-weight:500;}
 .paydue .rt .s{white-space:normal;line-height:1.4;}
 .paydue .s.warn{color:var(--c-red);}
@@ -567,6 +622,9 @@ html[data-look="glass"] .seg .thumb{
 /* ============ 低飽和模式：單色圖示、同色深淺圖表 ============ */
 html[data-muted] .cic,html[data-muted] .cat .b{color:var(--label);background:var(--fill);}
 html[data-muted] .cat.on .b{background:var(--accent);color:var(--on-accent);box-shadow:none;}
+html[data-muted] .cic.own,html[data-muted] .cat.own:not(.on) .b{color:var(--cc);background:color-mix(in srgb,var(--cc) 15%,var(--cell));}
+html[data-muted] .cat.own.on .b{background:var(--cc);color:#fff;}
+html[data-muted][data-look="glass"] .cic.own,html[data-muted][data-look="glass"] .cat.own:not(.on) .b{background:color-mix(in srgb,var(--cc) 20%,transparent);}
 html[data-muted] .sic{color:var(--label);background:var(--fill);}
 html[data-muted][data-look="glass"] .cic,html[data-muted][data-look="glass"] .sic,html[data-muted][data-look="glass"] .cat:not(.on) .b{background:rgba(127,127,127,.14);}
 
@@ -1072,20 +1130,38 @@ const GLYPH={
   phone:'<path d="M7.5 3h9v18h-9zM11 18h2"/>',
   bank:'<path d="M3.5 9.5 12 4.5l8.5 5M5.5 10v7M10 10v7M14 10v7M18.5 10v7M3.5 20h17"/>',
   card:'<path d="M3 6h18v12H3zM3 10h18M6.5 14.5h4"/>',
-  bolt:'<path d="M13 3 5.5 13.5H12L11 21l7.5-10.5H12z"/>'
+  bolt:'<path d="M13 3 5.5 13.5H12L11 21l7.5-10.5H12z"/>',
+  heart:'<path d="M12 20s-7.5-4.6-7.5-10A4.3 4.3 0 0 1 12 7.3 4.3 4.3 0 0 1 19.5 10c0 5.4-7.5 10-7.5 10z"/>',
+  music:'<path d="M9 18V5.5l10-2V16M9 18a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0zM19 16a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0z"/>',
+  shirt:'<path d="M8.5 4 4 6.5l1.8 3.8L8 9.3V20h8V9.3l2.2 1 1.8-3.8L15.5 4c-.6 1.6-2 2.5-3.5 2.5S9.1 5.6 8.5 4z"/>',
+  dumbbell:'<path d="M6.5 7v10M17.5 7v10M3.5 9.5v5M20.5 9.5v5M6.5 12h11"/>',
+  game:'<path d="M7 8h10a4 4 0 0 1 4 4.2l-.4 3.2a2.4 2.4 0 0 1-4.2 1.2L15 15H9l-1.4 1.6a2.4 2.4 0 0 1-4.2-1.2L3 12.2A4 4 0 0 1 7 8zM7.5 11v3M6 12.5h3M15.5 12h.01M17.5 13.5h.01"/>',
+  leaf:'<path d="M5 19c0-8 5-13 14-14 0 9-5 14-13 14zM5 19l7-7"/>',
+  paw:'<circle cx="7" cy="10" r="1.6"/><circle cx="10.2" cy="6.5" r="1.6"/><circle cx="13.8" cy="6.5" r="1.6"/><circle cx="17" cy="10" r="1.6"/><path d="M12 11.5c-2.5 0-4.5 3-4.5 5a2 2 0 0 0 2 2c1 0 1.6-.5 2.5-.5s1.5.5 2.5.5a2 2 0 0 0 2-2c0-2-2-5-4.5-5z"/>',
+  coin:'<circle cx="12" cy="12" r="8"/><path d="M14.5 9.3c-.5-.8-1.4-1.3-2.5-1.3-1.5 0-2.5.8-2.5 2s1 1.7 2.5 2 2.5.8 2.5 2-1 2-2.5 2c-1.1 0-2-.5-2.5-1.3M12 6.5v1.5M12 16v1.5"/>'
 };
-const CAT_GLYPH=[['卡費','card'],['餐','food'],['食','food'],['早','food'],['午','food'],['晚','food'],['飲','cup'],['咖啡','cup'],['茶','cup'],
+const CAT_GLYPH=[['卡費','card'],['寵','paw'],['健身','dumbbell'],['運動','dumbbell'],['遊戲','game'],['音樂','music'],['捐','heart'],['服飾','shirt'],['衣服','shirt'],['餐','food'],['食','food'],['早','food'],['午','food'],['晚','food'],['飲','cup'],['咖啡','cup'],['茶','cup'],
   ['交通','car'],['車','car'],['油','car'],['捷運','car'],['購物','bag'],['買','bag'],['衣','bag'],['居家','house'],['房','house'],['租','house'],
   ['水電','bolt'],['電費','bolt'],['娛樂','ticket'],['電影','ticket'],['醫','cross'],['藥','cross'],['學','book'],['書','book'],['旅','plane'],
   ['禮','gift'],['訂閱','repeat'],['電話','phone'],['手機','phone'],['薪','note'],['工資','note'],['紅包','envelope'],['投資','trend'],['股','trend'],['獎','star'],['其他','dots']];
 const glyph=k=>`<svg class="ico" viewBox="0 0 24 24" aria-hidden="true">${GLYPH[k]}</svg>`;
-const GLYPH_COLOR={card:'indigo',food:'orange',cup:'brown',car:'blue',bag:'pink',house:'teal',bolt:'yellow',ticket:'purple',cross:'red',book:'indigo',
+const GLYPH_COLOR={heart:'red',music:'purple',shirt:'pink',dumbbell:'orange',game:'indigo',leaf:'green',paw:'brown',coin:'yellow',card:'indigo',food:'orange',cup:'brown',car:'blue',bag:'pink',house:'teal',bolt:'yellow',ticket:'purple',cross:'red',book:'indigo',
   plane:'cyan',gift:'pink',repeat:'mint',phone:'blue',note:'green',envelope:'red',trend:'mint',star:'yellow',dots:'gray'};
 const CAT_POOL=['blue','orange','pink','mint','purple','yellow','teal','indigo','brown','cyan','green','red'];
-function catInfo(cat){const n=catName(cat);
-  for(const [k,g] of CAT_GLYPH)if(n.includes(k))return {g:glyph(g),c:`var(--c-${GLYPH_COLOR[g]})`};
+/* 分類外觀：自動（依名稱猜圖示和顏色）＋使用者在「設定 › 分類」單獨改過的（存在這本帳本的 catStyle）
+   顏色走 --k-*（整組配色可以換），單獨挑過的顏色走 --c-*（系統色），換整組配色時不會變 */
+const CAT_COLORS=['red','orange','yellow','green','mint','teal','cyan','blue','indigo','purple','pink','brown','gray'];
+const CAT_COLOR_NAME={red:'紅',orange:'橘',yellow:'黃',green:'綠',mint:'薄荷',teal:'藍綠',cyan:'天藍',blue:'藍',indigo:'靛',purple:'紫',pink:'粉紅',brown:'棕',gray:'灰'};
+const CAT_GLYPH_PICK=['food','cup','car','bag','shirt','house','bolt','phone','ticket','game','music','plane','book','cross','dumbbell','paw','heart','gift','leaf','repeat','card','bank','coin','note','envelope','trend','star','dots'];
+function catAuto(cat){const n=catName(cat);
+  for(const [k,g] of CAT_GLYPH)if(n.includes(k))return {g,c:GLYPH_COLOR[g]};
   let h=0;for(const ch of n)h=(h*31+ch.codePointAt(0))>>>0;
-  return {g:esc([...n][0]||'？'),c:`var(--c-${CAT_POOL[h%CAT_POOL.length]})`};}
+  return {g:null,c:CAT_POOL[h%CAT_POOL.length]};}
+function catStyleOf(cat){let d;try{d=D();}catch(e){return null;}const m=d&&d.catStyle;return m&&m[cat]||null;}
+function catInfo(cat){const n=catName(cat),a=catAuto(cat),o=catStyleOf(cat)||{};
+  const gk=o.g&&o.g!=='text'&&GLYPH[o.g]?o.g:(o.g==='text'?null:a.g);
+  const ck=o.c&&CAT_COLORS.includes(o.c)?o.c:null;
+  return {g:gk?glyph(gk):esc([...n][0]||'？'),c:ck?`var(--c-${ck})`:`var(--k-${a.c})`,own:!!ck,ck:ck||a.c,gk};}
 const catGlyph=cat=>catInfo(cat).g;
 const catColor=cat=>catInfo(cat).c;
 function acctInfo(a){const t=(a&&(a.name||''))+' '+(a&&a.icon||''),k=a&&a.kind;
@@ -1096,9 +1172,28 @@ function acctInfo(a){const t=(a&&(a.name||''))+' '+(a&&a.icon||''),k=a&&a.kind;
   return [esc([...(a&&a.name||'？')][0]),'gray'];}
 const acctGlyph=a=>{const [g,c]=acctInfo(a);return `<span class="cic" style="--cc:var(--c-${c})">${g}</span>`;};
 const tone=(i,n)=>`color-mix(in srgb,var(--accent) ${Math.round(100-(n>1?i/(n-1):0)*72)}%,transparent)`;
-const segColor=(c,i,n)=>settings.muted?tone(i,n):catColor(c);
+const segColor=(c,i,n)=>settings.muted&&!catInfo(c).own?tone(i,n):catColor(c);
+/* 整組分類配色（設定 › 主題色與圖示）：繽紛＝系統色；柔和、大地、跟隨主題色 */
+const CAT_PALS={
+  vivid:{n:'繽紛',d:'預設，顏色最好分辨'},
+  soft:{n:'柔和',d:'低彩度的莫蘭迪色',light:{red:'#C27C7C',orange:'#C9926A',yellow:'#B39A55',green:'#7FA37F',mint:'#6FA39A',teal:'#6A9CA3',cyan:'#7A9EB8',blue:'#7F93BF',indigo:'#8A87B8',purple:'#9C86B0',pink:'#B985A0',brown:'#A08A76',gray:'#95938F'},
+    dark:{red:'#D99A9A',orange:'#DDAE8A',yellow:'#D6BE7E',green:'#9DBF9D',mint:'#8EBFB6',teal:'#89B8BF',cyan:'#98BAD2',blue:'#9DAFD8',indigo:'#A8A5D2',purple:'#B8A3CB',pink:'#D3A3BC',brown:'#BCA592',gray:'#B0AEAA'}},
+  earth:{n:'大地',d:'陶土、橄欖、芥末黃',light:{red:'#B5533C',orange:'#C77D3A',yellow:'#A88634',green:'#6B8A4E',mint:'#5E8C6A',teal:'#4F7F7A',cyan:'#5A7F8F',blue:'#4E6A8A',indigo:'#5F5A7E',purple:'#7A5A6E',pink:'#B0706A',brown:'#8A6A4A',gray:'#8C857A'},
+    dark:{red:'#D2765E',orange:'#DC9A5A',yellow:'#D2B05A',green:'#8DAA6E',mint:'#80AC8A',teal:'#72A19C',cyan:'#7DA1B0',blue:'#7590B0',indigo:'#8580A6',purple:'#A07E93',pink:'#CC8E87',brown:'#B08C6A',gray:'#ADA699'}},
+  accent:{n:'跟隨主題色',d:'同一個色系的深淺'}
+};
+const catPalKey=()=>CAT_PALS[settings.catPal]?settings.catPal:'vivid';
+function catPalColor(pal,name,dark){
+  if(pal==='vivid')return `var(--c-${name})`;
+  if(pal==='accent'){const i=CAT_COLORS.indexOf(name),p=[100,62,84,46,74,56,92,40,68,52,80,44,58][i<0?0:i];
+    return i%2?`color-mix(in srgb,var(--accent) ${p}%,var(--label2))`:`color-mix(in srgb,var(--accent) ${p}%,var(--label3))`;}
+  const P=CAT_PALS[pal];return (dark?P.dark:P.light)[name];}
+function applyCatPal(){const r=document.documentElement.style,pal=catPalKey(),dark=darkMQ.matches;
+  CAT_COLORS.forEach(n=>{if(pal==='vivid')r.removeProperty('--k-'+n);else r.setProperty('--k-'+n,catPalColor(pal,n,dark));});}
+function setCatPal(k){if(!CAT_PALS[k]||catPalKey()===k)return;settings.catPal=k;saveSettings();haptic('success');
+  lookTransition(()=>{applyCatPal();renderAll();},reduceMotion()?0:260);setTimeout(refreshSettingsTop,280);}
 function applyMuted(){const de=document.documentElement;if(settings.muted)de.setAttribute('data-muted','');else de.removeAttribute('data-muted');}
-const catIcon=cat=>{const i=catInfo(cat);return `<span class="cic" style="--cc:${i.c}" aria-hidden="true">${i.g}</span>`;};
+const catIcon=cat=>{const i=catInfo(cat);return `<span class="cic${i.own?' own':''}" style="--cc:${i.c}" aria-hidden="true">${i.g}</span>`;};
 
 /* ---------- 圖示（簡單線條，跟 SF Symbols 同樣的視覺重量） ---------- */
 const sv=(p,extra='')=>`<svg class="ico" viewBox="0 0 24 24" aria-hidden="true" ${extra}>${p}</svg>`;
@@ -1517,7 +1612,7 @@ function applyWall(){
 }
 setInterval(()=>{if((settings.wall||'auto')==='auto')applyWall();},5*60*1000);
 document.addEventListener('visibilitychange',()=>{if(!document.hidden&&(settings.wall||'auto')==='auto')applyWall();});
-try{darkMQ.addEventListener('change',applyWall);}catch(e){}
+try{darkMQ.addEventListener('change',applyWall);darkMQ.addEventListener('change',applyCatPal);}catch(e){}
 function setWall(k){if(k==='photo'&&(!_wallImg||(settings.wall||'auto')==='photo')){pickWallPhoto();return;}
   if(!WALL_ORDER.includes(k)||(settings.wall||'auto')===k)return;settings.wall=k;saveSettings();haptic();
   const root=$('setStack');if(root)qsa('.wtile',root).forEach(b=>{b.classList.toggle('on',b.dataset.wall===k);b.setAttribute('aria-pressed',b.dataset.wall===k);});
@@ -2523,7 +2618,7 @@ function renderAmount(){
 function renderTxCats(){
   const d=D(),cats=(F.type==='expense'?d.catsExp:d.catsInc).slice();
   if(F.cat&&!cats.includes(F.cat))cats.unshift(F.cat);
-  $('txCats').innerHTML=cats.map(c=>`<button class="cat${c===F.cat?' on':''}" data-cat="${encodeURIComponent(c)}" role="option" aria-selected="${c===F.cat}" style="--cc:${catColor(c)}"><span class="b">${catGlyph(c)}</span><span>${esc(catName(c))}</span></button>`).join('');
+  $('txCats').innerHTML=cats.map(c=>`<button class="cat${c===F.cat?' on':''}${catInfo(c).own?' own':''}" data-cat="${encodeURIComponent(c)}" role="option" aria-selected="${c===F.cat}" style="--cc:${catColor(c)}"><span class="b">${catGlyph(c)}</span><span>${esc(catName(c))}</span></button>`).join('');
   const on=qs('.cat.on',$('txCats'));if(on)on.scrollIntoView({inline:'center',block:'nearest'});
 }
 function setKeypad(on){
@@ -2658,6 +2753,7 @@ const PAGES={
   books:{title:'帳本',render:renderBooksPage},
   accounts:{title:'帳戶',render:renderAccountsPage},
   cats:{title:'分類',render:renderCatsPage},
+  catEdit:{title:'編輯分類',render:renderCatEditPage},
   theme:{title:'主題色與圖示',render:renderThemePage},
   wall:{title:'背景',render:renderWallPage},
   nag:{title:'記帳提醒',render:renderNagPage},
@@ -2730,8 +2826,50 @@ function renderCatsPage(box){
   box.innerHTML=`<div class="seg-wrap"><div class="seg" data-segkey="catmgr"><button data-catmgr="expense" class="${catMgrType==='expense'?'on':''}">支出分類</button><button data-catmgr="income" class="${catMgrType==='income'?'on':''}">收入分類</button></div></div>
     <div class="sec"><div class="sec-h"><span></span><button class="link" data-sort="cats">排序</button></div><div class="group">${list.map((c,i)=>`<div class="swipe" data-id="c${i}"><div class="swipe-act"><button class="sa-del" data-cat-del="${i}" data-full>刪除</button></div>
       <button class="row tap swipe-main" data-cat-edit="${i}" style="--inset:66px">${catIcon(c)}<div class="rt"><div class="t">${esc(catName(c))}</div><div class="s">${d.tx.filter(r=>r.category===c).length} 筆記錄</div></div>${ICON.chev}</button></div>`).join('')}</div>
-    <div class="sec-f">點一下可以改名（舊記錄會一起更新）；往左滑刪除（舊記錄保留原本的分類名稱）；點「排序」可以調整順序。</div></div>
+    <div class="sec-f">點一下可以改名、換顏色和圖示；往左滑刪除（舊記錄保留原本的分類名稱）；點「排序」可以調整順序。整組換顏色在「設定 › 主題色與圖示 › 分類配色」。</div></div>
     <div class="sec"><div class="group"><button class="row action left tap" data-act="addCat">新增分類…</button></div></div>`;
+}
+let catEditKey=null,catEditPop=false;
+function renderCatEditPage(box){
+  const d=D(),arr=catMgrType==='expense'?d.catsExp:d.catsInc,c=catEditKey;
+  if(c==null||!arr.includes(c)){box.innerHTML='<div class="empty"><p>這個分類已經不在了。</p></div>';return;}
+  const I=catInfo(c),o=(d.catStyle&&d.catStyle[c])||{},cnt=d.tx.filter(r=>r.category===c).length;
+  const others=arr.filter(x=>x!==c).map(x=>catInfo(x).ck);
+  const check=ICON.check.replace('class="ico check"','class="ico"');
+  const auto=catAuto(c),autoCol=`var(--k-${auto.c})`;
+  box.innerHTML=`<div class="sec"><div class="card cprev" style="margin:0;width:100%;--cc:${I.c}"><span class="orb2${catEditPop?' pop':''}">${I.g}</span><b>${esc(catName(c))}</b><span class="s">${cnt} 筆記錄</span>
+      <span class="mini">${catIcon(c)}在清單和統計裡長這樣</span></div></div>
+    <div class="sec"><div class="sec-h">名稱</div><div class="group"><div class="frow"><input class="left" id="catEditName" value="${esc(catName(c))}" maxlength="12" autocomplete="off" aria-label="分類名稱"></div></div>
+      <div class="sec-f">改名後，這個分類的舊記錄也會一起更新。</div></div>
+    <div class="sec"><div class="sec-h">顏色</div><div class="card" style="margin:0;width:100%;padding:0">
+      <button class="cautorow${o.c?'':' on'}" data-cstyle-c="auto" aria-pressed="${!o.c}"><span class="dotx" style="--sc:${autoCol}"></span><div class="rt"><div class="t">自動</div><div class="s">依名稱挑選，目前是${CAT_COLOR_NAME[auto.c]}色，會跟著「分類配色」一起變</div></div><span class="ck">${check}</span></button>
+      <div class="cgrid">${CAT_COLORS.map(k=>`<button class="cdot${o.c===k?' on':''}" data-cstyle-c="${k}" style="--sc:var(--c-${k})" aria-label="${CAT_COLOR_NAME[k]}${others.includes(k)?'（其他分類也在用）':''}" aria-pressed="${o.c===k}">${check}${others.includes(k)?'<i class="used"></i>':''}</button>`).join('')}</div></div>
+      <div class="sec-f">自己挑的顏色不會被「分類配色」改掉。下面有小點的顏色，這本帳本裡其他分類也在用，統計圖上會比較難分辨。</div></div>
+    <div class="sec"><div class="sec-h">圖示</div><div class="card" style="margin:0;width:100%;padding:0;--cc:${I.c}">
+      <button class="cautorow${o.g?'':' on'}" data-cstyle-g="auto" aria-pressed="${!o.g}"><span class="dotx g">${auto.g?glyph(auto.g):esc([...catName(c)][0]||'字')}</span><div class="rt"><div class="t">自動</div><div class="s">依名稱挑選圖示</div></div><span class="ck">${check}</span></button>
+      <div class="cgrid g6"><button class="gpick${o.g==='text'?' on':''}" data-cstyle-g="text" aria-label="用名稱第一個字" aria-pressed="${o.g==='text'}">${esc([...catName(c)][0]||'字')}</button>
+      ${CAT_GLYPH_PICK.map(k=>`<button class="gpick${o.g===k?' on':''}" data-cstyle-g="${k}" aria-label="${k}" aria-pressed="${o.g===k}">${glyph(k)}</button>`).join('')}</div></div>
+      <div class="sec-f">顏色和圖示只套用在這本帳本。</div></div>
+    ${o.c||o.g?'<div class="sec"><div class="group"><button class="row action left tap" data-cstyle-reset>恢復自動的顏色和圖示</button></div></div>':''}`;
+  catEditPop=false;
+  const inp=$('catEditName');
+  inp.addEventListener('change',()=>catRename(inp.value));
+  inp.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();inp.blur();}});
+}
+function catRename(v){
+  const d=D(),arr=catMgrType==='expense'?d.catsExp:d.catsInc,c=catEditKey,i=arr.indexOf(c);if(i<0)return;
+  const n=String(v||'').replace(/\s+/g,'');if(!n){refreshSettingsTop();return;}
+  const full=catEmoji(c)+' '+n;if(full===c)return;
+  if(arr.includes(full)){toast('已經有這個分類');refreshSettingsTop();return;}
+  arr[i]=full;let k=0;d.tx.forEach(r=>{if(r.category===c&&r.type===catMgrType){r.category=full;k++;}});
+  if(d.catStyle&&d.catStyle[c]){d.catStyle[full]=d.catStyle[c];delete d.catStyle[c];}
+  catEditKey=full;saveDB();toast(k?`已更新分類與 ${k} 筆記錄`:'已更新分類');refreshSettingsTop();
+}
+function setCatStyle(part,v){
+  const d=D(),c=catEditKey;if(c==null)return;d.catStyle=d.catStyle||{};
+  const o=Object.assign({},d.catStyle[c]);if(v==null||v==='auto')delete o[part];else o[part]=v;
+  if(Object.keys(o).length)d.catStyle[c]=o;else delete d.catStyle[c];
+  catEditPop=true;saveDB();haptic();refreshSettingsTop();
 }
 function renderThemePage(box){
   const cur=currentPresetKey();
@@ -2741,6 +2879,8 @@ function renderThemePage(box){
         <div class="demo"><div class="bars">${[38,62,46,80,54,100,70].map((h,i)=>`<i style="height:${h}%;opacity:${i===5?1:.28+.08*i}"></i>`).join('')}</div><span class="thpill${mono?' mono':''}">＋ 記一筆</span></div></div>
       <div class="swatches" style="border-top:.5px solid var(--sep,rgba(127,127,127,.2))">${PRESETS.map(p=>`<button class="sw${cur===p.k?' on':''}" data-preset="${p.k}" style="--sc:${p.c}" aria-label="${p.n}" aria-pressed="${cur===p.k}"><span class="dot2">${ICON.check.replace('class="ico check"','class="ico"')}</span><span>${p.n}</span></button>`).join('')}</div></div>
     ${cur?'':`<div class="sec-f">目前使用兌換碼主題「${esc(themeName())}」。</div>`}</div>
+    <div class="sec"><div class="sec-h">分類配色</div><div class="card cpal" style="margin:0;width:100%">${Object.entries(CAT_PALS).map(([k,P])=>`<button class="${catPalKey()===k?'on':''}" data-catpal="${k}" aria-pressed="${catPalKey()===k}"><span class="tick">${ICON.check.replace('class="ico check"','class="ico"')}</span><span class="pstack">${['orange','blue','green','pink','purple'].map(n=>`<i style="--sc:${catPalColor(k,n,darkMQ.matches)}"></i>`).join('')}</span><b>${P.n}</b><span class="d">${P.d}</span></button>`).join('')}</div>
+      <div class="sec-f">一次換掉所有分類的顏色。在「設定 › 分類」單獨挑過顏色的分類不會跟著變。${settings.muted?'目前開著「低飽和模式」，沒有單獨挑色的分類會先顯示成灰色。':''}</div></div>
     <div class="sec"><div class="sec-h">主畫面圖示</div><div class="card hicons" style="margin:0;width:100%">${HOME_ICONS.map(x=>`<button class="hic${homeIconKey()===x.k?' on':''}" data-homeicon="${x.k}" aria-pressed="${homeIconKey()===x.k}"><span class="appicon">${x.svg()}</span><span>${x.n}${x.k==='light'?'（預設）':x.k==='gray'?'（深淺通用）':''}</span></button>`).join('')}</div>
       <div class="sec-f">iPhone 不會讓網頁 App 的圖示跟著深色模式自動變色，圖示是在「加入主畫面」那一刻決定的。想在深色主畫面也好看，可以選灰色。</div></div>
     <div class="sec"><div class="sec-h">換圖示前先備份</div><div class="card bkcard" style="margin:0;width:100%">${sic('share',backupInfo().warn||!backupFresh()?'red':'blue')}<div class="rt"><div class="t">完整備份</div><div class="s${backupInfo().warn?' warn':''}">上次匯出：${backupInfo().text}。移除主畫面圖示會刪掉裡面的記錄，加回來後要用這份備份還原。</div></div><button class="pbtn sm" data-act="backupJSON">匯出</button></div></div>
@@ -2902,7 +3042,7 @@ function setHomeIcon(k){if(!homeIcon(k)||homeIconKey()===k)return;settings.homeI
 async function copyIconURL(){const u=homeIconURL();if(isStandaloneApp()&&!(await remindBackup()))return;
   try{await navigator.clipboard.writeText(u);haptic('success');toast('已拷貝加入用網址');}
   catch(e){alertMsg('加入用網址','請手動拷貝這個網址：\n'+u);}}
-function initTheme(){readIconParam();syncMono();applyIcon();if(settings.theme){const th=parseTheme(settings.theme);if(th)applyTheme(th);}}
+function initTheme(){readIconParam();try{applyCatPal();}catch(e){}syncMono();applyIcon();if(settings.theme){const th=parseTheme(settings.theme);if(th)applyTheme(th);}}
 function redeemTheme(){
   const inp=$('themeCode'),code=(inp?inp.value:'').trim();
   if(!code){toast('請先輸入主題兌換碼');return;}
@@ -3445,7 +3585,11 @@ document.addEventListener('click',e=>{
   if((el=t.closest('[data-book-del]'))){bookAction('del',el.dataset.bookDel);return;}
   if((el=t.closest('[data-acct-edit]'))){acctAction('edit',Number(el.dataset.acctEdit));return;}
   if((el=t.closest('[data-acct-del]'))){acctAction('del',Number(el.dataset.acctDel));return;}
-  if((el=t.closest('[data-cat-edit]'))){catAction('edit',Number(el.dataset.catEdit));return;}
+  if((el=t.closest('[data-cat-edit]'))){const d=D(),arr=catMgrType==='expense'?d.catsExp:d.catsInc;catEditKey=arr[Number(el.dataset.catEdit)];haptic();pushPage('catEdit');return;}
+  if((el=t.closest('[data-cstyle-c]'))){setCatStyle('c',el.dataset.cstyleC);return;}
+  if((el=t.closest('[data-cstyle-g]'))){setCatStyle('g',el.dataset.cstyleG);return;}
+  if((el=t.closest('[data-cstyle-reset]'))){const d=D();if(d.catStyle)delete d.catStyle[catEditKey];saveDB();haptic('success');refreshSettingsTop();return;}
+  if((el=t.closest('[data-catpal]'))){setCatPal(el.dataset.catpal);return;}
   if((el=t.closest('[data-cat-del]'))){catAction('del',Number(el.dataset.catDel));return;}
   if((el=t.closest('[data-sort]'))){sortMode=el.dataset.sort;closeSwipe();haptic();refreshSettingsTop();return;}
   if((el=t.closest('[data-sort-done]'))){sortMode=null;haptic();refreshSettingsTop();renderAll();return;}
