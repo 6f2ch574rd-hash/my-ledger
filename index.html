@@ -452,15 +452,23 @@ html[data-nohap] .hap-ov{display:none;}
 .itile b{font-size:1.12rem;font-weight:650;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%;}
 .itile i{font-style:normal;font-size:.706rem;color:var(--label2);}
 .itile.on{box-shadow:0 0 0 2px var(--accent);}
+.ivars{margin-top:6px;display:flex;flex-wrap:wrap;gap:5px;align-items:center;font-size:.765rem;}
+.ivars span{padding:2px 9px;border-radius:999px;background:color-mix(in srgb,var(--label) 7%,transparent);color:var(--label);}
 .icmp{padding:0 20px 12px;font-size:.824rem;color:var(--label2);line-height:1.5;}
 .icmp b{color:var(--label);font-weight:600;}
-.ibars{display:flex;align-items:flex-end;gap:5px;height:96px;padding:6px 14px 0;margin:0 16px 4px;border-radius:16px;background:var(--cell);}
-.ibars .c{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%;min-width:0;padding-bottom:6px;}
+.ibars{display:flex;align-items:flex-end;gap:5px;height:118px;padding:6px 14px 0;margin:0 16px 4px;border-radius:16px;background:var(--cell);}
+.ibars .c{flex:1;appearance:none;border:0;background:none;font:inherit;color:inherit;cursor:pointer;-webkit-tap-highlight-color:transparent;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%;min-width:0;padding-bottom:6px;}
 .ibars .c u{display:block;width:100%;max-width:22px;border-radius:5px 5px 2px 2px;background:color-mix(in srgb,var(--accent) 38%,transparent);min-height:2px;}
 .ibars .c.on u{background:var(--accent);}
+.ibars .c:active u{transform:scaleY(.96);transform-origin:bottom;}
+.ibars .c em{font-style:normal;font-size:.62rem;font-weight:650;color:var(--label);margin-bottom:3px;white-space:nowrap;min-height:.8em;}
+.ibars .c.now:not(.on) u{background:color-mix(in srgb,var(--accent) 60%,transparent);}
 .ibars .c s{text-decoration:none;font-size:.62rem;color:var(--label2);margin-top:4px;white-space:nowrap;}
 .ibars .c.on s{color:var(--label);font-weight:600;}
-.ibars-h{padding:4px 20px 6px;font-size:.765rem;color:var(--label2);}
+.ibars-h{display:flex;justify-content:space-between;padding:4px 20px 6px;font-size:.765rem;color:var(--label2);}
+.ibars-h span{opacity:.75;}
+.ifocus{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:0 20px 10px;}
+.ifocus .link{color:var(--accent);font-size:.882rem;}
 
 .sumline b{display:block;font-size:1.65rem;color:var(--label);margin-top:2px;}
 
@@ -2594,16 +2602,54 @@ function renderStatsCatsInner(box){
 /* =====================================================================
    重複項目：名稱相同的記錄自動歸成一組（例如每次都記「捷運」）
    ===================================================================== */
-const itemKey=s=>String(s||'').trim().replace(/\s+/g,' ').toLowerCase();
-const itemOk=r=>!r.synthetic&&!r.payOf&&String(r.name||'').trim()&&String(r.name).trim()!==catName(r.category)&&String(r.name).trim()!==r.category;
+/* 名稱正規化：全形轉半形、忽略大小寫與多餘空白、去掉括號裡的補充、去掉結尾用空白、x 或單位隔開的數量（「捷運 30」「捷運x2」「捷運30元」）；
+   「項目123」這種黏在一起的數字算名字的一部分，交給下面的「開頭相同」規則處理 */
+function itemNorm(s){
+  let t=String(s||'').normalize('NFKC').toLowerCase().replace(/\s+/g,' ').trim();
+  t=t.replace(/[(\[【〔「『<][^)\]】〕」』>]*[)\]】〕」』>]/g,' ').replace(/\s+/g,' ').trim();
+  const cut=t.replace(/(?:\s+(?:[x×*]\s*)?\d+(?:\.\d+)?|\s*(?:(?<![a-z])x|×|\*)\s*\d+(?:\.\d+)?|\s*\d+(?:\.\d+)?\s*(?=元|塊|次|趟|杯|份))\s*(?:元|塊|次|趟|杯|份)?$/,'').replace(/[\s\-_.,，、/:：;；!！?？~～·•]+$/,'');
+  if(cut.length>=2&&/[a-z㐀-鿿぀-ヿ가-힯]/.test(cut))t=cut;
+  return t.replace(/[\s\-_.,，、/:：;；!！?？~～·•]+$/,'').trim();
+}
+const itemKey=s=>itemNorm(s);
+const isCJK=c=>/[㐀-鿿぀-ヿ가-힯]/.test(c||'');
+/* 相近名稱合併：同一種收支、同一個主要分類時，較長的名稱如果以較短的名稱開頭，就併到較短的那組（「捷運上班」→「捷運」）。
+   中文至少兩個字才當開頭；英文至少三個字母，而且要在單字的邊界（「car」不會吃掉「card」）。 */
+let _itemAliasCache={sig:'',map:null};
+function itemAlias(){
+  const tx=ledgerTx();let h=7;for(const r of tx){const t=r.type+'\u0001'+(r.name||'')+'\u0001'+(r.category||'')+(r.synthetic?'s':'')+(r.payOf?'p':'');for(let i=0;i<t.length;i++)h=(h*31+t.charCodeAt(i))|0;h=(h*31+10)|0;}const sig=tx.length+'|'+h;
+  if(_itemAliasCache.sig===sig&&_itemAliasCache.map)return _itemAliasCache.map;
+  const st={};
+  tx.forEach(r=>{if(!itemOk0(r))return;const n=itemNorm(r.name);if(!n)return;const k=r.type+'|'+n;const x=st[k]||(st[k]={t:r.type,n,cats:{},c:0});x.c++;x.cats[r.category]=(x.cats[r.category]||0)+1;});
+  const top=o=>Object.entries(o).sort((a,b)=>b[1]-a[1]||(a[0]<b[0]?-1:1))[0][0];
+  const by={};Object.values(st).forEach(x=>{x.cat=top(x.cats);(by[x.t+'|'+x.cat]||(by[x.t+'|'+x.cat]=new Set())).add(x.n);});
+  const map={};
+  Object.values(st).sort((a,b)=>a.n.length-b.n.length||(a.n<b.n?-1:1)).forEach(x=>{
+    const set=by[x.t+'|'+x.cat];let root=x.n;
+    for(let L=x.n.length-1;L>=2;L--){const pre=x.n.slice(0,L);if(!set.has(pre))continue;
+      const last=pre[L-1],next=x.n[L];
+      const ok=isCJK(last)?true:(L>=3&&!/[a-z0-9]/.test(next||''));
+      if(ok){root=map[x.t+'|'+pre]||pre;break;}}
+    map[x.t+'|'+x.n]=root;});
+  const disp={},cnt={};
+  tx.forEach(r=>{if(!itemOk0(r))return;const n=itemNorm(r.name);if(!n)return;const k=r.type+'|'+n;const root=map[k]||n;const o=String(r.name).trim(),gk=r.type+'|'+root;
+    if(n!==root)return;const clean=o.normalize('NFKC').toLowerCase().replace(/\s+/g,' ')===root?1:0;const c=(cnt[gk]||(cnt[gk]={}));c[o]=c[o]||{n:0,clean};c[o].n++;});
+  Object.entries(cnt).forEach(([gk,o])=>{disp[gk]=Object.entries(o).sort((a,b)=>b[1].clean-a[1].clean||b[1].n-a[1].n||(a[0]<b[0]?-1:1))[0][0];});
+  Object.defineProperty(map,'__disp',{value:disp,enumerable:false});_itemAliasCache={sig,map};return map;
+}
+function itemGKey(r,m){const n=itemNorm(r.name);if(!n)return null;m=m||itemAlias();return r.type+'|'+(m[r.type+'|'+n]||n);}
+const itemOk0=r=>!r.synthetic&&!r.payOf&&String(r.name||'').trim()&&String(r.name).trim()!==catName(r.category)&&String(r.name).trim()!==r.category;
+const itemOk=r=>itemOk0(r)&&!!itemNorm(r.name);
 let itemsAll=false,itemSel=null,itemPer='month';
 function itemGroups(rows){
   const g={};
-  rows.forEach(r=>{if(!itemOk(r))return;const nm=String(r.name).trim(),k=r.type+'|'+itemKey(nm);
-    const x=g[k]||(g[k]={k,type:r.type,n:0,sum:0,cats:{},names:{}});
-    x.n++;x.sum+=r.amount;x.cats[r.category]=(x.cats[r.category]||0)+1;x.names[nm]=(x.names[nm]||0)+1;});
-  const top=o=>Object.entries(o).sort((a,b)=>b[1]-a[1])[0][0];
-  return Object.values(g).filter(x=>x.n>=2).map(x=>Object.assign(x,{cat:top(x.cats),name:top(x.names)})).sort((a,b)=>b.sum-a.sum||b.n-a.n);
+  const am=itemAlias();
+  rows.forEach(r=>{if(!itemOk(r))return;const nm=String(r.name).trim(),k=itemGKey(r,am);if(!k)return;
+    const x=g[k]||(g[k]={k,type:r.type,n:0,sum:0,cats:{},names:{},rootNames:{}});
+    x.n++;x.sum+=r.amount;x.cats[r.category]=(x.cats[r.category]||0)+1;x.names[nm]=(x.names[nm]||0)+1;
+    if(r.type+'|'+itemNorm(nm)===k)x.rootNames[nm]=(x.rootNames[nm]||0)+1;});
+  const top=o=>Object.entries(o).sort((a,b)=>b[1]-a[1]||(a[0]<b[0]?-1:1))[0][0];
+  return Object.values(g).filter(x=>x.n>=2).map(x=>Object.assign(x,{cat:top(x.cats),name:(am.__disp&&am.__disp[x.k])||top(Object.keys(x.rootNames).length?x.rootNames:x.names)})).sort((a,b)=>b.sum-a.sum||b.n-a.n||(a.k<b.k?-1:1));
 }
 function itemsSecHTML(rows,SP,spanTxt){
   const gs=itemGroups(rows);if(!gs.length)return '';
@@ -2613,51 +2659,87 @@ function itemsSecHTML(rows,SP,spanTxt){
       <div class="rt"><div class="t">${esc(x.name)}</div><div class="s">${x.n} 次 · 平均每次 ${money(Math.round(x.sum/x.n))}</div></div>
       <span class="amt num">${money(x.sum)}</span>${ICON.chev}</button>`).join('')}
     ${gs.length>5?`<button class="row tap" data-items-all style="justify-content:center;color:var(--accent);font-size:.941rem">${itemsAll?'收起':`顯示全部 ${gs.length} 項`}</button>`:''}</div>
-    <div class="sec-f">名稱相同、出現兩次以上的記錄會自動歸成一組，例如每次都記「捷運」。點進去可以看這週、這個月、今年各花多少。</div></div>`;
+    <div class="sec-f">名稱相同或相近、出現兩次以上的記錄會自動歸成一組，例如「捷運」「捷運上班」「捷運 30」會算在一起。點進去可以看這週、這個月、今年各花多少。</div></div>`;
 }
-function itemRows(k){return ledgerTx().filter(r=>itemOk(r)&&r.type+'|'+itemKey(r.name)===k);}
-function itemPeriods(){
-  const t=today(),T=parseD(t),ws=weekStart(T),y=T.getFullYear(),m=T.getMonth();
-  const mEnd=(yy,mm)=>ymd(new Date(yy,mm+1,0,12));
-  return {
-    week:{l:'這週',from:ymd(ws),to:t,pl:'上週',pf:ymd(addDays(ws,-7)),pt:ymd(addDays(ws,-1)),ppt:ymd(addDays(ws,-7+((T.getDay()+6)%7)))},
-    month:{l:'這個月',from:ymd(new Date(y,m,1,12)),to:t,pl:'上個月',pf:ymd(new Date(y,m-1,1,12)),pt:mEnd(y,m-1),ppt:ymd(new Date(y,m-1,Math.min(T.getDate(),new Date(y,m,0).getDate()),12))},
-    year:{l:'今年',from:y+'-01-01',to:t,pl:'去年',pf:(y-1)+'-01-01',pt:(y-1)+'-12-31',ppt:(y-1)+t.slice(4)},
-    all:{l:'全部',from:'0000-01-01',to:'9999-12-31'}};
+function itemRows(k){const am=itemAlias();return ledgerTx().filter(r=>itemOk(r)&&itemGKey(r,am)===k);}
+/* 期間格：per = week / month / year / all；focus = 正在看的那一段（可以是過去某週、某月、某年，或統計頁選的一段） */
+let itemFocus=null,itemShowN=150;
+function itemBucket(per,dateStr){
+  const T=parseD(dateStr||today()),t=today();
+  if(per==='week'){const a=weekStart(T),e=addDays(a,6),cur=ymd(a)===ymd(weekStart(parseD(t)));
+    return {per,from:ymd(a),to:ymd(e),label:cur?'這週':`${a.getMonth()+1}/${a.getDate()} 那週`,cur};}
+  if(per==='month'){const a=new Date(T.getFullYear(),T.getMonth(),1,12),e=new Date(T.getFullYear(),T.getMonth()+1,0,12),cur=ymd(a).slice(0,7)===t.slice(0,7);
+    return {per,from:ymd(a),to:ymd(e),label:cur?'這個月':(a.getFullYear()!==parseD(t).getFullYear()?`${a.getFullYear()}年`:'')+`${a.getMonth()+1}月`,cur};}
+  if(per==='year'){const y=T.getFullYear(),cur=y===parseD(t).getFullYear();return {per,from:y+'-01-01',to:y+'-12-31',label:cur?'今年':y+'年',cur};}
+  return {per:'all',from:'0000-01-01',to:'9999-12-31',label:'全部',cur:true};
 }
-function itemTrend(rows,per){
+function itemPrevBucket(f){
+  if(f.per==='week')return itemBucket('week',ymd(addDays(parseD(f.from),-7)));
+  if(f.per==='month'){const d=parseD(f.from);return itemBucket('month',ymd(new Date(d.getFullYear(),d.getMonth()-1,1,12)));}
+  if(f.per==='year')return itemBucket('year',(Number(f.from.slice(0,4))-1)+'-06-01');
+  return null;
+}
+const PREV_WORD={week:'上週',month:'上個月',year:'去年'};
+function itemTrend(rows,per,focus){
   const T=parseD(today()),out=[];const sum=(f,t)=>rows.filter(r=>r.date>=f&&r.date<=t).reduce((s,r)=>s+r.amount,0);
-  if(per==='week'){const ws=weekStart(T);for(let i=7;i>=0;i--){const a=addDays(ws,-7*i),b=addDays(a,6);out.push({l:i?`${a.getMonth()+1}/${a.getDate()}`:'這週',v:sum(ymd(a),ymd(b)),on:!i});}return {h:'最近 8 週',bars:out};}
-  if(per==='month'){for(let i=11;i>=0;i--){const a=new Date(T.getFullYear(),T.getMonth()-i,1,12),b=new Date(a.getFullYear(),a.getMonth()+1,0,12);out.push({l:(a.getMonth()+1)+'月',v:sum(ymd(a),ymd(b)),on:!i});}return {h:'最近 12 個月',bars:out};}
-  const ys=rows.map(r=>Number(r.date.slice(0,4))),y1=T.getFullYear(),y0=per==='all'?Math.max(Math.min(y1,...ys),y1-7):y1-4;
-  for(let y=y0;y<=y1;y++)out.push({l:String(y),v:sum(y+'-01-01',y+'-12-31'),on:y===y1});
-  return {h:per==='all'?'每年':'最近 5 年',bars:out};
+  const fd=focus&&!focus.custom&&focus.per!=='all'?parseD(focus.from):null;
+  if(per==='week'){let end=weekStart(T);if(fd&&fd<addDays(end,-7*7))end=weekStart(fd);
+    for(let i=7;i>=0;i--){const bk=itemBucket('week',ymd(addDays(end,-7*i)));const a=parseD(bk.from);out.push(Object.assign(bk,{l:bk.cur?'這週':`${a.getMonth()+1}/${a.getDate()}`,v:sum(bk.from,bk.to)}));}
+    return {h:'每週',bars:out};}
+  if(per==='month'){let ey=T.getFullYear(),em=T.getMonth();if(fd&&(fd.getFullYear()*12+fd.getMonth())<(ey*12+em-11)){ey=fd.getFullYear();em=fd.getMonth();}
+    for(let i=11;i>=0;i--){const bk=itemBucket('month',ymd(new Date(ey,em-i,1,12)));const a=parseD(bk.from);out.push(Object.assign(bk,{l:(a.getMonth()+1)+'月',v:sum(bk.from,bk.to)}));}
+    return {h:'每個月',bars:out};}
+  const ys=rows.map(r=>Number(r.date.slice(0,4))),y1=T.getFullYear();let y0=per==='all'?Math.max(Math.min(y1,...ys),y1-7):y1-4;
+  if(fd&&fd.getFullYear()<y0)y0=fd.getFullYear();
+  for(let y=y0;y<=y1;y++){const bk=itemBucket('year',y+'-06-01');out.push(Object.assign(bk,{l:String(y),v:sum(bk.from,bk.to)}));}
+  return {h:'每年',bars:out};
 }
-function openItemSheet(k){itemSel=k;itemPer='month';renderItemSheet();openSheet('catSheet');haptic();}
+let _itemBars=[];
+/* 從統計頁打開：跟著統計頁正在看的期間（例如統計頁在 10 月，就直接看 10 月的捷運） */
+function itemCtxFromStats(){
+  try{const P=stPeriod(),SP=stSpan(P);
+    if(SP.sel){const one=SP.a===SP.b,per=stRange==='year'?(one?'month':'year'):stRange==='all'?'year':stRange;
+      if(stRange==='year'&&one)return itemBucket('month',SP.from);
+      if(stRange==='all'&&one)return itemBucket('year',SP.from);
+      return {per,from:SP.from,to:SP.to,label:SP.label,custom:true};}
+    if(stRange==='all')return itemBucket('all');
+    return itemBucket(stRange,P.from);
+  }catch(e){return itemBucket('month');}
+}
+function openItemSheet(k,ctx){itemSel=k;itemShowN=150;itemFocus=ctx||itemBucket('month');itemPer=itemFocus.per;renderItemSheet();openSheet('catSheet');haptic();}
+function setItemFocus(f){itemFocus=f;itemPer=f.per;itemShowN=150;haptic();renderItemSheet();}
 function renderItemSheet(){
   const k=itemSel,all=itemRows(k);if(!all.length){closeSheet('catSheet');return;}
-  const g=itemGroups(all)[0]||{name:all[0].name,cat:all[0].category,type:all[0].type};
-  const PS=itemPeriods(),word=g.type==='income'?'收入':'花費';
+  const g=itemGroups(all)[0]||{name:all[0].name,cat:all[0].category,type:all[0].type,names:{}};
+  const F=itemFocus||itemBucket('month'),word=g.type==='income'?'收入':'花費';
   const sumOf=(f,t)=>{const rs=all.filter(r=>r.date>=f&&r.date<=t);return {v:rs.reduce((s,r)=>s+r.amount,0),n:rs.length,rs};};
   $('catTitle').textContent=g.name;
-  const tiles=['week','month','year','all'].map(p=>{const x=sumOf(PS[p].from,PS[p].to);
-    return `<button class="itile${itemPer===p?' on':''}" data-item-per="${p}"><span class="l">${PS[p].l}</span><b class="num">${money(x.v)}</b><i>${x.n} 次</i></button>`;}).join('');
-  const P=PS[itemPer],cur=sumOf(P.from,P.to);
+  const tiles=['week','month','year','all'].map(p=>{const B=itemBucket(p),x=sumOf(B.from,B.to),on=!F.custom&&F.per===p&&F.from===B.from&&F.to===B.to;
+    return `<button class="itile${on?' on':''}" data-item-per="${p}" aria-pressed="${on}"><span class="l">${B.label}</span><b class="num">${money(x.v)}</b><i>${x.n} 次</i></button>`;}).join('');
+  const t=today(),cur=sumOf(F.from,F.to<t||F.per==='all'?F.to:t);
   let cmp='';
-  if(itemPer!=='all'){const pv=sumOf(P.pf,P.ppt).v,full=sumOf(P.pf,P.pt).v;
-    if(pv||cur.v){const d=cur.v-pv;cmp=`${P.pl}同期 ${money(pv)}${d?`，${P.l}${d>0?'多':'少'} <b class="num">${money(Math.abs(d))}</b>`:'，一樣多'}`;}
-    if(full&&P.pt!==P.ppt)cmp+=`${cmp?'　·　':''}${P.pl}整段 ${money(full)}`;}
-  else{const f=all.reduce((a,r)=>r.date<a?r.date:a,'9999'),days=Math.max(1,Math.round((parseD(today())-parseD(f))/864e5)+1);
+  if(F.custom){cmp=`${esc(F.label)} 共 ${cur.n} 次`;}
+  else if(F.per!=='all'){const PB=itemPrevBucket(F);
+    if(F.cur){const el=Math.round((parseD(t)-parseD(F.from))/864e5);let ppt=ymd(addDays(parseD(PB.from),el));if(ppt>PB.to)ppt=PB.to;
+      const pv=sumOf(PB.from,ppt).v,full=sumOf(PB.from,PB.to).v;
+      if(pv||cur.v){const d=cur.v-pv;cmp=`${PREV_WORD[F.per]}同期 ${money(pv)}${d?`，${F.label}${d>0?'多':'少'} <b class="num">${money(Math.abs(d))}</b>`:'，一樣多'}`;}
+      if(full&&ppt!==PB.to)cmp+=`${cmp?'　·　':''}${PREV_WORD[F.per]}整段 ${money(full)}`;}
+    else{const pv=sumOf(PB.from,PB.to).v;
+      if(pv||cur.v){const d=cur.v-pv;cmp=`${esc(PB.label)} ${money(pv)}${d?`，${esc(F.label)}${d>0?'多':'少'} <b class="num">${money(Math.abs(d))}</b>`:'，一樣多'}`;}}}
+  else{const f=all.reduce((a,r)=>r.date<a?r.date:a,'9999'),days=Math.max(1,Math.round((parseD(t)-parseD(f))/864e5)+1);
     cmp=`從 ${f.replace(/-/g,'/')} 開始共 ${all.length} 次，平均每個月約 <b class="num">${money(Math.round(cur.v/Math.max(1,days/30.44)))}</b>`;}
   const avg=cur.n?`平均每次 ${money(Math.round(cur.v/cur.n))}`:'';
-  const tr=itemTrend(all,itemPer),mx=Math.max(1,...tr.bars.map(b=>b.v));
-  $('catBody').innerHTML=`<div class="sumline">${esc(catName(g.cat))} · 自動整理名稱「${esc(g.name)}」的${word}</div>
+  const tr=itemTrend(all,F.per,F),mx=Math.max(1,...tr.bars.map(b=>b.v));_itemBars=tr.bars;
+  const vars=Object.keys(g.names||{}).filter(n=>n!==g.name).sort((a,b)=>(g.names[b]-g.names[a])||(a<b?-1:1));
+  $('catBody').innerHTML=`<div class="sumline">${esc(catName(g.cat))} · 自動整理名稱「${esc(g.name)}」的${word}${vars.length?`<div class="ivars">也算進來：${vars.slice(0,6).map(n=>`<span>${esc(n)}</span>`).join('')}${vars.length>6?`<span>等 ${vars.length} 種寫法</span>`:''}</div>`:''}</div>
     <div class="itiles">${tiles}</div>
+    ${F.custom?`<div class="ifocus"><span class="selchip">${esc(F.label)}</span><button class="link" data-item-per="${F.per==='all'?'all':F.per}">回到${itemBucket(F.per).label}</button></div>`:''}
     <div class="icmp">${cmp}${cmp&&avg?'　·　':''}${avg}</div>
-    <div class="ibars-h">${tr.h}</div>
-    <div class="ibars" role="img" aria-label="${esc(tr.h)}的${word}">${tr.bars.map(b=>`<div class="c${b.on?' on':''}" title="${esc(b.l)} ${money(b.v)}"><u style="height:${(b.v/mx*100).toFixed(1)}%"></u><s>${esc(b.l)}</s></div>`).join('')}</div>
-    <div class="sec" style="margin-top:14px"><div class="sec-h"><span>${esc(P.l)} · ${cur.n} 筆</span><span class="num">${money(cur.v)}</span></div>
-    ${cur.n?`<div class="group">${cur.rs.sort(byDateDesc).map(r=>txRowHTML(r,{showDate:true})).join('')}</div>`:`<div class="sec-f" style="padding-top:0">${esc(P.l)}還沒有這一項。</div>`}</div>`;
+    <div class="ibars-h">${tr.h}<span>點長條可以看那一段</span></div>
+    <div class="ibars" role="group" aria-label="${esc(tr.h)}的${word}">${tr.bars.map((b,i)=>{const on=!F.custom&&b.from===F.from&&b.to===F.to;
+      return `<button class="c${on?' on':''}${b.cur?' now':''}" data-item-bar="${i}" aria-pressed="${on}" aria-label="${esc(b.label)} ${money(b.v)}"><em class="num">${on&&b.v?money(b.v).replace('NT$',''):''}</em><u style="height:${(b.v/mx*100).toFixed(1)}%"></u><s>${esc(b.l)}</s></button>`;}).join('')}</div>
+    <div class="sec" style="margin-top:14px"><div class="sec-h"><span>${esc(F.label)} · ${cur.n} 筆</span><span class="num">${money(cur.v)}</span></div>
+    ${cur.n?`<div class="group">${cur.rs.sort(byDateDesc).slice(0,itemShowN).map(r=>txRowHTML(r,{showDate:true})).join('')}${cur.n>itemShowN?`<button class="row tap" data-item-more style="justify-content:center;color:var(--accent);font-size:.941rem">再顯示 ${Math.min(150,cur.n-itemShowN)} 筆（還有 ${cur.n-itemShowN} 筆）</button>`:''}</div>`:`<div class="sec-f" style="padding-top:0">${esc(F.label)}沒有這一項。</div>`}</div>`;
 }
 function openCatSheet(cat){
   const P=stPeriod(),SP=stSpan(P),rows=ledgerTx().filter(r=>r.type===stType&&r.category===cat&&r.date>=SP.from&&r.date<=SP.to).sort(byDateDesc);
@@ -3696,8 +3778,10 @@ document.addEventListener('click',e=>{
   if((el=t.closest('[data-sort-done]'))){sortMode=null;haptic();refreshSettingsTop();renderAll();return;}
   if((el=t.closest('[data-catmgr]'))){catMgrType=el.dataset.catmgr;haptic();refreshSettingsTop();return;}
   if((el=t.closest('[data-cat-open]'))){itemSel=null;openCatSheet(decodeURIComponent(el.dataset.catOpen));return;}
-  if((el=t.closest('[data-item-open]'))){openItemSheet(decodeURIComponent(el.dataset.itemOpen));return;}
-  if((el=t.closest('[data-item-per]'))){if(itemPer===el.dataset.itemPer)return;itemPer=el.dataset.itemPer;haptic();renderItemSheet();return;}
+  if((el=t.closest('[data-item-open]'))){openItemSheet(decodeURIComponent(el.dataset.itemOpen),itemCtxFromStats());return;}
+  if((el=t.closest('[data-item-per]'))){const B=itemBucket(el.dataset.itemPer);if(itemFocus&&!itemFocus.custom&&itemFocus.from===B.from&&itemFocus.to===B.to&&itemFocus.per===B.per)return;setItemFocus(B);return;}
+  if((el=t.closest('[data-item-more]'))){const sc=$('catBody').scrollTop;itemShowN+=150;haptic();renderItemSheet();$('catBody').scrollTop=sc;return;}
+  if((el=t.closest('[data-item-bar]'))){const b=_itemBars[Number(el.dataset.itemBar)];if(!b)return;const f=itemBucket(b.per,b.from);if(itemFocus&&!itemFocus.custom&&itemFocus.from===f.from&&itemFocus.to===f.to)return;setItemFocus(f);return;}
   if((el=t.closest('[data-items-all]'))){itemsAll=!itemsAll;haptic();renderStatsCats();return;}
   if((el=t.closest('[data-st-shift]'))){if(el.disabled)return;const dir=Number(el.dataset.stShift);stOffset+=dir;if(stOffset>0)stOffset=0;stSel=null;haptic();ANIM=true;renderStats();ANIM=false;slideIn($('stMain'),dir);return;}
   if((el=t.closest('[data-st-type]'))){if(stType===el.dataset.stType)return;stType=el.dataset.stType;haptic();ANIM=true;renderStats();ANIM=false;stagger($('statsCats'));return;}
@@ -3987,7 +4071,7 @@ async function nagCalendar(){
 /* 觸覺回饋（iOS 26.5 起只認「手指真的點在包著 switch 的 label 上」）：
    每個可點的元件裡都常駐一個透明 label，裡面包一個隱藏的 <input switch>。手指點下去 → iOS 視為真的切換 switch → 震一下；
    點擊照樣冒泡給按鈕本身；轉發給 switch 的那次點擊在 switch 上就攔下，按鈕不會被觸發兩次。 */
-const HAP_SEL='button,[role="button"],[role="tab"],[role="option"],.tap,.key,.chip,.pill,.cat,.wtile,[data-key],[data-act],[data-go],[data-open],[data-cat-open],[data-item-open],[data-item-per],[data-items-all],[data-edit],[data-del]';
+const HAP_SEL='button,[role="button"],[role="tab"],[role="option"],.tap,.key,.chip,.pill,.cat,.wtile,[data-key],[data-act],[data-go],[data-open],[data-cat-open],[data-item-open],[data-item-per],[data-item-bar],[data-item-more],[data-items-all],[data-edit],[data-del]';
 const HAP_TOUCH=('ontouchstart' in window)||(navigator.maxTouchPoints>0);
 var _hapAt=0;
 function hapOverlay(el){
