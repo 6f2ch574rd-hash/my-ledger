@@ -445,6 +445,23 @@ html[data-nohap] .hap-ov{display:none;}
 .key.fn{background:transparent;box-shadow:none;}
 .key .ico{width:26px;height:26px;stroke-width:1.8;}
 .sumline{padding:0 20px 14px;font-size:.882rem;color:var(--label2);}
+.itiles{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;padding:0 16px 12px;}
+.itile{display:flex;flex-direction:column;align-items:flex-start;gap:2px;min-width:0;padding:11px 14px 12px;border-radius:16px;background:var(--cell);text-align:left;color:var(--label);transition:transform .15s,box-shadow .2s;}
+.itile:active{transform:scale(.96);}
+.itile .l{font-size:.706rem;color:var(--label2);font-weight:600;letter-spacing:.02em;}
+.itile b{font-size:1.12rem;font-weight:650;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%;}
+.itile i{font-style:normal;font-size:.706rem;color:var(--label2);}
+.itile.on{box-shadow:0 0 0 2px var(--accent);}
+.icmp{padding:0 20px 12px;font-size:.824rem;color:var(--label2);line-height:1.5;}
+.icmp b{color:var(--label);font-weight:600;}
+.ibars{display:flex;align-items:flex-end;gap:5px;height:96px;padding:6px 14px 0;margin:0 16px 4px;border-radius:16px;background:var(--cell);}
+.ibars .c{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%;min-width:0;padding-bottom:6px;}
+.ibars .c u{display:block;width:100%;max-width:22px;border-radius:5px 5px 2px 2px;background:color-mix(in srgb,var(--accent) 38%,transparent);min-height:2px;}
+.ibars .c.on u{background:var(--accent);}
+.ibars .c s{text-decoration:none;font-size:.62rem;color:var(--label2);margin-top:4px;white-space:nowrap;}
+.ibars .c.on s{color:var(--label);font-weight:600;}
+.ibars-h{padding:4px 20px 6px;font-size:.765rem;color:var(--label2);}
+
 .sumline b{display:block;font-size:1.65rem;color:var(--label);margin-top:2px;}
 
 /* ============ 動作選單、提示框 ============ */
@@ -2571,7 +2588,76 @@ function renderStatsCatsInner(box){
     <div style="font-size:.765rem;color:var(--label2)">最多的是「${esc(catName(entries[0][0]))}」，占 ${Math.round(entries[0][1]/total*100)}%</div></div>
     <div class="group">${entries.map(([c,v])=>`<button class="row tap" data-cat-open="${encodeURIComponent(c)}" style="--inset:66px">${catIcon(c)}
       <div class="rt"><div class="t">${esc(catName(c))}</div><div class="s">${v/total<0.01?'不到 1':Math.round(v/total*100)}% · ${cnt[c]} 筆</div></div>
-      <span class="amt num">${money(v)}</span>${ICON.chev}</button>`).join('')}</div></div>`;
+      <span class="amt num">${money(v)}</span>${ICON.chev}</button>`).join('')}</div></div>`+itemsSecHTML(rows,SP,spanTxt);
+}
+
+/* =====================================================================
+   重複項目：名稱相同的記錄自動歸成一組（例如每次都記「捷運」）
+   ===================================================================== */
+const itemKey=s=>String(s||'').trim().replace(/\s+/g,' ').toLowerCase();
+const itemOk=r=>!r.synthetic&&!r.payOf&&String(r.name||'').trim()&&String(r.name).trim()!==catName(r.category)&&String(r.name).trim()!==r.category;
+let itemsAll=false,itemSel=null,itemPer='month';
+function itemGroups(rows){
+  const g={};
+  rows.forEach(r=>{if(!itemOk(r))return;const nm=String(r.name).trim(),k=r.type+'|'+itemKey(nm);
+    const x=g[k]||(g[k]={k,type:r.type,n:0,sum:0,cats:{},names:{}});
+    x.n++;x.sum+=r.amount;x.cats[r.category]=(x.cats[r.category]||0)+1;x.names[nm]=(x.names[nm]||0)+1;});
+  const top=o=>Object.entries(o).sort((a,b)=>b[1]-a[1])[0][0];
+  return Object.values(g).filter(x=>x.n>=2).map(x=>Object.assign(x,{cat:top(x.cats),name:top(x.names)})).sort((a,b)=>b.sum-a.sum||b.n-a.n);
+}
+function itemsSecHTML(rows,SP,spanTxt){
+  const gs=itemGroups(rows);if(!gs.length)return '';
+  const show=itemsAll?gs:gs.slice(0,5);
+  return `<div class="sec" id="itemsSec"><div class="sec-h big"><span>重複項目</span>${SP.sel?`<span class="selchip">${spanTxt}</span>`:''}</div>
+    <div class="group">${show.map(x=>`<button class="row tap" data-item-open="${encodeURIComponent(x.k)}" style="--inset:66px">${catIcon(x.cat)}
+      <div class="rt"><div class="t">${esc(x.name)}</div><div class="s">${x.n} 次 · 平均每次 ${money(Math.round(x.sum/x.n))}</div></div>
+      <span class="amt num">${money(x.sum)}</span>${ICON.chev}</button>`).join('')}
+    ${gs.length>5?`<button class="row tap" data-items-all style="justify-content:center;color:var(--accent);font-size:.941rem">${itemsAll?'收起':`顯示全部 ${gs.length} 項`}</button>`:''}</div>
+    <div class="sec-f">名稱相同、出現兩次以上的記錄會自動歸成一組，例如每次都記「捷運」。點進去可以看這週、這個月、今年各花多少。</div></div>`;
+}
+function itemRows(k){return ledgerTx().filter(r=>itemOk(r)&&r.type+'|'+itemKey(r.name)===k);}
+function itemPeriods(){
+  const t=today(),T=parseD(t),ws=weekStart(T),y=T.getFullYear(),m=T.getMonth();
+  const mEnd=(yy,mm)=>ymd(new Date(yy,mm+1,0,12));
+  return {
+    week:{l:'這週',from:ymd(ws),to:t,pl:'上週',pf:ymd(addDays(ws,-7)),pt:ymd(addDays(ws,-1)),ppt:ymd(addDays(ws,-7+((T.getDay()+6)%7)))},
+    month:{l:'這個月',from:ymd(new Date(y,m,1,12)),to:t,pl:'上個月',pf:ymd(new Date(y,m-1,1,12)),pt:mEnd(y,m-1),ppt:ymd(new Date(y,m-1,Math.min(T.getDate(),new Date(y,m,0).getDate()),12))},
+    year:{l:'今年',from:y+'-01-01',to:t,pl:'去年',pf:(y-1)+'-01-01',pt:(y-1)+'-12-31',ppt:(y-1)+t.slice(4)},
+    all:{l:'全部',from:'0000-01-01',to:'9999-12-31'}};
+}
+function itemTrend(rows,per){
+  const T=parseD(today()),out=[];const sum=(f,t)=>rows.filter(r=>r.date>=f&&r.date<=t).reduce((s,r)=>s+r.amount,0);
+  if(per==='week'){const ws=weekStart(T);for(let i=7;i>=0;i--){const a=addDays(ws,-7*i),b=addDays(a,6);out.push({l:i?`${a.getMonth()+1}/${a.getDate()}`:'這週',v:sum(ymd(a),ymd(b)),on:!i});}return {h:'最近 8 週',bars:out};}
+  if(per==='month'){for(let i=11;i>=0;i--){const a=new Date(T.getFullYear(),T.getMonth()-i,1,12),b=new Date(a.getFullYear(),a.getMonth()+1,0,12);out.push({l:(a.getMonth()+1)+'月',v:sum(ymd(a),ymd(b)),on:!i});}return {h:'最近 12 個月',bars:out};}
+  const ys=rows.map(r=>Number(r.date.slice(0,4))),y1=T.getFullYear(),y0=per==='all'?Math.max(Math.min(y1,...ys),y1-7):y1-4;
+  for(let y=y0;y<=y1;y++)out.push({l:String(y),v:sum(y+'-01-01',y+'-12-31'),on:y===y1});
+  return {h:per==='all'?'每年':'最近 5 年',bars:out};
+}
+function openItemSheet(k){itemSel=k;itemPer='month';renderItemSheet();openSheet('catSheet');haptic();}
+function renderItemSheet(){
+  const k=itemSel,all=itemRows(k);if(!all.length){closeSheet('catSheet');return;}
+  const g=itemGroups(all)[0]||{name:all[0].name,cat:all[0].category,type:all[0].type};
+  const PS=itemPeriods(),word=g.type==='income'?'收入':'花費';
+  const sumOf=(f,t)=>{const rs=all.filter(r=>r.date>=f&&r.date<=t);return {v:rs.reduce((s,r)=>s+r.amount,0),n:rs.length,rs};};
+  $('catTitle').textContent=g.name;
+  const tiles=['week','month','year','all'].map(p=>{const x=sumOf(PS[p].from,PS[p].to);
+    return `<button class="itile${itemPer===p?' on':''}" data-item-per="${p}"><span class="l">${PS[p].l}</span><b class="num">${money(x.v)}</b><i>${x.n} 次</i></button>`;}).join('');
+  const P=PS[itemPer],cur=sumOf(P.from,P.to);
+  let cmp='';
+  if(itemPer!=='all'){const pv=sumOf(P.pf,P.ppt).v,full=sumOf(P.pf,P.pt).v;
+    if(pv||cur.v){const d=cur.v-pv;cmp=`${P.pl}同期 ${money(pv)}${d?`，${P.l}${d>0?'多':'少'} <b class="num">${money(Math.abs(d))}</b>`:'，一樣多'}`;}
+    if(full&&P.pt!==P.ppt)cmp+=`${cmp?'　·　':''}${P.pl}整段 ${money(full)}`;}
+  else{const f=all.reduce((a,r)=>r.date<a?r.date:a,'9999'),days=Math.max(1,Math.round((parseD(today())-parseD(f))/864e5)+1);
+    cmp=`從 ${f.replace(/-/g,'/')} 開始共 ${all.length} 次，平均每個月約 <b class="num">${money(Math.round(cur.v/Math.max(1,days/30.44)))}</b>`;}
+  const avg=cur.n?`平均每次 ${money(Math.round(cur.v/cur.n))}`:'';
+  const tr=itemTrend(all,itemPer),mx=Math.max(1,...tr.bars.map(b=>b.v));
+  $('catBody').innerHTML=`<div class="sumline">${esc(catName(g.cat))} · 自動整理名稱「${esc(g.name)}」的${word}</div>
+    <div class="itiles">${tiles}</div>
+    <div class="icmp">${cmp}${cmp&&avg?'　·　':''}${avg}</div>
+    <div class="ibars-h">${tr.h}</div>
+    <div class="ibars" role="img" aria-label="${esc(tr.h)}的${word}">${tr.bars.map(b=>`<div class="c${b.on?' on':''}" title="${esc(b.l)} ${money(b.v)}"><u style="height:${(b.v/mx*100).toFixed(1)}%"></u><s>${esc(b.l)}</s></div>`).join('')}</div>
+    <div class="sec" style="margin-top:14px"><div class="sec-h"><span>${esc(P.l)} · ${cur.n} 筆</span><span class="num">${money(cur.v)}</span></div>
+    ${cur.n?`<div class="group">${cur.rs.sort(byDateDesc).map(r=>txRowHTML(r,{showDate:true})).join('')}</div>`:`<div class="sec-f" style="padding-top:0">${esc(P.l)}還沒有這一項。</div>`}</div>`;
 }
 function openCatSheet(cat){
   const P=stPeriod(),SP=stSpan(P),rows=ledgerTx().filter(r=>r.type===stType&&r.category===cat&&r.date>=SP.from&&r.date<=SP.to).sort(byDateDesc);
@@ -3609,7 +3695,10 @@ document.addEventListener('click',e=>{
   if((el=t.closest('[data-sort]'))){sortMode=el.dataset.sort;closeSwipe();haptic();refreshSettingsTop();return;}
   if((el=t.closest('[data-sort-done]'))){sortMode=null;haptic();refreshSettingsTop();renderAll();return;}
   if((el=t.closest('[data-catmgr]'))){catMgrType=el.dataset.catmgr;haptic();refreshSettingsTop();return;}
-  if((el=t.closest('[data-cat-open]'))){openCatSheet(decodeURIComponent(el.dataset.catOpen));return;}
+  if((el=t.closest('[data-cat-open]'))){itemSel=null;openCatSheet(decodeURIComponent(el.dataset.catOpen));return;}
+  if((el=t.closest('[data-item-open]'))){openItemSheet(decodeURIComponent(el.dataset.itemOpen));return;}
+  if((el=t.closest('[data-item-per]'))){if(itemPer===el.dataset.itemPer)return;itemPer=el.dataset.itemPer;haptic();renderItemSheet();return;}
+  if((el=t.closest('[data-items-all]'))){itemsAll=!itemsAll;haptic();renderStatsCats();return;}
   if((el=t.closest('[data-st-shift]'))){if(el.disabled)return;const dir=Number(el.dataset.stShift);stOffset+=dir;if(stOffset>0)stOffset=0;stSel=null;haptic();ANIM=true;renderStats();ANIM=false;slideIn($('stMain'),dir);return;}
   if((el=t.closest('[data-st-type]'))){if(stType===el.dataset.stType)return;stType=el.dataset.stType;haptic();ANIM=true;renderStats();ANIM=false;stagger($('statsCats'));return;}
   if((el=t.closest('#rangeSeg button'))){if(stRange===el.dataset.v)return;stRange=el.dataset.v;stOffset=0;stSel=null;haptic();ANIM=true;renderStats();ANIM=false;stagger($('statsBody'));return;}
@@ -3898,7 +3987,7 @@ async function nagCalendar(){
 /* 觸覺回饋（iOS 26.5 起只認「手指真的點在包著 switch 的 label 上」）：
    每個可點的元件裡都常駐一個透明 label，裡面包一個隱藏的 <input switch>。手指點下去 → iOS 視為真的切換 switch → 震一下；
    點擊照樣冒泡給按鈕本身；轉發給 switch 的那次點擊在 switch 上就攔下，按鈕不會被觸發兩次。 */
-const HAP_SEL='button,[role="button"],[role="tab"],[role="option"],.tap,.key,.chip,.pill,.cat,.wtile,[data-key],[data-act],[data-go],[data-open],[data-cat-open],[data-edit],[data-del]';
+const HAP_SEL='button,[role="button"],[role="tab"],[role="option"],.tap,.key,.chip,.pill,.cat,.wtile,[data-key],[data-act],[data-go],[data-open],[data-cat-open],[data-item-open],[data-item-per],[data-items-all],[data-edit],[data-del]';
 const HAP_TOUCH=('ontouchstart' in window)||(navigator.maxTouchPoints>0);
 var _hapAt=0;
 function hapOverlay(el){
